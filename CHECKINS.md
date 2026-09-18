@@ -24,6 +24,7 @@ Description of planned DSL:
     - Example: Functions can use mutable variables and conditionals to alter the state of elements
 
 <br>
+
 Example snippets of your DSL that illustrate at least each rich feature, and any interesting interaction between those:
 
 ```
@@ -106,12 +107,14 @@ element Fire is like Energy:
 ```
 
 <br>
+
 What plans have your team made for collaboration (timing of work, communication, meetings/tools used, etc.):
 - Make plans and discuss via Discord
 - Use google forms and polling sites to vote on ideas
 - Conduct in person meetings on Mondays at 2PM
 
 <br>
+
 Note any planned follow-up tasks or features still to design:
 1. Come up with a proper concrete syntax for the language
 2. Plan the modules and provision work:
