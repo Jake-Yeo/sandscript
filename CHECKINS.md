@@ -127,3 +127,62 @@ Note any planned follow-up tasks or features still to design:
 <br>
 TA Notes:
 - Make sure that users are able to code an unbounded number of elements and interactions programatically
+
+<br>
+
+# Check-in 2: 
+Planned division of main responsibilities between team members, considering how to enable working in parallel as much as possible. Consider the following points:
+- Modular design for the software system: what is the input, output of each component? Who is responsible for each component? Do you want to be jointly responsible for some components? 
+    - See below table.
+- What is the data at each interface point? Are there invariants over the data other than the class structure? 
+    - Text, Tokens, AST, Typescript
+- How will you be able to build component X independently? Can you write tests for component X independently of its dependent components?
+    - Split components into individual modules.
+- Who will be responsible for writing which tests, and when (will the same people write the tests as the code)? 
+    - Each person writes tests for their own module. They will write tests after the code.
+- Are there design or other project tasks (possibly including team management), other than these components, that need to be assigned/completed?
+    - Syntax and AST design needs to be flushed out.
+
+Work Split:
+| **Task**                     | **Assigned people** |
+| ---------------------------- | ------------------- |
+| Frontend (UI, orchestration) | Harper              |
+| Tokenization                 | Alyson              |
+| Parsing                      | Alyson              |
+| Interpreter                  | Jake                |
+| Game Builder                 | Stanley, Terence    |
+
+![Workload diagram](./diagrams/workload-diagram.png)
+
+Other Tasks:
+| **Task**                     | **Assigned people** |
+| ---------------------------- | ------------------- |
+| Submit checkins to repo      | Alyson              |
+| Set up repo                  | Harper              |
+| Video Presentation           | Harper              |
+
+
+Roadmap/timeline(s) for what should be done when, and how you will synchronise/check-in with each other to make sure progress is on-track. Talk clearly with your team members about your expectations for communication and progress, and what you will do as a team if someone falls behind.
+- Synchronisation will happen during the weekly meetings on Monday at 2pm. If urgent, check-ins can happen via Discord.
+
+| **Date/time**      | **Item**               |
+|--------------------|------------------------|
+| Sep 25 at 5:00pm   | Project 1 Check-in 2   |
+| Sep 25 at 1:00 pm  | Finalize Language Spec |
+| Sep 27th           | Set up repo            |
+| Sep 28th           | AST Definition         |
+| Sep 28th           | Plan first user study  |
+| Oct 2 at 5:00pm    | Project 1 Check-in 3   |
+| Oct 5              | Plan final user study  |
+| Oct 9 at 5:00pm    | Project 1 Check-in 4   |
+| Oct 16 at 5:00pm   | Project 1 Check-in 5   |
+
+Summary of progress so far:
+- Language specs have been started
+- Timelines have been established
+- Work has been seperated
+- Repo has been set up
+
+TA Notes:
+- Keep it pragmatic and allow for MVP first before adding additional complexity
+- Use interpreter instead of a compiler; Do not directly output typescript code but rather have the interpreter interact with API's
