@@ -1,0 +1,187 @@
+Use indentation like python (tabs only)
+There is no concept of users defining types like plain Python or JS.
+Use kebab-case for names, PascalCase for types and elements
+Use hash symbol for comment - no in line comments(stretch goal)
+
+
+Types
+
+Number
+Can hold any type of number supported by JavaScript / TypeScript, except for NaN, ±Infinity
+
+Boolean
+use 'not' to negate Booleans
+use 'equals' for ==
+use 'less-than' for <
+use 'and' for &&
+use 'or' for ||
+use parentheses () to indicate priority (stretch goal)
+
+Color
+Color(#123456) to define a custom color
+
+Element
+See classes below
+
+Null
+just the 'null' value to represent a lack of something
+all values are truthy, except false and null.
+
+Type (holds one of the above)
+use 'is' to check a type
+
+
+Variable Assignment
+
+use 'let x be y' for variable assignments (functions only)
+e.g. let speed be 10
+
+
+Classes
+
+use element to define a 'class'
+use template-element to define an 'abstract class'
+use 'has x' to define 'class members'
+use 'has x with y' to provide an initial value (element only - will always have value)
+use . notation to access them
+use 'this' to reference the element you are in
+functions always call the parent implementation (e.g. call super() automatically)
+only single inheritance is allowed, nested inheritance is allowed
+
+
+Functions
+
+function <function-name> needs <arg-name> <arg-name> <arg-name> ...:
+   ...
+   give <return value>
+
+Call functions with
+function-name(arg, arg, arg, ...)
+
+functions can only be added to elements (no top level funcs)
+
+variables and args can be type:
+Boolean, Color, Null, Number
+Element
+ElementType
+
+let x be f.type
+if x == “Fire”
+  do something()
+
+if x == Fire <- ElementType
+  do something()
+
+
+Conditionals
+use the following for conditionals
+if <condition>:
+  ...
+else if <condition>:
+  ...
+else:
+  ...
+
+Loops
+
+use 'for-every x in <collection-name>' to iterate through arrays
+e.g. for-every apple in apples
+
+use 'go-through x to y with <var-name>' to iterate through a set of numbers
+e.g. 'go-through 1 to 10 with i' for something like 'for (int i = 1; i <= 10; i++)'
+
+
+Other keywords
+
+use 'do-nothing' to be something like 'pass' from Python (stretch)
+use 'skip-iteration' for 'continue'
+use 'stop-looping' for 'break'
+
+
+Built-in functions
+
+get-all-elements(): returns array of all elements in the game
+convert-to(Element):
+
+
+Examples
+
+# in our actual language Element would be already implemented by the language
+# and cannot be altered
+template-element Element:
+    has position-x with 0
+    has position-y with 0
+    has color
+
+    has function tick
+
+    has function is-there-something-below:
+        let elements be get-all-elements() # probably language-implemented function
+
+        for-every element in elements:
+            if (element.position-y - 1) equals position-y:
+                give true
+
+        give false
+
+template-element Solid is like Element:
+    has function tick:
+        fall()
+
+    has function fall:
+        bool something-is-below = is-there-something-below()
+
+        if not something-is-below:
+            let position-y be position-y - 1
+
+template-element Liquid is like Element:
+    has function tick:
+        flow()
+
+    has function flow needs element
+        # do something with element that makes it flow properly with other liquids here
+        do-nothing
+
+template-element Gas is like Element:
+    has function tick:
+        do-nothing
+
+template-element Energy is like Element:
+    has intensity with 10
+
+    has function tick:
+        if intensity greater-than 0:
+            let intensity be intensity - 1
+        else
+            disappear()
+
+element Water is like Liquid:
+    has color with Color.blue
+
+element Lava is like Liquid:
+    has color with Color.red
+
+element Stone is like Solid:
+    has color with Color.grey
+
+element Ice is like Solid:
+    has color with Color.light-blue
+    has health with 50
+    has melting-speed with 2
+
+    has function tick:
+        parent()
+
+element Fire is like Energy:
+    has color with Color.orange
+
+interaction TNT t with Fire f:
+  t.convert-to(Fire)
+  let new-fire = t
+  for next 50 ticks:
+    new-fire.spread-element()
+
+interaction Ice i with Fire f:
+  let i.health be i.health - i.melting-speed
+  if health equals 0:
+    i.convert-to(Water)
