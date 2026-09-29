@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { CANVAS_DIMS } from '../misc/canvas';
-import type { WorkerRequest } from '../worker/worker';
+import { CANVAS_DIMS } from '../lib/canvas';
+import type { WorkerRequest } from '../lib/gameWorker/worker';
 
 export default function GameRenderer() {
   const workerRef = useRef<Worker | null>(null);

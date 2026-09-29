@@ -1,4 +1,4 @@
-import { CANVAS_DIMS } from '../misc/canvas';
+import { CANVAS_DIMS } from '../canvas';
 import Loop from './loop';
 
 export type WorkerRequest = {

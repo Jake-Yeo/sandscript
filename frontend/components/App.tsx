@@ -1,10 +1,10 @@
-import GameRenderer from './components/GameRenderer';
-import Input from './components/Input';
+import GameRenderer from './GameRenderer';
+import Input from './Input';
 
 function App() {
   return (
     <>
-      <div className="flex">
+      <div className="flex justify-center">
         <GameRenderer />
         <Input />
       </div>
