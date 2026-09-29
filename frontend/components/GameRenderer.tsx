@@ -22,7 +22,7 @@ export default function GameRenderer() {
   }, []);
 
   return (
-    <div className="m-5">
+    <div className="p-5">
       <canvas
         width={CANVAS_DIMS.x}
         height={CANVAS_DIMS.y}

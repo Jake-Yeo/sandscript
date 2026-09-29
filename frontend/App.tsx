@@ -1,9 +1,13 @@
 import GameRenderer from './components/GameRenderer';
+import Input from './components/Input';
 
 function App() {
   return (
     <>
-      <GameRenderer />
+      <div className="flex">
+        <GameRenderer />
+        <Input />
+      </div>
     </>
   );
 }
