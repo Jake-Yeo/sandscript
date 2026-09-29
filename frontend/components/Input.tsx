@@ -1,7 +1,11 @@
+import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
+
 export default function Input() {
   return (
     <div className="p-5">
-      <textarea className="w-[512px] h-[512px] border-2 border-solid" />
+      <Textarea className="w-[512px] h-[512px]" />
+      <Button variant="outline">Submit</Button>
     </div>
   );
 }
