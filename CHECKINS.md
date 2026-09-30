@@ -186,3 +186,55 @@ Summary of progress so far:
 TA Notes:
 - Keep it pragmatic and allow for MVP first before adding additional complexity
 - Use interpreter instead of a compiler; Do not directly output typescript code but rather have the interpreter interact with API's
+
+<br>
+
+# Check-in 3: 
+### Mockup of Concrete Language Design
+
+Explain a mockup of your concrete language design (as used for your first user study), including descriptions of both the syntax and what is meant to happen. Include the example snippets you used in your user study, and their outputs.
+
+- Please refer to `language-spec.txt` and `ast.ts` for examples and language design.
+
+### Notes About Your First User Study
+
+What did they find easy/difficult?
+  - TODO
+
+What did you learn from your user(s)? Is there anything you would have done differently? Can this be done for your final user study?
+  - TODO
+
+### Changes to Language Design
+What changes to your language design have you made so far, or are considering? How does this affect the example snippets you include here?
+
+- Added implicit local type inference while maintaining explicit signatures for function boundaries.
+- This means that local variables do not need their types explicitly declared because their types can be inferred from their assigned values. This change makes the example snippets more concise and readable.
+
+### Project Timeline/Plan
+Any changes to your project timeline/plan that you need to make?
+- No changes needed.
+
+| **Date/time** | **Item** |
+|---|---|
+| Sep 28th | AST Definition |
+| Sep 28th | Plan first user study |
+| Sep 30th | Conduct first user study |
+| Oct 2 at 5:00pm | Project 1 Check-in 3 |
+| Oct 5 | Plan final user study |
+| Oct 9 at 5:00pm | Project 1 Check-in 4 |
+| Oct 16 at 5:00pm | Project 1 Check-in 5 |
+
+### New Tests
+Are there new tests you can write now, based on your current project status? How can your snippets be made into unit tests, and for which component(s)? What about planned error handling in your components? Tests for these?
+
+- Yes, based on our AST and syntax specs, we can write unit tests for the lexer, parser, and AST construction.
+- We can also add error-handling tests for invalid syntax, such as:
+  - Missing indentation
+  - Invalid keywords
+  - Malformed function definitions
+  - Incorrect expressions
+  - Invalid element definitions
+
+### TA Notes
+- Do two users for the user studies.
+- Make sure that we are clear on what the domain is and how the DSL can be used.
