@@ -199,16 +199,19 @@ Explain a mockup of your concrete language design (as used for your first user s
 ### Notes About Your First User Study
 
 What did they find easy/difficult?
-  - TODO
+- Easy: making the class and declaring colors and basic properties
+- Hard: using built in functions and determining the difference between has and let.
 
-What did you learn from your user(s)? Is there anything you would have done differently? Can this be done for your final user study?
-  - TODO
+What did you learn from your user(s)? Is there anything you would have done differently? Can this be done for your final user study? 
+- The main thing is to make the language spec more example based rather than simply saying what features the language has. Users found it tedious and confusing when tasks did not have examples. This can be adjusted for final study.
+
 
 ### Changes to Language Design
 What changes to your language design have you made so far, or are considering? How does this affect the example snippets you include here?
 
 - Added implicit local type inference while maintaining explicit signatures for function boundaries.
-- This means that local variables do not need their types explicitly declared because their types can be inferred from their assigned values. This change makes the example snippets more concise and readable.
+    - This means that local variables do not need their types explicitly declared because their types can be inferred from their assigned values. This change makes the example snippets more concise and readable.
+- Considering simplifying the has and let syntax to account for user confusion.
 
 ### Project Timeline/Plan
 Any changes to your project timeline/plan that you need to make?
