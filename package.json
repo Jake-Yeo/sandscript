@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "fmt": "oxfmt",
     "preview": "vite preview",
-    "generate": "antlr-ng -Dlanguage=TypeScript -visitor -o generated src/grammar/DSL.g4"
+    "generate": "antlr-ng -Dlanguage=TypeScript -visitor -o src/generated src/grammar/DSLLexer.g4 src/grammar/DSLParser.g4"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
