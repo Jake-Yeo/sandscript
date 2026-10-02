@@ -1,6 +1,7 @@
+import LanguageServiceProvider from '@/context/LanguageServiceProvider';
 import MainContextProvider from '../context/MainContextProvider';
 import GameRenderer from './GameRenderer';
-import Input from './Input';
+import InputSection from './InputSection';
 
 function App() {
   return (
@@ -8,7 +9,9 @@ function App() {
       <MainContextProvider>
         <div className="flex justify-center">
           <GameRenderer />
-          <Input />
+          <LanguageServiceProvider>
+            <InputSection />
+          </LanguageServiceProvider>
         </div>
       </MainContextProvider>
     </>
