@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { ReactSetter } from '@/lib/utils';
+import type { ReactSetter } from '@/lib/types';
 
 type LexFunc = (text: string) => void;
 type ParseFunc = (text: string) => void;

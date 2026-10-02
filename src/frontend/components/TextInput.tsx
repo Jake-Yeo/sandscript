@@ -47,7 +47,7 @@ export default function TextInput() {
       <Textarea
         className={cn(
           'w-full h-full resize-none',
-          'text-transparent caret-black', // make text invisible
+          'text-transparent caret-foreground', // make text invisible
         )}
         value={langService.text}
         onChange={(e) => langService.setText(e.target.value)}

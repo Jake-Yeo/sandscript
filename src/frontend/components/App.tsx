@@ -2,6 +2,7 @@ import LanguageServiceProvider from '@/context/LanguageServiceProvider';
 import MainContextProvider from '../context/MainContextProvider';
 import GameRenderer from './GameRenderer';
 import InputSection from './InputSection';
+import ThemeButton from './ThemeButton';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
             <InputSection />
           </LanguageServiceProvider>
         </div>
+        <ThemeButton />
       </MainContextProvider>
     </>
   );

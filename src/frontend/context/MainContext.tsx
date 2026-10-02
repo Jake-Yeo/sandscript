@@ -1,8 +1,11 @@
 import { createContext, useContext } from 'react';
+import type { ReactSetter, Theme } from '@/lib/types';
 import type { Game } from '../../game/game';
 
 export type MainContextType = {
   game: Game | null;
+  theme: Theme;
+  setTheme: ReactSetter<Theme>;
 };
 
 export const MainContext = createContext<MainContextType | undefined>(undefined);
