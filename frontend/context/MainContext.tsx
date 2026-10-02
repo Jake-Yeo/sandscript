@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { Game } from '../../../game/game';
+import type { Game } from '../../game/game';
 
 export type MainContextType = {
   game: Game | null;
