@@ -7,7 +7,7 @@ export default function GameRenderer() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const worker = new Worker(new URL('../worker/worker.ts', import.meta.url), { type: 'module' });
+    const worker = new Worker(new URL('../lib/gameWorker/worker.ts', import.meta.url), { type: 'module' });
     workerRef.current = worker;
 
     if (!canvasRef.current) return;

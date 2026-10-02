@@ -1,4 +1,4 @@
-import MainContextProvider from './context/MainContextProvider';
+import MainContextProvider from '../context/MainContextProvider';
 import GameRenderer from './GameRenderer';
 import Input from './Input';
 

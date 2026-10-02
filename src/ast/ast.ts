@@ -170,7 +170,7 @@ interface DoNothing extends BaseNode {
 
 // ** PROGRAM **
 
-interface Program extends BaseNode {
+export interface Program extends BaseNode {
   type: 'Program';
   elementDefs: ElementDef[];
   interactionDefs: InteractionDef[];
