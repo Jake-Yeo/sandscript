@@ -8,7 +8,7 @@ export default function InputSection() {
   return (
     <div className="p-5">
       <Textarea
-        className="w-[512px] h-[512px] resize-none"
+        className="w-[512px] h-[512px] resize-none font-mono font-medium"
         value={langService.text}
         onChange={(e) => langService.setText(e.target.value)}
       />
