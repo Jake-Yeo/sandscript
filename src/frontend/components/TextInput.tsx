@@ -1,4 +1,5 @@
 import { cn } from 'cn';
+import { useRef } from 'react';
 import { useLanguageServiceContext } from '@/context/LanguageServiceContext';
 import { Textarea } from './ui/textarea';
 
@@ -19,15 +20,30 @@ function handleTab(e: ReactKBEvent) {
 
 export default function TextInput() {
   const langService = useLanguageServiceContext();
+  const highlightRef = useRef<HTMLDivElement | null>(null);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: ReactKBEvent) => {
     if (e.key !== 'Tab') return;
     handleTab(e);
   };
 
+  const handleTextareaScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
+    if (!highlightRef.current) return;
+    highlightRef.current.scrollTop = e.currentTarget.scrollTop;
+    highlightRef.current.scrollLeft = e.currentTarget.scrollLeft;
+  };
+
   return (
     <div className="w-[512px] h-[90vh] font-mono font-medium relative text-sm">
-      <Highlight />
+      <div
+        ref={highlightRef}
+        className={cn(
+          'pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap',
+          'border border-transparent px-2.5 py-2', // match Textarea
+        )}
+      >
+        <span>{langService.text}</span>
+      </div>
       <Textarea
         className={cn(
           'w-full h-full resize-none',
@@ -36,22 +52,11 @@ export default function TextInput() {
         value={langService.text}
         onChange={(e) => langService.setText(e.target.value)}
         onKeyDown={handleKeyDown}
+        onScroll={handleTextareaScroll}
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck="false"
       />
-    </div>
-  );
-}
-
-function Highlight() {
-  const langService = useLanguageServiceContext();
-
-  return (
-    <div
-      className={cn(
-        'pointer-events-none absolute inset-0 whitespace-pre-wrap',
-        'border border-transparent px-2.5 py-2', // match Textarea
-      )}
-    >
-      <span>{langService.text}</span>
     </div>
   );
 }
