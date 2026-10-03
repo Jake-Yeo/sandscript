@@ -24,7 +24,7 @@ export class Lexer implements TokenSource {
             return this.pendingTokens.shift()!;
         }
 
-        const token = this.lexer.nextToken();
+        let token = this.lexer.nextToken();
 
         if (token.type === Token.EOF) {
             this.handleEOF(token);
@@ -36,78 +36,80 @@ export class Lexer implements TokenSource {
             return token;
         }
 
-        if (token.type === DSLLexer.NEWLINE) {
-            this.atBeginningOfLine = true;
+        if (this.atBeginningOfLine) {
+            if (token.type === DSLLexer.NEWLINE) {
+                return token;
+            }
+
+            let indentation = 0;
+
+            while (token.type === DSLLexer.TAB) {
+                indentation++;
+                token = this.lexer.nextToken();
+
+                if (token.type === Token.EOF) {
+                    this.handleEOF(token);
+
+                    if (this.pendingTokens.length > 0) {
+                        return this.pendingTokens.shift()!;
+                    }
+
+                    return token;
+                }
+            }
+
+            const currentIndentation =
+                this.indentationStack[this.indentationStack.length - 1];
+
+            if (indentation > currentIndentation) {
+                this.indentationStack.push(indentation);
+                this.pendingTokens.push(
+                    this.createIndentToken(token),
+                );
+            } else if (indentation < currentIndentation) {
+                while (
+                    this.indentationStack.length > 1 &&
+                    indentation <
+                    this.indentationStack[
+                    this.indentationStack.length - 1
+                    ]
+                ) {
+                    this.indentationStack.pop();
+                    this.pendingTokens.push(
+                        this.createDedentToken(token),
+                    );
+                }
+
+                const expectedIndentation =
+                    this.indentationStack[
+                    this.indentationStack.length - 1
+                    ];
+
+                if (indentation !== expectedIndentation) {
+                    throw new Error(
+                        `Invalid indentation on line ${token.line}. ` +
+                        `Expected indentation level ` +
+                        `${expectedIndentation}, ` +
+                        `but found ${indentation}.`,
+                    );
+                }
+            }
+
+            this.atBeginningOfLine = false;
+
+            if (this.pendingTokens.length > 0) {
+                this.pendingTokens.push(token);
+                return this.pendingTokens.shift()!;
+            }
+
             return token;
         }
 
-        if (this.atBeginningOfLine) {
-            this.processBeginningOfLine(token);
-        }
-
-        if (this.pendingTokens.length > 0) {
-            this.pendingTokens.push(token);
-            return this.pendingTokens.shift()!;
+        if (token.type === DSLLexer.NEWLINE) {
+            this.atBeginningOfLine = true;
         }
 
         return token;
-    }
-
-    private processBeginningOfLine(token: Token): void {
-        let indentation = 0;
-
-        while (token.type === DSLLexer.TAB) {
-            indentation++;
-
-            token = this.lexer.nextToken();
-
-            if (token.type === Token.EOF) {
-                this.handleEOF(token);
-                return;
-            }
-        }
-
-        const currentIndentation =
-            this.indentationStack[this.indentationStack.length - 1];
-
-        if (indentation > currentIndentation) {
-            this.indentationStack.push(indentation);
-
-            this.pendingTokens.push(
-                this.createIndentToken(token),
-            );
-        } else if (indentation < currentIndentation) {
-            while (
-                this.indentationStack.length > 1 &&
-                indentation <
-                this.indentationStack[
-                this.indentationStack.length - 1
-                ]
-            ) {
-                this.indentationStack.pop();
-
-                this.pendingTokens.push(
-                    this.createDedentToken(token),
-                );
-            }
-
-            const expectedIndentation =
-                this.indentationStack[
-                this.indentationStack.length - 1
-                ];
-
-            if (indentation !== expectedIndentation) {
-                throw new Error(
-                    `Invalid indentation on line ${token.line}. ` +
-                    `Expected indentation level ` +
-                    `${expectedIndentation}, ` +
-                    `but found ${indentation}.`,
-                );
-            }
-        }
-
-        this.atBeginningOfLine = false;
-        this.pendingTokens.push(token);
     }
 
     private handleEOF(eofToken: Token): void {

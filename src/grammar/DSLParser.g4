@@ -17,7 +17,7 @@ elementDefinition:
 
 elementKeyword: ELEMENT | TEMPLATE_ELEMENT;
 
-elementParent: IS LIKE identifier;
+elementParent: IS LIKE typeOrIdentifier;
 
 elementMember:
 	elementVariableDefinition
@@ -137,6 +137,8 @@ generalIdentifier: identifier memberAccess*;
 memberAccess: DOT identifier;
 
 identifier: IDENTIFIER;
+
+typeOrIdentifier: identifier | typeLiteral;
 
 // LITERALS
 

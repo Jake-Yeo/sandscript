@@ -75,7 +75,7 @@ HEX_COLOR:
 
 // IDENTIFIERS
 
-IDENTIFIER: LOWERCASE (LETTER_OR_DIGIT_OR_HYPHEN)*;
+IDENTIFIER: LETTER (LETTER_OR_DIGIT_OR_HYPHEN)*;
 
 // OPERATORS
 
@@ -115,5 +115,7 @@ fragment DIGIT: [0-9];
 fragment HEX_DIGIT: [0-9a-fA-F];
 
 fragment LOWERCASE: [a-z];
+
+fragment LETTER: [a-zA-Z];
 
 fragment LETTER_OR_DIGIT_OR_HYPHEN: [a-zA-Z0-9-];

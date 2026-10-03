@@ -42,6 +42,7 @@ import { ArgumentListContext } from "./DSLParser.js";
 import { GeneralIdentifierContext } from "./DSLParser.js";
 import { MemberAccessContext } from "./DSLParser.js";
 import { IdentifierContext } from "./DSLParser.js";
+import { TypeOrIdentifierContext } from "./DSLParser.js";
 import { LiteralContext } from "./DSLParser.js";
 import { TypeLiteralContext } from "./DSLParser.js";
 import { ElementTypeLiteralContext } from "./DSLParser.js";
@@ -452,6 +453,16 @@ export class DSLParserListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitIdentifier?: (ctx: IdentifierContext) => void;
+    /**
+     * Enter a parse tree produced by `DSLParser.typeOrIdentifier`.
+     * @param ctx the parse tree
+     */
+    enterTypeOrIdentifier?: (ctx: TypeOrIdentifierContext) => void;
+    /**
+     * Exit a parse tree produced by `DSLParser.typeOrIdentifier`.
+     * @param ctx the parse tree
+     */
+    exitTypeOrIdentifier?: (ctx: TypeOrIdentifierContext) => void;
     /**
      * Enter a parse tree produced by `DSLParser.literal`.
      * @param ctx the parse tree
