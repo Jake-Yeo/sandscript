@@ -1,43 +1,53 @@
-import { CANVAS_DIMS } from '../canvas';
+import { Game } from '../FAKEGAME';
+import type { Location } from '../types';
+import { drawGame } from './draw';
 import Loop from './loop';
 
-export type WorkerRequest = {
+export type GameWorkerRequest = CanvasRequest | NewGameRequest | SpawnRequest;
+export type CanvasRequest = {
+  type: 'canvas';
   canvas: OffscreenCanvas;
 };
-export type WorkerResponse = null;
+export type NewGameRequest = {
+  type: 'game';
+};
+export type SpawnRequest = {
+  type: 'spawn';
+  location: Location;
+  elementName: string;
+};
+export type GameWorkerResponse = null;
 
 let loop: Loop = new Loop();
+let game: Game | null = null;
 
-function drawPixel(ctx: OffscreenCanvasRenderingContext2D, x: number, y: number) {
-  ctx.fillRect(x, y, 1, 1);
-}
+self.onmessage = (event: MessageEvent<GameWorkerRequest>) => {
+  const data = event.data;
+  if (data.type === 'canvas') handleGameWorkerRequest(data);
+  if (data.type === 'game') handleNewGameRequest();
+  if (data.type === 'spawn') handleSpawnRequest(data);
+};
 
-function paint(ctx: OffscreenCanvasRenderingContext2D, tick: number) {
-  const mod5 = tick % 5;
-
-  ctx.clearRect(0, 0, CANVAS_DIMS.x, CANVAS_DIMS.y);
-
-  ctx.fillStyle = 'rgb(255, 100, 0)';
-  for (let x = 0; x < CANVAS_DIMS.x; x++) {
-    for (let y = 0; y < CANVAS_DIMS.y; y++) {
-      if (x % 5 == mod5 && y % 5 == mod5) drawPixel(ctx, x, y);
-    }
-  }
-}
-
-self.onmessage = (event: MessageEvent<WorkerRequest>) => {
-  const canvas = event.data.canvas;
+function handleGameWorkerRequest(req: CanvasRequest) {
+  const canvas = req.canvas;
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  loop.callback = (tick: number) => {
-    paint(ctx, tick);
+  loop.callback = () => {
+    if (!game) return;
+    game.step();
+    drawGame(ctx, game);
   };
   loop.start();
+}
 
-  // Expensive work
-  //   const result = numbers.reduce((sum, n) => sum + n, 0);
-  //
-  //   self.postMessage(result);
-};
+function handleNewGameRequest() {
+  game = new Game();
+}
+
+function handleSpawnRequest(req: SpawnRequest) {
+  if (!game) return;
+  game.spawn(req.elementName, req.location.x, req.location.y);
+  console.log('kljdshfgsa');
+}

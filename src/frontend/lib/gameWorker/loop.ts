@@ -1,18 +1,14 @@
 const TICKS_PER_SECOND = 30;
 
 export default class Loop {
-  callback: (tick: number) => void = () => {};
+  callback: () => void = () => {};
 
-  private tick: number = 0;
   private intervalId: number | null = null;
 
   start() {
     if (this.intervalId !== null) return;
     this.intervalId = setInterval(
-      () => {
-        this.callback(this.tick);
-        this.tick++;
-      },
+      this.callback,
       (1 / TICKS_PER_SECOND) * 1000,
     );
   }
@@ -21,6 +17,5 @@ export default class Loop {
     if (this.intervalId === null) return;
     clearInterval(this.intervalId);
     this.intervalId = null;
-    this.tick = 0;
   }
 }
