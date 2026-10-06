@@ -199,16 +199,19 @@ Explain a mockup of your concrete language design (as used for your first user s
 ### Notes About Your First User Study
 
 What did they find easy/difficult?
-  - TODO
+- Easy: making the class and declaring colors and basic properties
+- Hard: using built in functions and determining the difference between has and let.
 
-What did you learn from your user(s)? Is there anything you would have done differently? Can this be done for your final user study?
-  - TODO
+What did you learn from your user(s)? Is there anything you would have done differently? Can this be done for your final user study? 
+- The main thing is to make the language spec more example based rather than simply saying what features the language has. Users found it tedious and confusing when tasks did not have examples. This can be adjusted for final study.
+
 
 ### Changes to Language Design
 What changes to your language design have you made so far, or are considering? How does this affect the example snippets you include here?
 
 - Added implicit local type inference while maintaining explicit signatures for function boundaries.
-- This means that local variables do not need their types explicitly declared because their types can be inferred from their assigned values. This change makes the example snippets more concise and readable.
+    - This means that local variables do not need their types explicitly declared because their types can be inferred from their assigned values. This change makes the example snippets more concise and readable.
+- Considering simplifying the has and let syntax to account for user confusion.
 
 ### Project Timeline/Plan
 Any changes to your project timeline/plan that you need to make?
@@ -238,3 +241,50 @@ Are there new tests you can write now, based on your current project status? How
 ### TA Notes
 - Do two users for the user studies.
 - Make sure that we are clear on what the domain is and how the DSL can be used.
+
+# Check-in 4:
+## Status of Implementation
+
+### Component-wise Progress
+
+* Grammar is written.
+* Parser and Lexer interfaces are written.
+  * Tests are in progress.
+* Frontend background and input box are written.
+
+### Which Tests Are Passing, and Which Are Not?
+
+* Frontend has no tests.
+* Existing parser tests are passing.
+
+### Which Extra Tests Still Need to Be Written/Made?
+
+* All tests for the lexer and additional tests for the parser.
+* All tests for non-implemented components.
+
+## Plans for Final User Study
+
+### Are There Any Major Differences From the Previous One? If So, What Are the Reasons?
+
+* Make users aware that there is no need for self-references (issues in first user study).
+* Use the frontend (newly implemented).
+
+### Make Sure to Find Suitable Users (Different From the First Study!)
+
+* Harper to find someone.
+* Terence to find someone.
+
+## Planned Timeline for the Remaining Days
+
+| Date/Time        | Item                                   |
+| ---------------- | -------------------------------------- |
+| Oct 5            | Plan final user study                  |
+| Oct 5            | Finalize game state spec               |
+| Oct 16           | Game builder & interpreter implemented |
+| Oct 16 at 5:00pm | Final User Study (2 participants)      |
+| Oct 16 at 5:00pm | Project 1 Check-in 5                   |
+| Oct 18           | Integration and E2E testing            |
+| Oct 19           | All bugs and integration issues fixed  |
+| Oct 20 at 5:00pm | Project Submission                     |
+
+* Ensure error handling is working.
