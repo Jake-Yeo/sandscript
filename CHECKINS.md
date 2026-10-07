@@ -252,6 +252,11 @@ Are there new tests you can write now, based on your current project status? How
   * Tests are in progress.
 * Frontend background and input box are written.
 
+### Todo
+We need to write tests and implement CompiledGame, GameEngine, and Evaluator
+We have the interfaces between them mostly defined
+Lastly, we need to chain up everything together: the Frontend, Game Engine, and Parser
+
 ### Which Tests Are Passing, and Which Are Not?
 
 * Frontend has no tests.
