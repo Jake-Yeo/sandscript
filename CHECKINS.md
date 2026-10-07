@@ -293,3 +293,5 @@ Lastly, we need to chain up everything together: the Frontend, Game Engine, and 
 | Oct 20 at 5:00pm | Project Submission                     |
 
 * Ensure error handling is working.
+
+## TA Notes: make sure that the physics engine works - doesn’t need to be super sophisticated.
