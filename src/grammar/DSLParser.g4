@@ -6,18 +6,18 @@ options {
 
 // PROGRAM
 
-program: NEWLINE* topLevelStatment* EOF;
+program: NEWLINE* topLevelStatement* EOF;
 
-topLevelStatment: elementDefinition | interactionDefinition;
+topLevelStatement: elementDefinition | interactionDefinition;
 
 // ELEMENT DEFINITIONS
 
 elementDefinition:
-	elementKeyword identifier elementParent? COLON NEWLINE INDENT elementMember* DEDENT;
+	elementKeyword pascalIdentifier elementParent? COLON NEWLINE INDENT elementMember* DEDENT;
 
 elementKeyword: ELEMENT | TEMPLATE_ELEMENT;
 
-elementParent: IS LIKE typeOrIdentifier;
+elementParent: IS LIKE typeReference;
 
 elementMember:
 	elementVariableDefinition
@@ -33,15 +33,13 @@ elementFunctionDefinition:
 
 functionParameters: NEEDS parameter+;
 
-parameter: identifier declaredType?;
-
-declaredType: typeLiteral | elementTypeLiteral;
+parameter: identifier typeReference?;
 
 // INTERACTIONS
 
 interactionDefinition:
-	INTERACTION identifier identifier WITH identifier identifier COLON NEWLINE INDENT statement*
-		DEDENT;
+	INTERACTION pascalIdentifier identifier WITH pascalIdentifier identifier COLON NEWLINE INDENT
+		statement* DEDENT;
 
 // STATEMENTS
 
@@ -51,7 +49,6 @@ statement:
 	| conditional
 	| collectionBasedLoop
 	| rangeBasedLoop
-	| nextTicksLoop
 	| skipIteration
 	| stopLooping
 	| doNothing
@@ -61,7 +58,7 @@ variableAssignment: LET generalIdentifier BE expression NEWLINE;
 
 giveStatement: GIVE expression NEWLINE;
 
-expressionStatement: expression NEWLINE;
+expressionStatement: functionCall NEWLINE;
 
 // CONDITIONALS
 
@@ -80,9 +77,6 @@ collectionBasedLoop:
 
 rangeBasedLoop:
 	GO_THROUGH expression TO expression WITH identifier COLON NEWLINE INDENT statement* DEDENT;
-
-nextTicksLoop:
-	FOR NEXT expression TICKS COLON NEWLINE INDENT statement* DEDENT;
 
 // SIMPLE CONTROL STATEMENTS
 
@@ -104,6 +98,7 @@ booleanAndExpression:
 
 booleanComparison:
 	arithmeticExpression comparisonOperator arithmeticExpression
+	| arithmeticExpression IS typeReference
 	| arithmeticExpression;
 
 comparisonOperator: EQUALS | LESS_THAN | GREATER_THAN;
@@ -116,12 +111,16 @@ arithmeticExpression:
 multiplicationExpression:
 	unaryExpression ((MULTIPLY | DIVIDE) unaryExpression)*;
 
-unaryExpression: NOT unaryExpression | primaryExpression;
+unaryExpression:
+	NOT unaryExpression
+	| MINUS unaryExpression
+	| primaryExpression;
 
 primaryExpression:
 	literal
 	| functionCall
 	| generalIdentifier
+	| elementTypeReference
 	| LPAREN expression RPAREN;
 
 // FUNCTION CALLS
@@ -138,17 +137,11 @@ memberAccess: DOT identifier;
 
 identifier: IDENTIFIER;
 
-typeOrIdentifier: identifier | typeLiteral;
+pascalIdentifier: PASCAL_IDENTIFIER;
 
 // LITERALS
 
-literal:
-	NUMBER
-	| BOOLEAN
-	| COLOR
-	| NULL
-	| typeLiteral
-	| elementTypeLiteral;
+literal: NUMBER | BOOLEAN | COLOR | NULL;
 
 typeLiteral:
 	NUMBER_TYPE
@@ -159,4 +152,6 @@ typeLiteral:
 	| NULL_TYPE
 	| TYPE_TYPE;
 
-elementTypeLiteral: identifier;
+elementTypeReference: pascalIdentifier;
+
+typeReference: typeLiteral | elementTypeReference;

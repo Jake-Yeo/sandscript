@@ -3,7 +3,7 @@ import { ErrorNode, ParseTreeListener, ParserRuleContext, TerminalNode } from "a
 
 
 import { ProgramContext } from "./DSLParser.js";
-import { TopLevelStatmentContext } from "./DSLParser.js";
+import { TopLevelStatementContext } from "./DSLParser.js";
 import { ElementDefinitionContext } from "./DSLParser.js";
 import { ElementKeywordContext } from "./DSLParser.js";
 import { ElementParentContext } from "./DSLParser.js";
@@ -13,7 +13,6 @@ import { ElementInitialValueContext } from "./DSLParser.js";
 import { ElementFunctionDefinitionContext } from "./DSLParser.js";
 import { FunctionParametersContext } from "./DSLParser.js";
 import { ParameterContext } from "./DSLParser.js";
-import { DeclaredTypeContext } from "./DSLParser.js";
 import { InteractionDefinitionContext } from "./DSLParser.js";
 import { StatementContext } from "./DSLParser.js";
 import { VariableAssignmentContext } from "./DSLParser.js";
@@ -24,7 +23,6 @@ import { ElseIfClauseContext } from "./DSLParser.js";
 import { ElseClauseContext } from "./DSLParser.js";
 import { CollectionBasedLoopContext } from "./DSLParser.js";
 import { RangeBasedLoopContext } from "./DSLParser.js";
-import { NextTicksLoopContext } from "./DSLParser.js";
 import { SkipIterationContext } from "./DSLParser.js";
 import { StopLoopingContext } from "./DSLParser.js";
 import { DoNothingContext } from "./DSLParser.js";
@@ -42,10 +40,11 @@ import { ArgumentListContext } from "./DSLParser.js";
 import { GeneralIdentifierContext } from "./DSLParser.js";
 import { MemberAccessContext } from "./DSLParser.js";
 import { IdentifierContext } from "./DSLParser.js";
-import { TypeOrIdentifierContext } from "./DSLParser.js";
+import { PascalIdentifierContext } from "./DSLParser.js";
 import { LiteralContext } from "./DSLParser.js";
 import { TypeLiteralContext } from "./DSLParser.js";
-import { ElementTypeLiteralContext } from "./DSLParser.js";
+import { ElementTypeReferenceContext } from "./DSLParser.js";
+import { TypeReferenceContext } from "./DSLParser.js";
 
 
 /**
@@ -64,15 +63,15 @@ export class DSLParserListener implements ParseTreeListener {
      */
     exitProgram?: (ctx: ProgramContext) => void;
     /**
-     * Enter a parse tree produced by `DSLParser.topLevelStatment`.
+     * Enter a parse tree produced by `DSLParser.topLevelStatement`.
      * @param ctx the parse tree
      */
-    enterTopLevelStatment?: (ctx: TopLevelStatmentContext) => void;
+    enterTopLevelStatement?: (ctx: TopLevelStatementContext) => void;
     /**
-     * Exit a parse tree produced by `DSLParser.topLevelStatment`.
+     * Exit a parse tree produced by `DSLParser.topLevelStatement`.
      * @param ctx the parse tree
      */
-    exitTopLevelStatment?: (ctx: TopLevelStatmentContext) => void;
+    exitTopLevelStatement?: (ctx: TopLevelStatementContext) => void;
     /**
      * Enter a parse tree produced by `DSLParser.elementDefinition`.
      * @param ctx the parse tree
@@ -163,16 +162,6 @@ export class DSLParserListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitParameter?: (ctx: ParameterContext) => void;
-    /**
-     * Enter a parse tree produced by `DSLParser.declaredType`.
-     * @param ctx the parse tree
-     */
-    enterDeclaredType?: (ctx: DeclaredTypeContext) => void;
-    /**
-     * Exit a parse tree produced by `DSLParser.declaredType`.
-     * @param ctx the parse tree
-     */
-    exitDeclaredType?: (ctx: DeclaredTypeContext) => void;
     /**
      * Enter a parse tree produced by `DSLParser.interactionDefinition`.
      * @param ctx the parse tree
@@ -273,16 +262,6 @@ export class DSLParserListener implements ParseTreeListener {
      * @param ctx the parse tree
      */
     exitRangeBasedLoop?: (ctx: RangeBasedLoopContext) => void;
-    /**
-     * Enter a parse tree produced by `DSLParser.nextTicksLoop`.
-     * @param ctx the parse tree
-     */
-    enterNextTicksLoop?: (ctx: NextTicksLoopContext) => void;
-    /**
-     * Exit a parse tree produced by `DSLParser.nextTicksLoop`.
-     * @param ctx the parse tree
-     */
-    exitNextTicksLoop?: (ctx: NextTicksLoopContext) => void;
     /**
      * Enter a parse tree produced by `DSLParser.skipIteration`.
      * @param ctx the parse tree
@@ -454,15 +433,15 @@ export class DSLParserListener implements ParseTreeListener {
      */
     exitIdentifier?: (ctx: IdentifierContext) => void;
     /**
-     * Enter a parse tree produced by `DSLParser.typeOrIdentifier`.
+     * Enter a parse tree produced by `DSLParser.pascalIdentifier`.
      * @param ctx the parse tree
      */
-    enterTypeOrIdentifier?: (ctx: TypeOrIdentifierContext) => void;
+    enterPascalIdentifier?: (ctx: PascalIdentifierContext) => void;
     /**
-     * Exit a parse tree produced by `DSLParser.typeOrIdentifier`.
+     * Exit a parse tree produced by `DSLParser.pascalIdentifier`.
      * @param ctx the parse tree
      */
-    exitTypeOrIdentifier?: (ctx: TypeOrIdentifierContext) => void;
+    exitPascalIdentifier?: (ctx: PascalIdentifierContext) => void;
     /**
      * Enter a parse tree produced by `DSLParser.literal`.
      * @param ctx the parse tree
@@ -484,15 +463,25 @@ export class DSLParserListener implements ParseTreeListener {
      */
     exitTypeLiteral?: (ctx: TypeLiteralContext) => void;
     /**
-     * Enter a parse tree produced by `DSLParser.elementTypeLiteral`.
+     * Enter a parse tree produced by `DSLParser.elementTypeReference`.
      * @param ctx the parse tree
      */
-    enterElementTypeLiteral?: (ctx: ElementTypeLiteralContext) => void;
+    enterElementTypeReference?: (ctx: ElementTypeReferenceContext) => void;
     /**
-     * Exit a parse tree produced by `DSLParser.elementTypeLiteral`.
+     * Exit a parse tree produced by `DSLParser.elementTypeReference`.
      * @param ctx the parse tree
      */
-    exitElementTypeLiteral?: (ctx: ElementTypeLiteralContext) => void;
+    exitElementTypeReference?: (ctx: ElementTypeReferenceContext) => void;
+    /**
+     * Enter a parse tree produced by `DSLParser.typeReference`.
+     * @param ctx the parse tree
+     */
+    enterTypeReference?: (ctx: TypeReferenceContext) => void;
+    /**
+     * Exit a parse tree produced by `DSLParser.typeReference`.
+     * @param ctx the parse tree
+     */
+    exitTypeReference?: (ctx: TypeReferenceContext) => void;
 
     visitTerminal(node: TerminalNode): void {}
     visitErrorNode(node: ErrorNode): void {}
