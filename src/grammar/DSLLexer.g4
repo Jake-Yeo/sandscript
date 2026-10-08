@@ -101,7 +101,7 @@ COMMENT: '#' ~[\r\n]* -> skip;
 
 // WHITESPACE
 
-SPACE: [ ]+ -> skip;
+SPACE: [ ]+;
 
 TAB: '\t';
 

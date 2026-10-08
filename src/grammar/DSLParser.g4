@@ -58,7 +58,7 @@ variableAssignment: LET generalIdentifier BE expression NEWLINE;
 
 giveStatement: GIVE expression NEWLINE;
 
-expressionStatement: expression NEWLINE;
+expressionStatement: functionCall NEWLINE;
 
 // CONDITIONALS
 

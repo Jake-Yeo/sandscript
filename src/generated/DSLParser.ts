@@ -498,7 +498,7 @@ export class DSLParser extends antlr.Parser {
             this.state = 152;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 24340480) !== 0) || ((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 4287) !== 0)) {
+            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
                 this.state = 149;
@@ -626,7 +626,7 @@ export class DSLParser extends antlr.Parser {
             this.state = 179;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 24340480) !== 0) || ((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 4287) !== 0)) {
+            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
                 this.state = 176;
@@ -717,15 +717,7 @@ export class DSLParser extends antlr.Parser {
                 this.doNothing();
                 }
                 break;
-            case DSLParser.NOT:
-            case DSLParser.BOOLEAN:
-            case DSLParser.NULL:
-            case DSLParser.COLOR:
-            case DSLParser.NUMBER:
-            case DSLParser.PASCAL_IDENTIFIER:
             case DSLParser.IDENTIFIER:
-            case DSLParser.MINUS:
-            case DSLParser.LPAREN:
                 this.enterOuterAlt(localContext, 9);
                 {
                 this.state = 192;
@@ -814,7 +806,7 @@ export class DSLParser extends antlr.Parser {
             this.enterOuterAlt(localContext, 1);
             {
             this.state = 205;
-            this.expression();
+            this.functionCall();
             this.state = 206;
             this.match(DSLParser.NEWLINE);
             }
@@ -853,7 +845,7 @@ export class DSLParser extends antlr.Parser {
             this.state = 216;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 24340480) !== 0) || ((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 4287) !== 0)) {
+            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
                 this.state = 213;
@@ -929,7 +921,7 @@ export class DSLParser extends antlr.Parser {
             this.state = 238;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 24340480) !== 0) || ((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 4287) !== 0)) {
+            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
                 this.state = 235;
@@ -975,7 +967,7 @@ export class DSLParser extends antlr.Parser {
             this.state = 250;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 24340480) !== 0) || ((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 4287) !== 0)) {
+            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
                 this.state = 247;
@@ -1027,7 +1019,7 @@ export class DSLParser extends antlr.Parser {
             this.state = 265;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 24340480) !== 0) || ((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 4287) !== 0)) {
+            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
                 this.state = 262;
@@ -1083,7 +1075,7 @@ export class DSLParser extends antlr.Parser {
             this.state = 282;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
-            while ((((_la) & ~0x1F) === 0 && ((1 << _la) & 24340480) !== 0) || ((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 4287) !== 0)) {
+            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
                 this.state = 279;
@@ -1979,7 +1971,7 @@ export class DSLParser extends antlr.Parser {
         190,1,0,0,0,193,191,1,0,0,0,193,192,1,0,0,0,194,25,1,0,0,0,195,196,
         5,11,0,0,196,197,3,70,35,0,197,198,5,12,0,0,198,199,3,48,24,0,199,
         200,5,52,0,0,200,27,1,0,0,0,201,202,5,13,0,0,202,203,3,48,24,0,203,
-        204,5,52,0,0,204,29,1,0,0,0,205,206,3,48,24,0,206,207,5,52,0,0,207,
+        204,5,52,0,0,204,29,1,0,0,0,205,206,3,66,33,0,206,207,5,52,0,0,207,
         31,1,0,0,0,208,209,5,14,0,0,209,210,3,48,24,0,210,211,5,51,0,0,211,
         212,5,52,0,0,212,216,5,1,0,0,213,215,3,24,12,0,214,213,1,0,0,0,215,
         218,1,0,0,0,216,214,1,0,0,0,216,217,1,0,0,0,217,219,1,0,0,0,218,
@@ -2605,8 +2597,8 @@ export class ExpressionStatementContext extends antlr.ParserRuleContext {
     public constructor(parent: antlr.ParserRuleContext | null, invokingState: number) {
         super(parent, invokingState);
     }
-    public expression(): ExpressionContext {
-        return this.getRuleContext(0, ExpressionContext)!;
+    public functionCall(): FunctionCallContext {
+        return this.getRuleContext(0, FunctionCallContext)!;
     }
     public NEWLINE(): antlr.TerminalNode {
         return this.getToken(DSLParser.NEWLINE, 0)!;
