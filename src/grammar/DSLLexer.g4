@@ -31,10 +31,6 @@ GO_THROUGH: 'go-through';
 IN: 'in';
 TO: 'to';
 
-FOR: 'for';
-NEXT: 'next';
-TICKS: 'ticks';
-
 SKIP_ITERATION: 'skip-iteration';
 STOP_LOOPING: 'stop-looping';
 DO_NOTHING: 'do-nothing';
@@ -70,15 +66,16 @@ COLOR: 'Color' LPAREN HEX_COLOR RPAREN;
 
 NUMBER: DIGIT+ ('.' DIGIT+)?;
 
-HEX_COLOR:
-	'#' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
-
 // IDENTIFIERS
 
-IDENTIFIER: LETTER (LETTER_OR_DIGIT_OR_HYPHEN)*;
+PASCAL_IDENTIFIER: UPPERCASE (LETTER_OR_DIGIT)*;
+
+IDENTIFIER:
+	LOWERCASE (LOWERCASE | DIGIT)* (
+		UNDERSCORE LOWERCASE (LOWERCASE | DIGIT)*
+	)*;
 
 // OPERATORS
-
 PLUS: '+';
 MINUS: '-';
 MULTIPLY: '*';
@@ -116,6 +113,11 @@ fragment HEX_DIGIT: [0-9a-fA-F];
 
 fragment LOWERCASE: [a-z];
 
-fragment LETTER: [a-zA-Z];
+fragment UPPERCASE: [A-Z];
 
-fragment LETTER_OR_DIGIT_OR_HYPHEN: [a-zA-Z0-9-];
+fragment LETTER_OR_DIGIT: [a-zA-Z0-9];
+
+fragment UNDERSCORE: '_';
+
+fragment HEX_COLOR:
+	'#' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
