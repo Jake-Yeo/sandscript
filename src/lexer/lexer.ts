@@ -37,10 +37,6 @@ export class Lexer implements TokenSource {
         }
 
         if (this.atBeginningOfLine) {
-            if (token.type === DSLLexer.NEWLINE) {
-                return token;
-            }
-
             let indentation = 0;
 
             while (token.type === DSLLexer.TAB) {
@@ -56,6 +52,10 @@ export class Lexer implements TokenSource {
 
                     return token;
                 }
+            }
+
+            if (token.type === DSLLexer.NEWLINE) {
+                return this.nextToken();
             }
 
             const currentIndentation =
