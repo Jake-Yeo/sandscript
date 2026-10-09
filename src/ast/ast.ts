@@ -8,9 +8,7 @@ export type Literal =
   | NumberLiteral
   | BooleanLiteral
   | ColorLiteral
-  | NullLiteral
-  | TypeLiteral
-  | ElementTypeLiteral;
+  | NullLiteral;
 
 export interface NumberLiteral extends BaseNode {
   type: 'NumberLiteral';
@@ -60,10 +58,13 @@ export type GeneralIdentifier = Identifier | MemberAccess;
 
 export type Expression =
   | Literal
+  | ElementTypeLiteral
   | GeneralIdentifier
   | ArithmeticExpression
   | BooleanExpression
-  | FunctionCall;
+  | FunctionCall
+  | UnaryMinusExpression
+  | TypeCheckExpression;
 
 export interface ArithmeticExpression extends BaseNode {
   type: 'ArithmeticExpression';
@@ -90,6 +91,17 @@ export interface ExpressionStatement extends BaseNode {
   expression: Expression;
 }
 
+export interface UnaryMinusExpression extends BaseNode {
+  type: 'UnaryMinusExpression';
+  value: Expression;
+}
+
+export interface TypeCheckExpression extends BaseNode {
+  type: 'TypeCheckExpression';
+  value: Expression;
+  checkedType: TypeLiteral | ElementTypeLiteral;
+}
+
 export interface FunctionCall extends BaseNode {
   type: 'FunctionCall';
   callee: GeneralIdentifier;
@@ -105,7 +117,6 @@ export type Statement =
   | Conditional
   | CollectionBasedLoop
   | RangeBasedLoop
-  | NextTicksLoop
   | SkipIteration
   | StopLooping
   | DoNothing;
@@ -146,13 +157,6 @@ export interface RangeBasedLoop extends BaseNode {
   iteratorVar: Identifier;
   start: Expression;
   end: Expression;
-  statements: Statement[];
-}
-
-export interface NextTicksLoop extends BaseNode {
-  type: 'NextTicksLoop';
-  iteratorVar: Identifier;
-  ticks: Expression;
   statements: Statement[];
 }
 

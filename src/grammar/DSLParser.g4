@@ -17,7 +17,7 @@ elementDefinition:
 
 elementKeyword: ELEMENT | TEMPLATE_ELEMENT;
 
-elementParent: IS LIKE typeReference;
+elementParent: IS LIKE (ELEMENT_TYPE | pascalIdentifier);
 
 elementMember:
 	elementVariableDefinition
