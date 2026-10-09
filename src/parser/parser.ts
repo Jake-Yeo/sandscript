@@ -1,4 +1,4 @@
-import { CommonTokenStream, RecognitionException, Recognizer, Token, type ANTLRErrorListener } from 'antlr4ng';
+import { CommonTokenStream, type ANTLRErrorListener } from 'antlr4ng';
 
 import { DSLParser } from '../generated/DSLParser';
 import { Lexer } from '../lexer/lexer';
@@ -37,7 +37,15 @@ export class Parser {
     }
 
     parse() {
-        return this.parser.program();
+        const tree = this.parser.program();
+
+        if (this.errors.length > 0) {
+            throw new Error(
+                `Parsing failed:\n${this.errors.join('\n')}`,
+            );
+        }
+
+        return tree;
     }
 
     getErrors(): string[] {

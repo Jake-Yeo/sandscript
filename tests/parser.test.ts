@@ -339,8 +339,7 @@ has color
 `;
 
         const parser = new Parser(source);
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -352,8 +351,7 @@ has color
 `;
 
         const parser = new Parser(source);
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -367,8 +365,7 @@ has color
 `;
 
         const parser = new Parser(source);
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -384,8 +381,7 @@ has color
 `;
 
         const parser = new Parser(source);
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -400,8 +396,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -416,8 +411,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -432,8 +426,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -450,8 +443,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -468,8 +460,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -484,8 +475,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -500,8 +490,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -518,8 +507,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -536,8 +524,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -552,8 +539,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -566,8 +552,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -582,8 +567,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -596,8 +580,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -612,8 +595,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -628,8 +610,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -647,8 +628,7 @@ has color
 
         const parser = new Parser(source);
 
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -727,8 +707,7 @@ has color
 `;
 
         const parser = new Parser(source);
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -743,8 +722,7 @@ has color
 `;
 
         const parser = new Parser(source);
-        parser.parse();
-
+        expect(() => parser.parse()).toThrow();
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -758,8 +736,38 @@ has color
 `;
 
         const parser = new Parser(source);
-        parser.parse();
+        expect(() => parser.parse()).toThrow();
+        expect(parser.getErrors().length).toBeGreaterThan(0);
+    });
 
+    test('accepts a valid program', () => {
+        const parser = new Parser(
+            'element Water:\n\thas color with Color(#123456)\n',
+        );
+
+        expect(() => parser.parse()).not.toThrow();
+        expect(parser.getErrors()).toEqual([]);
+    });
+
+    test('rejects an invalid element definition', () => {
+        const parser = new Parser(
+            'element Water\n',
+        );
+
+        expect(() => parser.parse()).toThrow(
+            'Parsing failed:',
+        );
+        expect(parser.getErrors().length).toBeGreaterThan(0);
+    });
+
+    test('rejects an invalid expression', () => {
+        const parser = new Parser(
+            'element Water:\n\thas function tick:\n\t\tlet speed be 1 +\n',
+        );
+
+        expect(() => parser.parse()).toThrow(
+            'Parsing failed:',
+        );
         expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 });
