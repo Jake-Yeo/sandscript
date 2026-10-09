@@ -1,0 +1,628 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import type { ElementVarDef, Expression, Identifier, InteractionDef } from '../src/ast/ast.ts';
+import type {
+  CompiledElement,
+  CompiledGame,
+  Completion,
+  ElementId,
+  EvalContext,
+  Evaluator,
+  RuntimeHost,
+  RuntimeValue,
+} from '../src/game/contracts.ts';
+import { createEngine, DEFAULT_COLOR, INSTRUCTION_LIMIT } from '../src/game/game.ts';
+
+const identifier = (value: string): Identifier => ({ type: 'Identifier', value });
+const number = (value: number): Expression => ({ type: 'NumberLiteral', value });
+const color = (value: string): Expression => ({ type: 'Color', value });
+const field = (name: string, value: Expression | null): ElementVarDef => ({
+  type: 'ElementVarDef',
+  varName: identifier(name),
+  value,
+});
+const element = (
+  name: string,
+  fields: ElementVarDef[] = [],
+  abstract = false,
+): CompiledElement => ({
+  name,
+  abstract,
+  fieldInitializers: fields,
+  methods: new Map(),
+});
+const rule = (a: string, b: string): InteractionDef => ({
+  type: 'InteractionDef',
+  element1: identifier(a),
+  element2: identifier(b),
+  element1Binding: identifier('a'),
+  element2Binding: identifier('b'),
+  statements: [],
+});
+const refId = (value: RuntimeValue | undefined): number => {
+  assert(value && typeof value === 'object' && 'kind' in value && value.kind === 'element-ref');
+  return value.id;
+};
+
+// A's fixture is already resolved; B's double delegates behavior to per-test hooks.
+// This deliberately does not implement parsing, inheritance resolution or DSL execution.
+function harness(
+  types: CompiledElement[] = [element('Stone', [field('color', color('#888888'))])],
+  interactions: InteractionDef[] = [],
+  hooks: {
+    expression?: (node: Expression, ctx: EvalContext) => RuntimeValue;
+    tick?: (id: ElementId, ctx: EvalContext) => void;
+    interaction?: (ctx: EvalContext, index: number) => Completion;
+  } = {},
+  width = 6,
+  height = 6,
+) {
+  let host: RuntimeHost | undefined;
+  const ticks: number[] = [];
+  let interactionCount = 0;
+  const game: CompiledGame = {
+    elements: new Map(types.map((type) => [type.name, type])),
+    interactions,
+  };
+  const evaluator: Evaluator = {
+    evaluateExpression(node, ctx) {
+      host = ctx.host;
+      assert.equal(ctx.locals.size, 0);
+      ctx.host.consumeInstruction();
+      if (hooks.expression) return hooks.expression(node, ctx);
+      switch (node.type) {
+        case 'Color':
+          return { kind: 'color', hex: node.value };
+        case 'NumberLiteral':
+        case 'BooleanLiteral':
+          return node.value;
+        case 'Null':
+          return null;
+        case 'Identifier':
+          return ctx.host.readField(ctx.self!, node.value);
+        default:
+          throw new Error(`Unsupported fixture expression ${node.type}`);
+      }
+    },
+    callMethod(id, name, args, ctx) {
+      host = ctx.host;
+      assert.equal(name, 'tick');
+      assert.deepEqual(args, []);
+      assert.equal(ctx.self, id);
+      assert.equal(ctx.locals.size, 0);
+      ticks.push(id);
+      hooks.tick?.(id, ctx);
+      return null;
+    },
+    executeStatements(_nodes, ctx) {
+      host = ctx.host;
+      assert.equal(ctx.self, null);
+      return hooks.interaction?.(ctx, interactionCount++) ?? { kind: 'normal' };
+    },
+  };
+  const engine = createEngine(game, { width, height }, evaluator);
+  return {
+    engine,
+    ticks,
+    evaluator,
+    game,
+    host: () => {
+      assert(host);
+      return host;
+    },
+  };
+}
+
+test('dimensions must be positive safe integers', () => {
+  const h = harness();
+  for (const value of [0, -1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+    assert.throws(() => createEngine(h.game, { width: value, height: 3 }, h.evaluator));
+    assert.throws(() => createEngine(h.game, { width: 3, height: value }, h.evaluator));
+  }
+});
+
+test('placement validates definitions, coordinates and occupied cells', () => {
+  const h = harness([element('Template', [], true), element('Stone')]);
+  assert.deepEqual(h.engine.availableElements(), ['Stone']);
+  assert.throws(() => h.engine.place('Template', 0, 0), /Template/);
+  assert.throws(() => h.engine.place('Unknown', 0, 0), /Unknown/);
+  for (const [x, y] of [
+    [-1, 0],
+    [0, 6],
+    [6, 0],
+    [0.5, 0],
+    [0, NaN],
+  ]) {
+    assert.throws(() => h.engine.place('Stone', x, y));
+  }
+  const id = h.engine.place('Stone', 1, 2);
+  assert.throws(() => h.engine.place('Stone', 1, 2), /occupied/);
+  assert.deepEqual(h.engine.snapshot().elements, [
+    { id, elementType: 'Stone', x: 1, y: 2, color: DEFAULT_COLOR },
+  ]);
+});
+
+test('defaults register all fields first and run parent-first only once', () => {
+  let evaluations = 0;
+  const h = harness(
+    [
+      element('Stone', [
+        field('color', color('#123456')),
+        field('health', number(3)),
+        field('health', number(8)),
+        field('copy', identifier('health')),
+        field('unset', null),
+        field('position-x', number(100)),
+        field('position-y', number(100)),
+        field('type', number(100)),
+      ]),
+    ],
+    [],
+    {
+      expression(node, ctx) {
+        evaluations++;
+        assert(ctx.host.hasField(ctx.self!, 'unset'));
+        assert.equal(ctx.host.readField(ctx.self!, 'position-x'), 2);
+        assert.equal(ctx.host.readField(ctx.self!, 'position-y'), 3);
+        if (node.type === 'Color') return { kind: 'color', hex: node.value };
+        if (node.type === 'NumberLiteral') return node.value;
+        if (node.type === 'Identifier') return ctx.host.readField(ctx.self!, node.value);
+        throw new Error('Unexpected default');
+      },
+    },
+  );
+  const id = h.engine.place('Stone', 2, 3);
+  assert.equal(evaluations, 4);
+  assert.equal(h.host().readField(id, 'health'), 8);
+  assert.equal(h.host().readField(id, 'copy'), 8);
+  assert.equal(h.host().readField(id, 'unset'), null);
+  h.engine.step();
+  assert.equal(evaluations, 4);
+  assert.equal(h.engine.snapshot().elements[0].x, 2);
+  assert.equal(h.engine.snapshot().elements[0].y, 3);
+});
+
+test('coordinate writes during default evaluation preserve the requested position', () => {
+  const h = harness(undefined, [], {
+    expression(_node, ctx) {
+      ctx.host.writeField(ctx.self!, 'position-x', 4);
+      return { kind: 'color', hex: '#123456' };
+    },
+  });
+  h.engine.place('Stone', 1, 1);
+  assert.equal(h.engine.snapshot().elements[0].x, 1);
+  assert.equal(h.host().invokeBuiltin('get-element-at', null, [4, 1]), null);
+});
+
+test('movement keeps grid occupancy consistent and blocks occupied/out-of-bounds cells', () => {
+  const h = harness();
+  const id = h.engine.place('Stone', 1, 1);
+  h.engine.place('Stone', 2, 1);
+  const host = h.host();
+  host.writeField(id, 'position-x', 2);
+  host.writeField(id, 'position-y', -1);
+  assert.equal(host.readField(id, 'position-x'), 1);
+  assert.equal(host.readField(id, 'position-y'), 1);
+  host.writeField(id, 'position-y', 2);
+  assert.equal(host.invokeBuiltin('get-element-at', null, [1, 1]), null);
+  assert.deepEqual(host.invokeBuiltin('get-element-at', null, [1, 2]), { kind: 'element-ref', id });
+  assert.throws(() => host.writeField(id, 'position-y', 0.5), /integer/);
+  host.writeField(id, 'position-y', 2);
+  assert.equal(host.readField(id, 'position-y'), 2);
+});
+
+test('unknown fields and writes to type fail; declared state is mutable', () => {
+  const h = harness([element('Stone', [field('health', number(3))])]);
+  const id = h.engine.place('Stone', 0, 0);
+  assert(h.host().hasField(id, 'color'));
+  assert(h.host().hasField(id, 'type'));
+  assert(!h.host().hasField(id, 'missing'));
+  assert.deepEqual(h.host().readField(id, 'type'), { kind: 'element-type', name: 'Stone' });
+  assert.throws(() => h.host().readField(id, 'missing'), /Unknown field/);
+  assert.throws(() => h.host().writeField(id, 'missing', 1), /Unknown field/);
+  assert.throws(() => h.host().writeField(id, 'type', null), /read-only/);
+  h.host().writeField(id, 'health', 2);
+  assert.equal(h.host().readField(id, 'health'), 2);
+});
+
+test('built-ins validate receivers, argument counts and coordinates', () => {
+  const h = harness();
+  const id = h.engine.place('Stone', 0, 0);
+  const host = h.host();
+  for (const name of ['convert-to', 'disappear', 'spread-element'] as const) {
+    assert.throws(() => host.invokeBuiltin(name, null, []), /receiver/);
+  }
+  for (const name of ['get-all-elements', 'get-element-at'] as const) {
+    assert.throws(() => host.invokeBuiltin(name, id, []), /receiver/);
+  }
+  assert.throws(() => host.invokeBuiltin('get-all-elements', null, [0]), /arguments/);
+  assert.throws(() => host.invokeBuiltin('get-element-at', null, [0]), /arguments/);
+  assert.throws(() => host.invokeBuiltin('get-element-at', null, [0.1, 0]), /integer/);
+  assert.throws(() => host.invokeBuiltin('get-element-at', null, [Infinity, 0]), /integer/);
+  assert.throws(() => host.invokeBuiltin('convert-to', id, [1]), /element-type/);
+  assert.throws(() => host.invokeBuiltin('disappear', id, [1]), /arguments/);
+  assert.equal(host.invokeBuiltin('get-element-at', null, [-1, 0]), null);
+  assert.equal(host.invokeBuiltin('get-element-at', null, [6, 0]), null);
+  assert.equal(host.invokeBuiltin('get-element-at', null, [5, 5]), null);
+});
+
+test('get-all-elements returns a detached snapshot of live references in ID order', () => {
+  const h = harness();
+  const first = h.engine.place('Stone', 0, 0);
+  const references = h.host().invokeBuiltin('get-all-elements', null, []) as RuntimeValue[];
+  const second = h.engine.place('Stone', 1, 0);
+  assert.deepEqual(references, [{ kind: 'element-ref', id: first }]);
+  references.length = 0;
+  assert.deepEqual(h.host().invokeBuiltin('get-all-elements', null, []), [
+    { kind: 'element-ref', id: first },
+    { kind: 'element-ref', id: second },
+  ]);
+});
+
+test('conversion preserves ID/position and replaces old fields with target defaults', () => {
+  const h = harness([
+    element('Ice', [field('health', number(3)), field('color', color('#aaddff'))]),
+    element('Water', [field('color', color('#0000ff')), field('speed', number(2))]),
+    element('Template', [], true),
+  ]);
+  const id = h.engine.place('Ice', 2, 3);
+  const value = { kind: 'element-type', name: 'Water' } as const;
+  assert.equal(h.host().invokeBuiltin('convert-to', id, [value]), null);
+  assert.equal(h.host().getElementType(id), 'Water');
+  assert(!h.host().hasField(id, 'health'));
+  assert.equal(h.host().readField(id, 'speed'), 2);
+  assert.deepEqual(h.engine.snapshot().elements, [
+    { id, elementType: 'Water', x: 2, y: 3, color: '#0000ff' },
+  ]);
+  for (const name of ['Template', 'Unknown']) {
+    assert.throws(() => h.host().invokeBuiltin('convert-to', id, [{ kind: 'element-type', name }]));
+    assert.equal(h.host().getElementType(id), 'Water');
+  }
+});
+
+test('failed defaults free placement and preserve the old instance on failed conversion', () => {
+  const h = harness([
+    element('Good', [field('health', number(3))]),
+    element('Bad', [field('health', identifier('missing'))]),
+  ]);
+  assert.throws(() => h.engine.place('Bad', 0, 0), /Unknown field/);
+  assert.equal(h.engine.snapshot().elements.length, 0);
+  const id = h.engine.place('Good', 0, 0);
+  assert.throws(
+    () => h.host().invokeBuiltin('convert-to', id, [{ kind: 'element-type', name: 'Bad' }]),
+    /Unknown field/,
+  );
+  assert.equal(h.host().getElementType(id), 'Good');
+  assert.equal(h.host().readField(id, 'health'), 3);
+  assert.equal(refId(h.host().invokeBuiltin('get-element-at', null, [0, 0])), id);
+});
+
+test('erase/disappear free cells and deleted IDs are never reused', () => {
+  const h = harness();
+  const first = h.engine.place('Stone', 0, 0);
+  h.engine.erase(0, 0);
+  h.engine.erase(0, 0);
+  h.engine.erase(-1, 0);
+  assert.throws(() => h.engine.erase(0.5, 0), /integer/);
+  const second = h.engine.place('Stone', 0, 0);
+  assert(second > first);
+  assert.equal(h.host().invokeBuiltin('disappear', second, []), null);
+  for (const id of [first, second]) {
+    assert.throws(() => h.host().getElementType(id), /deleted/);
+    assert.throws(() => h.host().hasField(id, 'color'), /deleted/);
+    assert.throws(() => h.host().readField(id, 'color'), /deleted/);
+    assert.throws(() => h.host().writeField(id, 'color', null), /deleted/);
+    assert.throws(() => h.host().invokeBuiltin('disappear', id, []), /deleted/);
+    assert.throws(() => h.host().invokeBuiltin('spread-element', id, []), /deleted/);
+    assert.throws(
+      () => h.host().invokeBuiltin('convert-to', id, [{ kind: 'element-type', name: 'Stone' }]),
+      /deleted/,
+    );
+  }
+  assert.equal(h.engine.snapshot().elements.length, 0);
+});
+
+test('spreading fills only empty orthogonal neighbors with independent defaults', () => {
+  const h = harness([
+    element('Fire', [field('health', number(3)), field('color', color('#ff6600'))]),
+  ]);
+  const source = h.engine.place('Fire', 1, 1);
+  h.engine.place('Fire', 2, 1);
+  h.host().writeField(source, 'health', 1);
+  h.host().invokeBuiltin('spread-element', source, []);
+  assert.equal(h.engine.snapshot().elements.length, 5);
+  assert.equal(h.host().invokeBuiltin('get-element-at', null, [0, 0]), null);
+  for (const [x, y] of [
+    [1, 0],
+    [1, 2],
+    [0, 1],
+  ]) {
+    const id = refId(h.host().invokeBuiltin('get-element-at', null, [x, y]));
+    assert.equal(h.host().readField(id, 'health'), 3);
+  }
+  h.host().invokeBuiltin('spread-element', source, []);
+  assert.equal(h.engine.snapshot().elements.length, 5);
+  const edge = h.engine.place('Fire', 0, 0);
+  h.host().invokeBuiltin('spread-element', edge, []);
+  assert.equal(h.engine.snapshot().elements.length, 6);
+});
+
+test('snapshots and runtime values cannot mutate engine state', () => {
+  const h = harness([element('Stone', [field('color', color('#123456')), field('items', null)])]);
+  const id = h.engine.place('Stone', 1, 1);
+  const before = h.engine.snapshot();
+  before.elements[0].x = 5;
+  before.elements[0].color = '#ffffff';
+  const items: RuntimeValue[] = [{ kind: 'color', hex: '#abcdef' }];
+  h.host().writeField(id, 'items', items);
+  items.length = 0;
+  const read = h.host().readField(id, 'items') as RuntimeValue[];
+  read.length = 0;
+  assert.deepEqual(h.host().readField(id, 'items'), [{ kind: 'color', hex: '#abcdef' }]);
+  const picker = h.engine.availableElements() as string[];
+  picker.length = 0;
+  assert.deepEqual(h.engine.availableElements(), ['Stone']);
+  assert.equal(h.engine.snapshot().tick, 0);
+  assert.deepEqual(h.engine.snapshot().elements, [
+    { id, elementType: 'Stone', x: 1, y: 1, color: '#123456' },
+  ]);
+});
+
+test('rejects nonfinite state and invalid colors without altering existing state', () => {
+  const h = harness([
+    element('Stone', [field('color', color('#123456')), field('health', number(3))]),
+  ]);
+  const id = h.engine.place('Stone', 0, 0);
+  for (const value of [NaN, Infinity, -Infinity]) {
+    assert.throws(() => h.host().writeField(id, 'health', value), /finite/);
+  }
+  for (const value of [3, { kind: 'color', hex: 'red' }] as RuntimeValue[]) {
+    assert.throws(() => h.host().writeField(id, 'color', value));
+  }
+  assert.equal(h.host().readField(id, 'health'), 3);
+  assert.equal(h.engine.snapshot().elements[0].color, '#123456');
+});
+
+test('ticks run by frozen ascending IDs; new instances first tick next step', () => {
+  let source = 0;
+  const h = harness(undefined, [], {
+    tick(id, ctx) {
+      if (id === source) ctx.host.invokeBuiltin('spread-element', id, []);
+    },
+  });
+  source = h.engine.place('Stone', 1, 1);
+  assert.equal(h.engine.step().tick, 1);
+  assert.deepEqual(h.ticks, [source]);
+  assert.equal(h.engine.snapshot().elements.length, 5);
+  h.engine.step();
+  assert.deepEqual(h.ticks, [source, ...h.engine.snapshot().elements.map((view) => view.id)]);
+});
+
+test('elements deleted before their turn are skipped and conversion ticks only once', () => {
+  let second = 0;
+  let first = 0;
+  const h = harness([element('Stone'), element('Water')], [], {
+    tick(id, ctx) {
+      if (id === first) {
+        ctx.host.invokeBuiltin('disappear', second, []);
+        ctx.host.invokeBuiltin('convert-to', first, [{ kind: 'element-type', name: 'Water' }]);
+      }
+    },
+  });
+  first = h.engine.place('Stone', 0, 0);
+  second = h.engine.place('Stone', 1, 0);
+  assert.equal(h.engine.step().tick, 1);
+  assert.deepEqual(h.ticks, [first]);
+  assert.equal(h.engine.snapshot().elements[0].elementType, 'Water');
+});
+
+test('stub falling behavior advances downward and respects the floor', () => {
+  const h = harness(
+    undefined,
+    [],
+    {
+      tick(id, ctx) {
+        const y = ctx.host.readField(id, 'position-y') as number;
+        ctx.host.writeField(id, 'position-y', y + 1);
+      },
+    },
+    3,
+    3,
+  );
+  h.engine.place('Stone', 1, 0);
+  assert.equal(h.engine.step().elements[0].y, 1);
+  assert.equal(h.engine.step().elements[0].y, 2);
+  assert.equal(h.engine.step().elements[0].y, 2);
+});
+
+test('interactions bind types regardless of ID/spatial order and melt Ice into Water', () => {
+  const seen: number[][] = [];
+  const h = harness(
+    [element('Ice', [field('health', number(2))]), element('Fire'), element('Water')],
+    [rule('Ice', 'Fire')],
+    {
+      interaction(ctx) {
+        const ice = refId(ctx.locals.get('a'));
+        const fire = refId(ctx.locals.get('b'));
+        seen.push([ice, fire]);
+        const health = ctx.host.readField(ice, 'health') as number;
+        ctx.host.writeField(ice, 'health', health - 1);
+        if (health === 1)
+          ctx.host.invokeBuiltin('convert-to', ice, [{ kind: 'element-type', name: 'Water' }]);
+        return { kind: 'normal' };
+      },
+    },
+  );
+  const fire = h.engine.place('Fire', 1, 0);
+  const ice = h.engine.place('Ice', 1, 1);
+  h.engine.step();
+  assert.equal(h.host().readField(ice, 'health'), 1);
+  h.engine.step();
+  assert.equal(h.host().getElementType(ice), 'Water');
+  h.engine.step();
+  assert.deepEqual(seen, [
+    [ice, fire],
+    [ice, fire],
+  ]);
+});
+
+test('same-type pairs run once and diagonals do not match', () => {
+  let count = 0;
+  const h = harness(undefined, [rule('Stone', 'Stone')], {
+    interaction() {
+      count++;
+      return { kind: 'normal' };
+    },
+  });
+  h.engine.place('Stone', 0, 0);
+  h.engine.place('Stone', 1, 0);
+  h.engine.place('Stone', 2, 1);
+  h.engine.step();
+  assert.equal(count, 1);
+});
+
+test('interaction rules run in source order with current types rechecked after conversion', () => {
+  const seen: string[] = [];
+  const h = harness(
+    [element('Ice'), element('Fire'), element('Water')],
+    [rule('Ice', 'Fire'), rule('Ice', 'Fire'), rule('Water', 'Fire')],
+    {
+      interaction(ctx) {
+        const id = refId(ctx.locals.get('a'));
+        const type = ctx.host.getElementType(id);
+        seen.push(type);
+        if (type === 'Ice')
+          ctx.host.invokeBuiltin('convert-to', id, [{ kind: 'element-type', name: 'Water' }]);
+        return { kind: 'return', value: 42 };
+      },
+    },
+  );
+  h.engine.place('Ice', 0, 0);
+  h.engine.place('Fire', 1, 0);
+  h.engine.step();
+  assert.deepEqual(seen, ['Ice', 'Water']);
+});
+
+test('movement/removal in interactions invalidates remaining rules and stale pairs', () => {
+  for (const action of ['move', 'remove']) {
+    let count = 0;
+    const h = harness(undefined, [rule('Stone', 'Stone'), rule('Stone', 'Stone')], {
+      interaction(ctx) {
+        count++;
+        const id = refId(ctx.locals.get('a'));
+        if (action === 'move') ctx.host.writeField(id, 'position-y', 3);
+        else ctx.host.invokeBuiltin('disappear', id, []);
+        return { kind: 'normal' };
+      },
+    });
+    h.engine.place('Stone', 1, 1);
+    h.engine.place('Stone', 1, 0);
+    h.engine.place('Stone', 0, 1);
+    h.engine.step();
+    assert.equal(count, 1);
+  }
+});
+
+test('new pairs created by interactions wait for the next step', () => {
+  let count = 0;
+  const h = harness(undefined, [rule('Stone', 'Stone')], {
+    interaction(ctx) {
+      count++;
+      ctx.host.invokeBuiltin('spread-element', refId(ctx.locals.get('a')), []);
+      return { kind: 'normal' };
+    },
+  });
+  h.engine.place('Stone', 1, 1);
+  h.engine.place('Stone', 1, 0);
+  h.engine.step();
+  assert.equal(count, 1);
+  h.engine.step();
+  assert(count > 1);
+});
+
+test('interactions see pairs formed by ticks', () => {
+  let count = 0;
+  const h = harness(undefined, [rule('Stone', 'Stone')], {
+    tick(id, ctx) {
+      if (ctx.host.readField(id, 'position-x') === 0) ctx.host.writeField(id, 'position-x', 1);
+    },
+    interaction() {
+      count++;
+      return { kind: 'normal' };
+    },
+  });
+  h.engine.place('Stone', 0, 0);
+  h.engine.place('Stone', 2, 0);
+  h.engine.step();
+  assert.equal(count, 1);
+});
+
+test('break and continue escaping an interaction are errors without advancing time', () => {
+  for (const kind of ['break', 'continue'] as const) {
+    const h = harness(undefined, [rule('Stone', 'Stone')], { interaction: () => ({ kind }) });
+    h.engine.place('Stone', 0, 0);
+    h.engine.place('Stone', 1, 0);
+    assert.throws(() => h.engine.step(), new RegExp(`Stray ${kind}`));
+    assert.equal(h.engine.snapshot().tick, 0);
+  }
+});
+
+test('instruction limit interrupts ticks and resets on the next public operation', () => {
+  let exhaust = true;
+  const h = harness(undefined, [], {
+    tick(_id, ctx) {
+      if (exhaust) for (let i = 0; i <= INSTRUCTION_LIMIT; i++) ctx.host.consumeInstruction();
+    },
+  });
+  h.engine.place('Stone', 0, 0);
+  assert.throws(() => h.engine.step(), /Instruction limit/);
+  assert.equal(h.engine.snapshot().tick, 0);
+  exhaust = false;
+  h.engine.place('Stone', 1, 0);
+  assert.equal(h.engine.step().tick, 1);
+});
+
+test('instruction limit also covers defaults and failed placement cleans up', () => {
+  let exhaust = true;
+  const h = harness(undefined, [], {
+    expression(_node, ctx) {
+      if (exhaust) for (let i = 0; i <= INSTRUCTION_LIMIT; i++) ctx.host.consumeInstruction();
+      return { kind: 'color', hex: '#123456' };
+    },
+  });
+  assert.throws(() => h.engine.place('Stone', 0, 0), /Instruction limit/);
+  assert.equal(h.engine.snapshot().elements.length, 0);
+  exhaust = false;
+  h.engine.place('Stone', 0, 0);
+  assert.equal(h.engine.snapshot().elements.length, 1);
+});
+
+test('initializers cannot remove or convert their own partially initialized instance', () => {
+  for (const name of ['disappear', 'convert-to'] as const) {
+    const h = harness(undefined, [], {
+      expression(_node, ctx) {
+        return ctx.host.invokeBuiltin(
+          name,
+          ctx.self,
+          name === 'convert-to' ? [{ kind: 'element-type', name: 'Stone' }] : [],
+        );
+      },
+    });
+    assert.throws(() => h.engine.place('Stone', 0, 0), /during its defaults/);
+    assert.equal(h.engine.snapshot().elements.length, 0);
+  }
+});
+
+test('errors propagate and operation guards release for subsequent work', () => {
+  let fail = true;
+  const h = harness(undefined, [], {
+    tick() {
+      if (fail) throw new Error('DSL failure');
+    },
+  });
+  h.engine.place('Stone', 0, 0);
+  assert.throws(() => h.engine.step(), /DSL failure/);
+  assert.equal(h.engine.snapshot().tick, 0);
+  fail = false;
+  assert.equal(h.engine.step().tick, 1);
+});
