@@ -3,7 +3,7 @@ const TICKS_PER_SECOND = 30;
 export default class Loop {
   callback: () => void = () => {};
 
-  private intervalId: number | null = null;
+  private intervalId: ReturnType<typeof setInterval> | null = null;
 
   start() {
     if (this.intervalId !== null) return;

@@ -1,9 +1,9 @@
 import { createContext, useContext } from 'react';
 import type { ReactSetter, Theme } from '@/lib/types';
-import type { Game } from '../../game/game';
+import type { GameEngine } from '../../game/contracts';
 
 export type MainContextType = {
-  game: Game | null;
+  game: GameEngine | null;
   theme: Theme;
   setTheme: ReactSetter<Theme>;
 };
