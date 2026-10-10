@@ -6,6 +6,8 @@ import { useLanguageServiceContext } from '@/context/LanguageServiceContext';
 import { Textarea } from './ui/textarea';
 import { getTokenColor } from '@/lib/token-utils';
 import { useMainContext } from '@/context/MainContext';
+import { ArrowRightToLine } from 'lucide-react';
+import { DSLLexer } from '../../generated/DSLLexer';
 
 type ReactKBEvent = React.KeyboardEvent<HTMLTextAreaElement>;
 
@@ -68,9 +70,15 @@ export default function TextInput() {
 
 function TokenDisplay({ token }: { token: Token }) {
   const mainContext = useMainContext();
+  const isTab = token.type === DSLLexer.TAB;
+
   return (
-    <span style={{ color: getTokenColor(token.type, mainContext.theme) }} >
+    <span
+      className='relative'
+      style={{ color: getTokenColor(token.type, mainContext.theme) }}
+    >
       {token.text}
+      {isTab && <ArrowRightToLine className="absolute inset-0 m-auto size-3 opacity-50" />}
     </span>
-  )
+  );
 }
