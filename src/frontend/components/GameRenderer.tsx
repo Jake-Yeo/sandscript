@@ -1,21 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
 import { CANVAS_DIMS } from '../lib/canvas';
 import type {
-  CanvasRequest,
   EraseRequest,
-  NewGameRequest,
-  NewGameResponse,
   SpawnRequest,
 } from '../lib/gameWorker/worker';
 import type { Location } from '../lib/types';
-import { Button } from './ui/button';
+import { useGameContext } from '@/context/GameContext';
 
 export default function GameRenderer() {
-  const workerRef = useRef<Worker | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [element, setElement] = useState('fire');
-  const [elements, setElements] = useState<readonly string[]>([]);
-  const [strokeSize, setStrokeSize] = useState(1);
+  const { workerRef, canvasRef, element, strokeSize } = useGameContext();
 
   const mouseToGridPos = (event: React.PointerEvent<HTMLCanvasElement>): Location => {
     const canvas = event.currentTarget;
@@ -57,32 +49,6 @@ export default function GameRenderer() {
     draw(mouseToGridPos(event), erasing);
   };
 
-  useEffect(() => {
-    const worker = new Worker(new URL('../lib/gameWorker/worker.ts', import.meta.url), {
-      type: 'module',
-    });
-    workerRef.current = worker;
-
-    worker.onmessage = (event: MessageEvent<NewGameResponse>) => {
-      if (event.data.type === 'game') {
-        setElements(event.data.elements);
-      }
-    };
-
-    if (!canvasRef.current) return;
-    const offscreen = canvasRef.current.transferControlToOffscreen();
-
-    const canvasReq: CanvasRequest = { type: 'canvas', canvas: offscreen };
-    worker.postMessage(canvasReq, [offscreen]);
-
-    const gameReq: NewGameRequest = { type: 'game' };
-    worker.postMessage(gameReq, []);
-
-    return () => {
-      worker.terminate();
-    };
-  }, []);
-
   return (
     <div className="p-5">
       <canvas
@@ -94,27 +60,6 @@ export default function GameRenderer() {
         onPointerMove={handlePointer}
         onContextMenu={(event) => event.preventDefault()}
       />
-      <div>
-        {elements.map((elm) => (
-          <Button key={elm} onClick={() => setElement(elm)}>
-            {elm}
-          </Button>
-        ))}
-      </div>
-      <div>
-        <Button onClick={() => setStrokeSize(1)}>
-          1
-        </Button>
-        <Button onClick={() => setStrokeSize(2)}>
-          2
-        </Button>
-        <Button onClick={() => setStrokeSize(3)}>
-          3
-        </Button>
-        <Button onClick={() => setStrokeSize(4)}>
-          4
-        </Button>
-      </div>
     </div>
   );
 }
