@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { LanguageServiceContext } from './LanguageServiceContext';
+import { CharStream, Token } from 'antlr4ng';
+import { DSLLexer } from '../../generated/DSLLexer';
+
+function lex(source: string): Token[] {
+  const lexer = new DSLLexer(CharStream.fromString(source));
+  lexer.removeErrorListeners();
+  return lexer.getAllTokens();
+}
 
 export default function LanguageServiceProvider({ children }: { children: ReactNode }) {
-  const [text, setText] = useState('');
+  const [text, setTextState] = useState('');
+  const [tokens, setTokens] = useState<Token[]>([]);
 
   const workerRef = useRef<Worker | null>(null);
 
@@ -17,9 +26,18 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
     };
   }, []);
 
+  const setText = (value: string) => {
+    const tokens = lex(value)
+    setTokens(tokens);
+    console.log(tokens);
+    setTextState(value);
+  }
+
+
   const value = {
     lex: () => {},
-    parse: () => {},
+    parse: () => { },
+    tokens,
     text,
     setText,
   };

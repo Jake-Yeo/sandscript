@@ -1,7 +1,10 @@
+import type { Token } from 'antlr4ng';
 import { cn } from 'cn';
 import { useRef } from 'react';
 import { useLanguageServiceContext } from '@/context/LanguageServiceContext';
 import { Textarea } from './ui/textarea';
+import { getTokenColor } from '@/lib/token-utils';
+import { useMainContext } from '@/context/MainContext';
 
 type ReactKBEvent = React.KeyboardEvent<HTMLTextAreaElement>;
 
@@ -38,15 +41,15 @@ export default function TextInput() {
       <div
         ref={highlightRef}
         className={cn(
-          'pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap',
+          'pointer-events-none absolute inset-0 overflow-hidden whitespace-pre',
           'border border-transparent px-2.5 py-2', // match Textarea
         )}
       >
-        <span>{langService.text}</span>
+        {langService.tokens.map((t, i) => <TokenDisplay key={i} token={t} />)}
       </div>
       <Textarea
         className={cn(
-          'w-full h-full resize-none',
+          'w-full h-full resize-none whitespace-pre',
           'text-transparent caret-foreground', // make text invisible
         )}
         value={langService.text}
@@ -59,4 +62,13 @@ export default function TextInput() {
       />
     </div>
   );
+}
+
+function TokenDisplay({ token }: { token: Token }) {
+  const mainContext = useMainContext();
+  return (
+    <span style={{ color: getTokenColor(token.type, mainContext.theme) }} >
+      {token.text}
+    </span>
+  )
 }

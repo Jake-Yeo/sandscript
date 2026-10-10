@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import type { ReactSetter } from '@/lib/types';
+import type { Token } from 'antlr4ng';
 
 type LexFunc = (text: string) => void;
 type ParseFunc = (text: string) => void;
@@ -7,6 +8,7 @@ type ParseFunc = (text: string) => void;
 export type LanguageServiceContextType = {
   lex: LexFunc;
   parse: ParseFunc;
+  tokens: Token[];
   text: string;
   setText: ReactSetter<string>;
 };

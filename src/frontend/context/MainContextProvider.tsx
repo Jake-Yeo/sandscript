@@ -22,7 +22,6 @@ export default function MainContextProvider({ children }: { children: ReactNode 
   };
 
   const value = {
-    game: null,
     theme,
     setTheme,
   };
