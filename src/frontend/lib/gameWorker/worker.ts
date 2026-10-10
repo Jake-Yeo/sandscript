@@ -18,19 +18,23 @@ export type SpawnRequest = {
   location: Location;
   elementName: string;
 };
-export type GameWorkerResponse = null;
+export type GameWorkerResponse = NewGameResponse;
+export type NewGameResponse = {
+  type: 'game';
+  elements: readonly string[];
+};
 
 let loop: Loop = new Loop();
 let game: GameEngine | null = null;
 
 self.onmessage = (event: MessageEvent<GameWorkerRequest>) => {
   const data = event.data;
-  if (data.type === 'canvas') handleGameWorkerRequest(data);
+  if (data.type === 'canvas') handleCanvasRequest(data);
   if (data.type === 'game') handleNewGameRequest();
   if (data.type === 'spawn') handleSpawnRequest(data);
 };
 
-function handleGameWorkerRequest(req: CanvasRequest) {
+function handleCanvasRequest(req: CanvasRequest) {
   const canvas = req.canvas;
 
   const ctx = canvas.getContext('2d');
@@ -45,6 +49,12 @@ function handleGameWorkerRequest(req: CanvasRequest) {
 
 function handleNewGameRequest() {
   game = createFakeEngine({ width: CANVAS_DIMS.x, height: CANVAS_DIMS.y });
+
+  const message: NewGameResponse = {
+    type: 'game',
+    elements: game.availableElements()
+  }
+  self.postMessage(message);
 }
 
 function handleSpawnRequest(req: SpawnRequest) {
