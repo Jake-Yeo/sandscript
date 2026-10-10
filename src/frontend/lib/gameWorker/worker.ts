@@ -5,7 +5,7 @@ import type { Location } from '../types';
 import { drawGame } from './draw';
 import Loop from './loop';
 
-export type GameWorkerRequest = CanvasRequest | NewGameRequest | SpawnRequest;
+export type GameWorkerRequest = CanvasRequest | NewGameRequest | SpawnRequest | EraseRequest;
 export type CanvasRequest = {
   type: 'canvas';
   canvas: OffscreenCanvas;
@@ -17,6 +17,10 @@ export type SpawnRequest = {
   type: 'spawn';
   location: Location;
   elementName: string;
+};
+export type EraseRequest = {
+  type: 'erase';
+  location: Location;
 };
 export type GameWorkerResponse = NewGameResponse;
 export type NewGameResponse = {
@@ -32,6 +36,7 @@ self.onmessage = (event: MessageEvent<GameWorkerRequest>) => {
   if (data.type === 'canvas') handleCanvasRequest(data);
   if (data.type === 'game') handleNewGameRequest();
   if (data.type === 'spawn') handleSpawnRequest(data);
+  if (data.type === 'erase') handleEraseRequest(data);
 };
 
 function handleCanvasRequest(req: CanvasRequest) {
@@ -60,4 +65,9 @@ function handleNewGameRequest() {
 function handleSpawnRequest(req: SpawnRequest) {
   if (!game) return;
   game.place(req.elementName, req.location.x, req.location.y);
+}
+
+function handleEraseRequest(req: EraseRequest) {
+  if (!game) return;
+  game.erase(req.location.x, req.location.y);
 }
