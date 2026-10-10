@@ -1,6 +1,7 @@
 import type { Token } from 'antlr4ng';
 import { cn } from 'cn';
 import { useRef } from 'react';
+import { flushSync } from 'react-dom';
 import { useLanguageServiceContext } from '@/context/LanguageServiceContext';
 import { Textarea } from './ui/textarea';
 import { getTokenColor } from '@/lib/token-utils';
@@ -8,7 +9,7 @@ import { useMainContext } from '@/context/MainContext';
 
 type ReactKBEvent = React.KeyboardEvent<HTMLTextAreaElement>;
 
-function handleTab(e: ReactKBEvent) {
+function handleTab(e: ReactKBEvent, setText: (value: string) => void) {
   e.preventDefault();
 
   const textarea = e.currentTarget;
@@ -16,7 +17,7 @@ function handleTab(e: ReactKBEvent) {
   const end = textarea.selectionEnd;
 
   const text = textarea.value;
-  textarea.value = text.substring(0, start) + '\t' + text.substring(end);
+  flushSync(() => setText(text.substring(0, start) + '\t' + text.substring(end)));
 
   textarea.selectionStart = textarea.selectionEnd = start + 1;
 }
@@ -27,7 +28,7 @@ export default function TextInput() {
 
   const handleKeyDown = (e: ReactKBEvent) => {
     if (e.key !== 'Tab') return;
-    handleTab(e);
+    handleTab(e, langService.setText);
   };
 
   const handleTextareaScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
@@ -51,6 +52,7 @@ export default function TextInput() {
         className={cn(
           'w-full h-full resize-none whitespace-pre',
           'text-transparent caret-foreground', // make text invisible
+          // 'text-red-500' // debugging
         )}
         value={langService.text}
         onChange={(e) => langService.setText(e.target.value)}

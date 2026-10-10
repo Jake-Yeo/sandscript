@@ -27,9 +27,7 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
   }, []);
 
   const setText = (value: string) => {
-    const tokens = lex(value)
-    setTokens(tokens);
-    console.log(tokens);
+    setTokens(lex(value));
     setTextState(value);
   }
 
