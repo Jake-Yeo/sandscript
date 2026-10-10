@@ -1,4 +1,6 @@
-import { Game } from '../FAKEGAME';
+import type { GameEngine } from '../../../game/contracts';
+import { CANVAS_DIMS } from '../canvas';
+import { createFakeEngine } from '../FAKEGAME';
 import type { Location } from '../types';
 import { drawGame } from './draw';
 import Loop from './loop';
@@ -19,7 +21,7 @@ export type SpawnRequest = {
 export type GameWorkerResponse = null;
 
 let loop: Loop = new Loop();
-let game: Game | null = null;
+let game: GameEngine | null = null;
 
 self.onmessage = (event: MessageEvent<GameWorkerRequest>) => {
   const data = event.data;
@@ -36,18 +38,16 @@ function handleGameWorkerRequest(req: CanvasRequest) {
 
   loop.callback = () => {
     if (!game) return;
-    game.step();
-    drawGame(ctx, game);
+    drawGame(ctx, game.step());
   };
   loop.start();
 }
 
 function handleNewGameRequest() {
-  game = new Game();
+  game = createFakeEngine({ width: CANVAS_DIMS.x, height: CANVAS_DIMS.y });
 }
 
 function handleSpawnRequest(req: SpawnRequest) {
   if (!game) return;
-  game.spawn(req.elementName, req.location.x, req.location.y);
-  console.log('kljdshfgsa');
+  game.place(req.elementName, req.location.x, req.location.y);
 }
