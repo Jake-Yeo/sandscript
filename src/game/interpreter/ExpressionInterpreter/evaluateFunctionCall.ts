@@ -2,7 +2,7 @@ import type { FunctionCall, MemberAccess } from '../../../ast/ast';
 import type { BuiltinName, EvalContext, RuntimeValue } from '../../contracts';
 import { callMethod } from '../MethodInterpreter/methodInterpreter';
 import evaluateExpression from './expressionInterpreter';
-import { requireElementId } from './runtimeValueGuards';
+import { requireElementId } from '../runtimeValueGuards';
 
 const BUILTIN_NAMES: ReadonlySet<string> = new Set(
   [

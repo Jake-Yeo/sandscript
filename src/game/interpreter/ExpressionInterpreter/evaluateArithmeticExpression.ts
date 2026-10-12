@@ -1,7 +1,7 @@
 import type { ArithmeticExpression } from '../../../ast/ast';
 import type { EvalContext, RuntimeValue } from '../../contracts';
 import evaluateExpression from './expressionInterpreter';
-import { requireNumber } from './runtimeValueGuards';
+import { requireNumber } from '../runtimeValueGuards';
 
 export function evaluateArithmeticExpression(expression: ArithmeticExpression, ctx: EvalContext): RuntimeValue {
   const num1 = requireNumber(evaluateExpression(expression.value1, ctx))

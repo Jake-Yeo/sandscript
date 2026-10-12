@@ -1,7 +1,7 @@
 import type { VarAssignment } from '../../../ast/ast';
 import type { Completion, EvalContext } from '../../contracts';
 import evaluateExpression from '../ExpressionInterpreter/expressionInterpreter';
-import { requireElementId } from '../ExpressionInterpreter/runtimeValueGuards';
+import { requireElementId } from '../runtimeValueGuards';
 
 export function executeVarAssignment(statement: VarAssignment, ctx: EvalContext): Completion {
 

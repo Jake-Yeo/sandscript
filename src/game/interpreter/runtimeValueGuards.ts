@@ -1,4 +1,4 @@
-import type { ElementId, RuntimeValue } from '../../contracts';
+import type { ElementId, RuntimeValue } from '../contracts';
 
 export function requireNumber(value: RuntimeValue): number {
   if (typeof value !== 'number') {

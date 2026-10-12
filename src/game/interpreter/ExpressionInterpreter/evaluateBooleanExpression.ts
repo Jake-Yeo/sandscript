@@ -1,7 +1,7 @@
 import type { BooleanExpression, TwoValueBooleanExpression } from '../../../ast/ast';
 import type { EvalContext, RuntimeValue } from '../../contracts';
 import evaluateExpression from './expressionInterpreter';
-import { requireNumber } from './runtimeValueGuards';
+import { requireNumber } from '../runtimeValueGuards';
 
 export function evaluateBooleanExpression(
   expression: BooleanExpression,
