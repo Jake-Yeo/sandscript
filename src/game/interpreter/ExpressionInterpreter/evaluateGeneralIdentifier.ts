@@ -30,10 +30,18 @@ function evaluateIdentifier(identifier: Identifier, ctx: EvalContext): RuntimeVa
   }
 
   if (ctx.locals.has(identifierName)) {
-    return ctx.locals.get(identifierName) || null
+    return ctx.locals.get(identifierName)!;
   }
 
-  return null;
+  if (
+    ctx.self !== null &&
+    ctx.host.hasField(ctx.self, identifierName)
+  ) {
+    return ctx.host.readField(ctx.self, identifierName);
+  }
+
+  throw new Error(`Unknown identifier ${identifierName}.`);
+
 }
 
 function evaluateMemberAccess(memberAccess: MemberAccess, ctx: EvalContext): RuntimeValue {
