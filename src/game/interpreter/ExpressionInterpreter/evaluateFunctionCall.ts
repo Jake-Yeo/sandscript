@@ -1,7 +1,8 @@
-import type { FunctionCall } from '../../../ast/ast';
+import type { FunctionCall, MemberAccess } from '../../../ast/ast';
 import type { BuiltinName, EvalContext, RuntimeValue } from '../../contracts';
 import { callMethod } from '../MethodInterpreter/methodInterpreter';
 import evaluateExpression from './expressionInterpreter';
+import { requireElementId } from './runtimeValueGuards';
 
 const BUILTIN_NAMES: ReadonlySet<string> = new Set(
   [
@@ -35,31 +36,52 @@ export function evaluateFunctionCall(call: FunctionCall, ctx: EvalContext): Runt
   const name = getFunctionName(call);
 
   if (call.callee.type === 'Identifier') {
-    // For bare calls like disappear()
+    return evaluateBareFunctionCall(name, methodArguments, ctx);
+  }
 
-    if (isBuiltinName(name)) {
+  return evaluateMemberFunctionCall(call.callee, name, methodArguments, ctx);
+}
 
+function evaluateBareFunctionCall(name: string, methodArguments: readonly RuntimeValue[], ctx: EvalContext): RuntimeValue {
+
+  if (isBuiltinName(name)) {
+    if (isReceiverBuiltinName(name)) {
+      if (ctx.self === null) {
+        throw new Error(
+          `Cannot call ${name} without a current element.`,
+        );
+      }
+
+      return ctx.host.invokeBuiltin(name, ctx.self, methodArguments);
     } else {
-
-    }
-  } else {
-    // For chained calls like target.convert_to()
-
-    if (ctx.self === null) {
-      throw new Error(
-        `Cannot call ${name} without a current element.`,
-      );
-    }
-
-    if (isBuiltinName(name)) {
-      ctx.host.invokeBuiltin(name, ctx.self, methodArguments)
-    } else {
-      callMethod(ctx.self, name, methodArguments, ctx)
+      return ctx.host.invokeBuiltin(name, null, methodArguments);
     }
   }
 
+  if (ctx.self === null) {
+    throw new Error(
+      `Cannot call ${name} without a current element.`,
+    );
+  }
 
-  return null;
+  return callMethod(ctx.self, name, methodArguments, ctx);
+}
+
+function evaluateMemberFunctionCall(callee: MemberAccess, name: string, methodArguments: readonly RuntimeValue[], ctx: EvalContext): RuntimeValue {
+
+  const elementId = requireElementId(evaluateExpression(callee.source, ctx));
+
+  if (isBuiltinName(name)) {
+    if (!isReceiverBuiltinName(name)) {
+      throw new Error(
+        `Built-in ${name} cannot be called on an element.`,
+      );
+    }
+
+    return ctx.host.invokeBuiltin(name, elementId, methodArguments);
+  }
+
+  return callMethod(elementId, name, methodArguments, ctx);
 }
 
 function isBuiltinName(name: string): name is BuiltinName {
