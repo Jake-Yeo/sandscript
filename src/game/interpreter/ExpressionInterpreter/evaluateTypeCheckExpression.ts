@@ -3,9 +3,6 @@ import type { EvalContext, RuntimeValue } from '../../contracts';
 import evaluateExpression from './expressionInterpreter';
 
 export function evaluateTypeCheckExpression(expression: TypeCheckExpression, ctx: EvalContext): RuntimeValue {
-  void expression;
-  void ctx;
-
   const value = evaluateExpression(expression.value, ctx);
   const type = getRuntimeValueKind(value);
 
