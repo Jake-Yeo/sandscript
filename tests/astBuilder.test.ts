@@ -90,7 +90,7 @@ describe('ASTBuilder', () => {
 
 \thas color with Color(#123456)
 \thas weight with 10
-template-element Fire is like Water:
+template_element Fire is like Water:
 \thas temperature with 100
 `;
 
@@ -166,10 +166,10 @@ template-element Fire is like Water:
 \thas function calculate:
 \t\tif x equals 1:
 \t\t\tlet result be 2
-\t\telse if x less-than 1:
+\t\telse if x less_than 1:
 \t\t\tlet result be 3
 \t\telse:
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 `;
 
         const ast = buildAST(source);
@@ -248,9 +248,9 @@ template-element Fire is like Water:
         const source = `element Calculator:
 
 \thas function calculate:
-\t\tfor-every item in items:
+\t\tfor_every item in items:
 \t\t\tlet result be item.value
-\t\tgo-through 1 to 3 with i:
+\t\tgo_through 1 to 3 with i:
 \t\t\tlet result be i
 `;
 
@@ -325,7 +325,7 @@ template-element Fire is like Water:
 
 \thas negative with -5
 \thas enabled with not false
-\thas valid with x equals 1 and y greater-than 2
+\thas valid with x equals 1 and y greater_than 2
 \thas is_number with x is Number
 `;
 
@@ -631,13 +631,13 @@ template-element Fire is like Water:
         ]);
     });
 
-    test('builds skip-iteration, stop-looping, and do-nothing statements', () => {
+    test('builds skip_iteration, stop_looping, and do_nothing statements', () => {
         const source = `element Calculator:
 
 \thas function calculate:
-\t\tskip-iteration
-\t\tstop-looping
-\t\tdo-nothing
+\t\tskip_iteration
+\t\tstop_looping
+\t\tdo_nothing
 `;
 
         const ast = buildAST(source);
@@ -655,11 +655,11 @@ template-element Fire is like Water:
 \thas function calculate:
 \t\tif x equals 1:
 \t\t\tif y equals 2:
-\t\t\t\tdo-nothing
+\t\t\t\tdo_nothing
 \t\t\telse:
-\t\t\t\tskip-iteration
+\t\t\t\tskip_iteration
 \t\telse:
-\t\t\tstop-looping
+\t\t\tstop_looping
 `;
 
         const ast = buildAST(source);
@@ -699,8 +699,8 @@ template-element Fire is like Water:
         const source = `element Calculator:
 
 \thas function calculate:
-\t\tgo-through start + 1 to finish * 2 with i:
-\t\t\tdo-nothing
+\t\tgo_through start + 1 to finish * 2 with i:
+\t\t\tdo_nothing
 `;
 
         const ast = buildAST(source);

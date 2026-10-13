@@ -109,11 +109,11 @@ export class DSLParser extends antlr.Parser {
     public static readonly RULE_typeReference = 42;
 
     public static readonly literalNames = [
-        null, null, null, "'element'", "'template-element'", "'has'", "'with'", 
+        null, null, null, "'element'", "'template_element'", "'has'", "'with'", 
         "'is'", "'like'", "'function'", "'needs'", "'let'", "'be'", "'give'", 
-        "'if'", "'else'", "'for-every'", "'go-through'", "'in'", "'to'", 
-        "'skip-iteration'", "'stop-looping'", "'do-nothing'", "'interaction'", 
-        "'not'", "'equals'", "'less-than'", "'greater-than'", "'and'", "'or'", 
+        "'if'", "'else'", "'for_every'", "'go_through'", "'in'", "'to'", 
+        "'skip_iteration'", "'stop_looping'", "'do_nothing'", "'interaction'", 
+        "'not'", "'equals'", "'less_than'", "'greater_than'", "'and'", "'or'", 
         "'Number'", "'Boolean'", "'Color'", "'Element'", "'ElementType'", 
         "'Null'", "'Type'", null, "'null'", null, null, null, null, "'+'", 
         "'-'", "'*'", "'/'", "'.'", "','", "'('", "')'", "':'", null, null, 
@@ -505,28 +505,44 @@ export class DSLParser extends antlr.Parser {
                 }
             }
 
-            this.state = 148;
-            this.match(DSLParser.COLON);
-            this.state = 149;
-            this.match(DSLParser.NEWLINE);
-            this.state = 150;
-            this.match(DSLParser.INDENT);
-            this.state = 154;
+            this.state = 159;
             this.errorHandler.sync(this);
-            _la = this.tokenStream.LA(1);
-            while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
+            switch (this.tokenStream.LA(1)) {
+            case DSLParser.COLON:
                 {
-                {
-                this.state = 151;
-                this.statement();
-                }
-                }
-                this.state = 156;
+                this.state = 148;
+                this.match(DSLParser.COLON);
+                this.state = 149;
+                this.match(DSLParser.NEWLINE);
+                this.state = 150;
+                this.match(DSLParser.INDENT);
+                this.state = 154;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
+                while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
+                    {
+                    {
+                    this.state = 151;
+                    this.statement();
+                    }
+                    }
+                    this.state = 156;
+                    this.errorHandler.sync(this);
+                    _la = this.tokenStream.LA(1);
+                }
+                this.state = 157;
+                this.match(DSLParser.DEDENT);
+                }
+                break;
+            case DSLParser.NEWLINE:
+                {
+                this.state = 158;
+                this.match(DSLParser.NEWLINE);
+                }
+                break;
+            default:
+                throw new antlr.NoViableAltException(this);
             }
-            this.state = 157;
-            this.match(DSLParser.DEDENT);
             }
         }
         catch (re) {
@@ -549,19 +565,19 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 159;
-            this.match(DSLParser.NEEDS);
             this.state = 161;
+            this.match(DSLParser.NEEDS);
+            this.state = 163;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             do {
                 {
                 {
-                this.state = 160;
+                this.state = 162;
                 this.parameter();
                 }
                 }
-                this.state = 163;
+                this.state = 165;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             } while (_la === 42);
@@ -587,14 +603,14 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 165;
-            this.identifier();
             this.state = 167;
+            this.identifier();
+            this.state = 169;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             if (((((_la - 30)) & ~0x1F) === 0 && ((1 << (_la - 30)) & 2175) !== 0)) {
                 {
-                this.state = 166;
+                this.state = 168;
                 this.typeReference();
                 }
             }
@@ -621,39 +637,39 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 169;
-            this.match(DSLParser.INTERACTION);
-            this.state = 170;
-            this.pascalIdentifier();
             this.state = 171;
-            this.identifier();
+            this.match(DSLParser.INTERACTION);
             this.state = 172;
-            this.match(DSLParser.WITH);
-            this.state = 173;
             this.pascalIdentifier();
-            this.state = 174;
+            this.state = 173;
             this.identifier();
+            this.state = 174;
+            this.match(DSLParser.WITH);
             this.state = 175;
-            this.match(DSLParser.COLON);
+            this.pascalIdentifier();
             this.state = 176;
-            this.match(DSLParser.NEWLINE);
+            this.identifier();
             this.state = 177;
+            this.match(DSLParser.COLON);
+            this.state = 178;
+            this.match(DSLParser.NEWLINE);
+            this.state = 179;
             this.match(DSLParser.INDENT);
-            this.state = 181;
+            this.state = 183;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
-                this.state = 178;
+                this.state = 180;
                 this.statement();
                 }
                 }
-                this.state = 183;
+                this.state = 185;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 184;
+            this.state = 186;
             this.match(DSLParser.DEDENT);
             }
         }
@@ -674,69 +690,69 @@ export class DSLParser extends antlr.Parser {
         let localContext = new StatementContext(this.context, this.state);
         this.enterRule(localContext, 24, DSLParser.RULE_statement);
         try {
-            this.state = 195;
+            this.state = 197;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case DSLParser.LET:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 186;
+                this.state = 188;
                 this.variableAssignment();
                 }
                 break;
             case DSLParser.GIVE:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 187;
+                this.state = 189;
                 this.giveStatement();
                 }
                 break;
             case DSLParser.IF:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 188;
+                this.state = 190;
                 this.conditional();
                 }
                 break;
             case DSLParser.FOR_EVERY:
                 this.enterOuterAlt(localContext, 4);
                 {
-                this.state = 189;
+                this.state = 191;
                 this.collectionBasedLoop();
                 }
                 break;
             case DSLParser.GO_THROUGH:
                 this.enterOuterAlt(localContext, 5);
                 {
-                this.state = 190;
+                this.state = 192;
                 this.rangeBasedLoop();
                 }
                 break;
             case DSLParser.SKIP_ITERATION:
                 this.enterOuterAlt(localContext, 6);
                 {
-                this.state = 191;
+                this.state = 193;
                 this.skipIteration();
                 }
                 break;
             case DSLParser.STOP_LOOPING:
                 this.enterOuterAlt(localContext, 7);
                 {
-                this.state = 192;
+                this.state = 194;
                 this.stopLooping();
                 }
                 break;
             case DSLParser.DO_NOTHING:
                 this.enterOuterAlt(localContext, 8);
                 {
-                this.state = 193;
+                this.state = 195;
                 this.doNothing();
                 }
                 break;
             case DSLParser.IDENTIFIER:
                 this.enterOuterAlt(localContext, 9);
                 {
-                this.state = 194;
+                this.state = 196;
                 this.expressionStatement();
                 }
                 break;
@@ -763,15 +779,15 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 197;
-            this.match(DSLParser.LET);
-            this.state = 198;
-            this.generalIdentifier();
             this.state = 199;
-            this.match(DSLParser.BE);
+            this.match(DSLParser.LET);
             this.state = 200;
-            this.expression();
+            this.generalIdentifier();
             this.state = 201;
+            this.match(DSLParser.BE);
+            this.state = 202;
+            this.expression();
+            this.state = 203;
             this.match(DSLParser.NEWLINE);
             }
         }
@@ -794,11 +810,11 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 203;
-            this.match(DSLParser.GIVE);
-            this.state = 204;
-            this.expression();
             this.state = 205;
+            this.match(DSLParser.GIVE);
+            this.state = 206;
+            this.expression();
+            this.state = 207;
             this.match(DSLParser.NEWLINE);
             }
         }
@@ -821,9 +837,9 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 207;
+            this.state = 209;
             this.functionCall();
-            this.state = 208;
+            this.state = 210;
             this.match(DSLParser.NEWLINE);
             }
         }
@@ -848,54 +864,54 @@ export class DSLParser extends antlr.Parser {
             let alternative: number;
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 210;
-            this.match(DSLParser.IF);
-            this.state = 211;
-            this.expression();
             this.state = 212;
-            this.match(DSLParser.COLON);
+            this.match(DSLParser.IF);
             this.state = 213;
-            this.match(DSLParser.NEWLINE);
+            this.expression();
             this.state = 214;
+            this.match(DSLParser.COLON);
+            this.state = 215;
+            this.match(DSLParser.NEWLINE);
+            this.state = 216;
             this.match(DSLParser.INDENT);
-            this.state = 218;
+            this.state = 220;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
-                this.state = 215;
+                this.state = 217;
                 this.statement();
                 }
                 }
-                this.state = 220;
+                this.state = 222;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 221;
+            this.state = 223;
             this.match(DSLParser.DEDENT);
-            this.state = 225;
+            this.state = 227;
             this.errorHandler.sync(this);
-            alternative = this.interpreter.adaptivePredict(this.tokenStream, 15, this.context);
+            alternative = this.interpreter.adaptivePredict(this.tokenStream, 16, this.context);
             while (alternative !== 2 && alternative !== antlr.ATN.INVALID_ALT_NUMBER) {
                 if (alternative === 1) {
                     {
                     {
-                    this.state = 222;
+                    this.state = 224;
                     this.elseIfClause();
                     }
                     }
                 }
-                this.state = 227;
+                this.state = 229;
                 this.errorHandler.sync(this);
-                alternative = this.interpreter.adaptivePredict(this.tokenStream, 15, this.context);
+                alternative = this.interpreter.adaptivePredict(this.tokenStream, 16, this.context);
             }
-            this.state = 229;
+            this.state = 231;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             if (_la === 15) {
                 {
-                this.state = 228;
+                this.state = 230;
                 this.elseClause();
                 }
             }
@@ -922,33 +938,33 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 231;
-            this.match(DSLParser.ELSE);
-            this.state = 232;
-            this.match(DSLParser.IF);
             this.state = 233;
-            this.expression();
+            this.match(DSLParser.ELSE);
             this.state = 234;
-            this.match(DSLParser.COLON);
+            this.match(DSLParser.IF);
             this.state = 235;
-            this.match(DSLParser.NEWLINE);
+            this.expression();
             this.state = 236;
+            this.match(DSLParser.COLON);
+            this.state = 237;
+            this.match(DSLParser.NEWLINE);
+            this.state = 238;
             this.match(DSLParser.INDENT);
-            this.state = 240;
+            this.state = 242;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
-                this.state = 237;
+                this.state = 239;
                 this.statement();
                 }
                 }
-                this.state = 242;
+                this.state = 244;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 243;
+            this.state = 245;
             this.match(DSLParser.DEDENT);
             }
         }
@@ -972,29 +988,29 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 245;
-            this.match(DSLParser.ELSE);
-            this.state = 246;
-            this.match(DSLParser.COLON);
             this.state = 247;
-            this.match(DSLParser.NEWLINE);
+            this.match(DSLParser.ELSE);
             this.state = 248;
+            this.match(DSLParser.COLON);
+            this.state = 249;
+            this.match(DSLParser.NEWLINE);
+            this.state = 250;
             this.match(DSLParser.INDENT);
-            this.state = 252;
+            this.state = 254;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
-                this.state = 249;
+                this.state = 251;
                 this.statement();
                 }
                 }
-                this.state = 254;
+                this.state = 256;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 255;
+            this.state = 257;
             this.match(DSLParser.DEDENT);
             }
         }
@@ -1018,35 +1034,35 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 257;
-            this.match(DSLParser.FOR_EVERY);
-            this.state = 258;
-            this.identifier();
             this.state = 259;
-            this.match(DSLParser.IN);
+            this.match(DSLParser.FOR_EVERY);
             this.state = 260;
-            this.expression();
+            this.identifier();
             this.state = 261;
-            this.match(DSLParser.COLON);
+            this.match(DSLParser.IN);
             this.state = 262;
-            this.match(DSLParser.NEWLINE);
+            this.expression();
             this.state = 263;
+            this.match(DSLParser.COLON);
+            this.state = 264;
+            this.match(DSLParser.NEWLINE);
+            this.state = 265;
             this.match(DSLParser.INDENT);
-            this.state = 267;
+            this.state = 269;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
-                this.state = 264;
+                this.state = 266;
                 this.statement();
                 }
                 }
-                this.state = 269;
+                this.state = 271;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 270;
+            this.state = 272;
             this.match(DSLParser.DEDENT);
             }
         }
@@ -1070,39 +1086,39 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 272;
-            this.match(DSLParser.GO_THROUGH);
-            this.state = 273;
-            this.expression();
             this.state = 274;
-            this.match(DSLParser.TO);
+            this.match(DSLParser.GO_THROUGH);
             this.state = 275;
             this.expression();
             this.state = 276;
-            this.match(DSLParser.WITH);
+            this.match(DSLParser.TO);
             this.state = 277;
-            this.identifier();
+            this.expression();
             this.state = 278;
-            this.match(DSLParser.COLON);
+            this.match(DSLParser.WITH);
             this.state = 279;
-            this.match(DSLParser.NEWLINE);
+            this.identifier();
             this.state = 280;
+            this.match(DSLParser.COLON);
+            this.state = 281;
+            this.match(DSLParser.NEWLINE);
+            this.state = 282;
             this.match(DSLParser.INDENT);
-            this.state = 284;
+            this.state = 286;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (((((_la - 11)) & ~0x1F) === 0 && ((1 << (_la - 11)) & 2147487341) !== 0)) {
                 {
                 {
-                this.state = 281;
+                this.state = 283;
                 this.statement();
                 }
                 }
-                this.state = 286;
+                this.state = 288;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
-            this.state = 287;
+            this.state = 289;
             this.match(DSLParser.DEDENT);
             }
         }
@@ -1125,9 +1141,9 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 289;
+            this.state = 291;
             this.match(DSLParser.SKIP_ITERATION);
-            this.state = 290;
+            this.state = 292;
             this.match(DSLParser.NEWLINE);
             }
         }
@@ -1150,9 +1166,9 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 292;
+            this.state = 294;
             this.match(DSLParser.STOP_LOOPING);
-            this.state = 293;
+            this.state = 295;
             this.match(DSLParser.NEWLINE);
             }
         }
@@ -1175,9 +1191,9 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 295;
+            this.state = 297;
             this.match(DSLParser.DO_NOTHING);
-            this.state = 296;
+            this.state = 298;
             this.match(DSLParser.NEWLINE);
             }
         }
@@ -1200,7 +1216,7 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 298;
+            this.state = 300;
             this.booleanOrExpression();
             }
         }
@@ -1224,21 +1240,21 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 300;
+            this.state = 302;
             this.booleanAndExpression();
-            this.state = 305;
+            this.state = 307;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 29) {
                 {
                 {
-                this.state = 301;
+                this.state = 303;
                 this.match(DSLParser.OR);
-                this.state = 302;
+                this.state = 304;
                 this.booleanAndExpression();
                 }
                 }
-                this.state = 307;
+                this.state = 309;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1264,21 +1280,21 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 308;
+            this.state = 310;
             this.booleanComparison();
-            this.state = 313;
+            this.state = 315;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 28) {
                 {
                 {
-                this.state = 309;
+                this.state = 311;
                 this.match(DSLParser.AND);
-                this.state = 310;
+                this.state = 312;
                 this.booleanComparison();
                 }
                 }
-                this.state = 315;
+                this.state = 317;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1301,35 +1317,35 @@ export class DSLParser extends antlr.Parser {
         let localContext = new BooleanComparisonContext(this.context, this.state);
         this.enterRule(localContext, 54, DSLParser.RULE_booleanComparison);
         try {
-            this.state = 325;
+            this.state = 327;
             this.errorHandler.sync(this);
-            switch (this.interpreter.adaptivePredict(this.tokenStream, 23, this.context) ) {
+            switch (this.interpreter.adaptivePredict(this.tokenStream, 24, this.context) ) {
             case 1:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 316;
-                this.arithmeticExpression();
-                this.state = 317;
-                this.comparisonOperator();
                 this.state = 318;
+                this.arithmeticExpression();
+                this.state = 319;
+                this.comparisonOperator();
+                this.state = 320;
                 this.arithmeticExpression();
                 }
                 break;
             case 2:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 320;
-                this.arithmeticExpression();
-                this.state = 321;
-                this.match(DSLParser.IS);
                 this.state = 322;
+                this.arithmeticExpression();
+                this.state = 323;
+                this.match(DSLParser.IS);
+                this.state = 324;
                 this.typeReference();
                 }
                 break;
             case 3:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 324;
+                this.state = 326;
                 this.arithmeticExpression();
                 }
                 break;
@@ -1355,7 +1371,7 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 327;
+            this.state = 329;
             _la = this.tokenStream.LA(1);
             if(!((((_la) & ~0x1F) === 0 && ((1 << _la) & 234881024) !== 0))) {
             this.errorHandler.recoverInline(this);
@@ -1386,15 +1402,15 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 329;
+            this.state = 331;
             this.multiplicationExpression();
-            this.state = 334;
+            this.state = 336;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 43 || _la === 44) {
                 {
                 {
-                this.state = 330;
+                this.state = 332;
                 _la = this.tokenStream.LA(1);
                 if(!(_la === 43 || _la === 44)) {
                 this.errorHandler.recoverInline(this);
@@ -1403,11 +1419,11 @@ export class DSLParser extends antlr.Parser {
                     this.errorHandler.reportMatch(this);
                     this.consume();
                 }
-                this.state = 331;
+                this.state = 333;
                 this.multiplicationExpression();
                 }
                 }
-                this.state = 336;
+                this.state = 338;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1433,15 +1449,15 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 337;
+            this.state = 339;
             this.unaryExpression();
-            this.state = 342;
+            this.state = 344;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 45 || _la === 46) {
                 {
                 {
-                this.state = 338;
+                this.state = 340;
                 _la = this.tokenStream.LA(1);
                 if(!(_la === 45 || _la === 46)) {
                 this.errorHandler.recoverInline(this);
@@ -1450,11 +1466,11 @@ export class DSLParser extends antlr.Parser {
                     this.errorHandler.reportMatch(this);
                     this.consume();
                 }
-                this.state = 339;
+                this.state = 341;
                 this.unaryExpression();
                 }
                 }
-                this.state = 344;
+                this.state = 346;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1477,24 +1493,24 @@ export class DSLParser extends antlr.Parser {
         let localContext = new UnaryExpressionContext(this.context, this.state);
         this.enterRule(localContext, 62, DSLParser.RULE_unaryExpression);
         try {
-            this.state = 350;
+            this.state = 352;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case DSLParser.NOT:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 345;
+                this.state = 347;
                 this.match(DSLParser.NOT);
-                this.state = 346;
+                this.state = 348;
                 this.unaryExpression();
                 }
                 break;
             case DSLParser.MINUS:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 347;
+                this.state = 349;
                 this.match(DSLParser.MINUS);
-                this.state = 348;
+                this.state = 350;
                 this.unaryExpression();
                 }
                 break;
@@ -1507,7 +1523,7 @@ export class DSLParser extends antlr.Parser {
             case DSLParser.LPAREN:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 349;
+                this.state = 351;
                 this.primaryExpression();
                 }
                 break;
@@ -1532,45 +1548,45 @@ export class DSLParser extends antlr.Parser {
         let localContext = new PrimaryExpressionContext(this.context, this.state);
         this.enterRule(localContext, 64, DSLParser.RULE_primaryExpression);
         try {
-            this.state = 360;
+            this.state = 362;
             this.errorHandler.sync(this);
-            switch (this.interpreter.adaptivePredict(this.tokenStream, 27, this.context) ) {
+            switch (this.interpreter.adaptivePredict(this.tokenStream, 28, this.context) ) {
             case 1:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 352;
+                this.state = 354;
                 this.literal();
                 }
                 break;
             case 2:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 353;
+                this.state = 355;
                 this.functionCall();
                 }
                 break;
             case 3:
                 this.enterOuterAlt(localContext, 3);
                 {
-                this.state = 354;
+                this.state = 356;
                 this.generalIdentifier();
                 }
                 break;
             case 4:
                 this.enterOuterAlt(localContext, 4);
                 {
-                this.state = 355;
+                this.state = 357;
                 this.elementTypeReference();
                 }
                 break;
             case 5:
                 this.enterOuterAlt(localContext, 5);
                 {
-                this.state = 356;
-                this.match(DSLParser.LPAREN);
-                this.state = 357;
-                this.expression();
                 this.state = 358;
+                this.match(DSLParser.LPAREN);
+                this.state = 359;
+                this.expression();
+                this.state = 360;
                 this.match(DSLParser.RPAREN);
                 }
                 break;
@@ -1596,21 +1612,21 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 362;
+            this.state = 364;
             this.generalIdentifier();
-            this.state = 363;
-            this.match(DSLParser.LPAREN);
             this.state = 365;
+            this.match(DSLParser.LPAREN);
+            this.state = 367;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             if (((((_la - 24)) & ~0x1F) === 0 && ((1 << (_la - 24)) & 35119105) !== 0)) {
                 {
-                this.state = 364;
+                this.state = 366;
                 this.argumentList();
                 }
             }
 
-            this.state = 367;
+            this.state = 369;
             this.match(DSLParser.RPAREN);
             }
         }
@@ -1634,21 +1650,21 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 369;
+            this.state = 371;
             this.expression();
-            this.state = 374;
+            this.state = 376;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 48) {
                 {
                 {
-                this.state = 370;
+                this.state = 372;
                 this.match(DSLParser.COMMA);
-                this.state = 371;
+                this.state = 373;
                 this.expression();
                 }
                 }
-                this.state = 376;
+                this.state = 378;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1674,19 +1690,19 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 377;
+            this.state = 379;
             this.identifier();
-            this.state = 381;
+            this.state = 383;
             this.errorHandler.sync(this);
             _la = this.tokenStream.LA(1);
             while (_la === 47) {
                 {
                 {
-                this.state = 378;
+                this.state = 380;
                 this.memberAccess();
                 }
                 }
-                this.state = 383;
+                this.state = 385;
                 this.errorHandler.sync(this);
                 _la = this.tokenStream.LA(1);
             }
@@ -1711,9 +1727,9 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 384;
+            this.state = 386;
             this.match(DSLParser.DOT);
-            this.state = 385;
+            this.state = 387;
             this.identifier();
             }
         }
@@ -1736,7 +1752,7 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 387;
+            this.state = 389;
             this.match(DSLParser.IDENTIFIER);
             }
         }
@@ -1759,7 +1775,7 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 389;
+            this.state = 391;
             this.match(DSLParser.PASCAL_IDENTIFIER);
             }
         }
@@ -1783,7 +1799,7 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 391;
+            this.state = 393;
             _la = this.tokenStream.LA(1);
             if(!(((((_la - 37)) & ~0x1F) === 0 && ((1 << (_la - 37)) & 15) !== 0))) {
             this.errorHandler.recoverInline(this);
@@ -1814,7 +1830,7 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 393;
+            this.state = 395;
             _la = this.tokenStream.LA(1);
             if(!(((((_la - 30)) & ~0x1F) === 0 && ((1 << (_la - 30)) & 127) !== 0))) {
             this.errorHandler.recoverInline(this);
@@ -1844,7 +1860,7 @@ export class DSLParser extends antlr.Parser {
         try {
             this.enterOuterAlt(localContext, 1);
             {
-            this.state = 395;
+            this.state = 397;
             this.pascalIdentifier();
             }
         }
@@ -1865,7 +1881,7 @@ export class DSLParser extends antlr.Parser {
         let localContext = new TypeReferenceContext(this.context, this.state);
         this.enterRule(localContext, 84, DSLParser.RULE_typeReference);
         try {
-            this.state = 399;
+            this.state = 401;
             this.errorHandler.sync(this);
             switch (this.tokenStream.LA(1)) {
             case DSLParser.NUMBER_TYPE:
@@ -1877,14 +1893,14 @@ export class DSLParser extends antlr.Parser {
             case DSLParser.TYPE_TYPE:
                 this.enterOuterAlt(localContext, 1);
                 {
-                this.state = 397;
+                this.state = 399;
                 this.typeLiteral();
                 }
                 break;
             case DSLParser.PASCAL_IDENTIFIER:
                 this.enterOuterAlt(localContext, 2);
                 {
-                this.state = 398;
+                this.state = 400;
                 this.elementTypeReference();
                 }
                 break;
@@ -1907,7 +1923,7 @@ export class DSLParser extends antlr.Parser {
     }
 
     public static readonly _serializedATN: number[] = [
-        4,1,55,402,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
+        4,1,55,404,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,
         6,2,7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,2,12,7,12,2,13,7,13,
         2,14,7,14,2,15,7,15,2,16,7,16,2,17,7,17,2,18,7,18,2,19,7,19,2,20,
         7,20,2,21,7,21,2,22,7,22,2,23,7,23,2,24,7,24,2,25,7,25,2,26,7,26,
@@ -1918,134 +1934,135 @@ export class DSLParser extends antlr.Parser {
         2,1,2,3,2,108,8,2,1,2,1,2,1,2,1,2,5,2,114,8,2,10,2,12,2,117,9,2,
         1,2,1,2,1,3,1,3,1,4,1,4,1,4,1,4,3,4,127,8,4,1,5,1,5,3,5,131,8,5,
         1,6,1,6,1,6,3,6,136,8,6,1,6,1,6,1,7,1,7,1,7,1,8,1,8,1,8,1,8,3,8,
-        147,8,8,1,8,1,8,1,8,1,8,5,8,153,8,8,10,8,12,8,156,9,8,1,8,1,8,1,
-        9,1,9,4,9,162,8,9,11,9,12,9,163,1,10,1,10,3,10,168,8,10,1,11,1,11,
-        1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,5,11,180,8,11,10,11,12,11,
-        183,9,11,1,11,1,11,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,1,12,
-        3,12,196,8,12,1,13,1,13,1,13,1,13,1,13,1,13,1,14,1,14,1,14,1,14,
-        1,15,1,15,1,15,1,16,1,16,1,16,1,16,1,16,1,16,5,16,217,8,16,10,16,
-        12,16,220,9,16,1,16,1,16,5,16,224,8,16,10,16,12,16,227,9,16,1,16,
-        3,16,230,8,16,1,17,1,17,1,17,1,17,1,17,1,17,1,17,5,17,239,8,17,10,
-        17,12,17,242,9,17,1,17,1,17,1,18,1,18,1,18,1,18,1,18,5,18,251,8,
-        18,10,18,12,18,254,9,18,1,18,1,18,1,19,1,19,1,19,1,19,1,19,1,19,
-        1,19,1,19,5,19,266,8,19,10,19,12,19,269,9,19,1,19,1,19,1,20,1,20,
-        1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,5,20,283,8,20,10,20,12,20,
-        286,9,20,1,20,1,20,1,21,1,21,1,21,1,22,1,22,1,22,1,23,1,23,1,23,
-        1,24,1,24,1,25,1,25,1,25,5,25,304,8,25,10,25,12,25,307,9,25,1,26,
-        1,26,1,26,5,26,312,8,26,10,26,12,26,315,9,26,1,27,1,27,1,27,1,27,
-        1,27,1,27,1,27,1,27,1,27,3,27,326,8,27,1,28,1,28,1,29,1,29,1,29,
-        5,29,333,8,29,10,29,12,29,336,9,29,1,30,1,30,1,30,5,30,341,8,30,
-        10,30,12,30,344,9,30,1,31,1,31,1,31,1,31,1,31,3,31,351,8,31,1,32,
-        1,32,1,32,1,32,1,32,1,32,1,32,1,32,3,32,361,8,32,1,33,1,33,1,33,
-        3,33,366,8,33,1,33,1,33,1,34,1,34,1,34,5,34,373,8,34,10,34,12,34,
-        376,9,34,1,35,1,35,5,35,380,8,35,10,35,12,35,383,9,35,1,36,1,36,
-        1,36,1,37,1,37,1,38,1,38,1,39,1,39,1,40,1,40,1,41,1,41,1,42,1,42,
-        3,42,400,8,42,1,42,0,0,43,0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,
-        30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,
-        74,76,78,80,82,84,0,6,1,0,3,4,1,0,25,27,1,0,43,44,1,0,45,46,1,0,
-        37,40,1,0,30,36,402,0,89,1,0,0,0,2,102,1,0,0,0,4,104,1,0,0,0,6,120,
-        1,0,0,0,8,122,1,0,0,0,10,130,1,0,0,0,12,132,1,0,0,0,14,139,1,0,0,
-        0,16,142,1,0,0,0,18,159,1,0,0,0,20,165,1,0,0,0,22,169,1,0,0,0,24,
-        195,1,0,0,0,26,197,1,0,0,0,28,203,1,0,0,0,30,207,1,0,0,0,32,210,
-        1,0,0,0,34,231,1,0,0,0,36,245,1,0,0,0,38,257,1,0,0,0,40,272,1,0,
-        0,0,42,289,1,0,0,0,44,292,1,0,0,0,46,295,1,0,0,0,48,298,1,0,0,0,
-        50,300,1,0,0,0,52,308,1,0,0,0,54,325,1,0,0,0,56,327,1,0,0,0,58,329,
-        1,0,0,0,60,337,1,0,0,0,62,350,1,0,0,0,64,360,1,0,0,0,66,362,1,0,
-        0,0,68,369,1,0,0,0,70,377,1,0,0,0,72,384,1,0,0,0,74,387,1,0,0,0,
-        76,389,1,0,0,0,78,391,1,0,0,0,80,393,1,0,0,0,82,395,1,0,0,0,84,399,
-        1,0,0,0,86,88,5,52,0,0,87,86,1,0,0,0,88,91,1,0,0,0,89,87,1,0,0,0,
-        89,90,1,0,0,0,90,95,1,0,0,0,91,89,1,0,0,0,92,94,3,2,1,0,93,92,1,
-        0,0,0,94,97,1,0,0,0,95,93,1,0,0,0,95,96,1,0,0,0,96,98,1,0,0,0,97,
-        95,1,0,0,0,98,99,5,0,0,1,99,1,1,0,0,0,100,103,3,4,2,0,101,103,3,
-        22,11,0,102,100,1,0,0,0,102,101,1,0,0,0,103,3,1,0,0,0,104,105,3,
-        6,3,0,105,107,3,76,38,0,106,108,3,8,4,0,107,106,1,0,0,0,107,108,
-        1,0,0,0,108,109,1,0,0,0,109,110,5,51,0,0,110,111,5,52,0,0,111,115,
-        5,1,0,0,112,114,3,10,5,0,113,112,1,0,0,0,114,117,1,0,0,0,115,113,
-        1,0,0,0,115,116,1,0,0,0,116,118,1,0,0,0,117,115,1,0,0,0,118,119,
-        5,2,0,0,119,5,1,0,0,0,120,121,7,0,0,0,121,7,1,0,0,0,122,123,5,7,
-        0,0,123,126,5,8,0,0,124,127,5,33,0,0,125,127,3,76,38,0,126,124,1,
-        0,0,0,126,125,1,0,0,0,127,9,1,0,0,0,128,131,3,12,6,0,129,131,3,16,
-        8,0,130,128,1,0,0,0,130,129,1,0,0,0,131,11,1,0,0,0,132,133,5,5,0,
-        0,133,135,3,74,37,0,134,136,3,14,7,0,135,134,1,0,0,0,135,136,1,0,
-        0,0,136,137,1,0,0,0,137,138,5,52,0,0,138,13,1,0,0,0,139,140,5,6,
-        0,0,140,141,3,48,24,0,141,15,1,0,0,0,142,143,5,5,0,0,143,144,5,9,
-        0,0,144,146,3,74,37,0,145,147,3,18,9,0,146,145,1,0,0,0,146,147,1,
-        0,0,0,147,148,1,0,0,0,148,149,5,51,0,0,149,150,5,52,0,0,150,154,
-        5,1,0,0,151,153,3,24,12,0,152,151,1,0,0,0,153,156,1,0,0,0,154,152,
-        1,0,0,0,154,155,1,0,0,0,155,157,1,0,0,0,156,154,1,0,0,0,157,158,
-        5,2,0,0,158,17,1,0,0,0,159,161,5,10,0,0,160,162,3,20,10,0,161,160,
-        1,0,0,0,162,163,1,0,0,0,163,161,1,0,0,0,163,164,1,0,0,0,164,19,1,
-        0,0,0,165,167,3,74,37,0,166,168,3,84,42,0,167,166,1,0,0,0,167,168,
-        1,0,0,0,168,21,1,0,0,0,169,170,5,23,0,0,170,171,3,76,38,0,171,172,
-        3,74,37,0,172,173,5,6,0,0,173,174,3,76,38,0,174,175,3,74,37,0,175,
-        176,5,51,0,0,176,177,5,52,0,0,177,181,5,1,0,0,178,180,3,24,12,0,
-        179,178,1,0,0,0,180,183,1,0,0,0,181,179,1,0,0,0,181,182,1,0,0,0,
-        182,184,1,0,0,0,183,181,1,0,0,0,184,185,5,2,0,0,185,23,1,0,0,0,186,
-        196,3,26,13,0,187,196,3,28,14,0,188,196,3,32,16,0,189,196,3,38,19,
-        0,190,196,3,40,20,0,191,196,3,42,21,0,192,196,3,44,22,0,193,196,
-        3,46,23,0,194,196,3,30,15,0,195,186,1,0,0,0,195,187,1,0,0,0,195,
-        188,1,0,0,0,195,189,1,0,0,0,195,190,1,0,0,0,195,191,1,0,0,0,195,
-        192,1,0,0,0,195,193,1,0,0,0,195,194,1,0,0,0,196,25,1,0,0,0,197,198,
-        5,11,0,0,198,199,3,70,35,0,199,200,5,12,0,0,200,201,3,48,24,0,201,
-        202,5,52,0,0,202,27,1,0,0,0,203,204,5,13,0,0,204,205,3,48,24,0,205,
-        206,5,52,0,0,206,29,1,0,0,0,207,208,3,66,33,0,208,209,5,52,0,0,209,
-        31,1,0,0,0,210,211,5,14,0,0,211,212,3,48,24,0,212,213,5,51,0,0,213,
-        214,5,52,0,0,214,218,5,1,0,0,215,217,3,24,12,0,216,215,1,0,0,0,217,
-        220,1,0,0,0,218,216,1,0,0,0,218,219,1,0,0,0,219,221,1,0,0,0,220,
-        218,1,0,0,0,221,225,5,2,0,0,222,224,3,34,17,0,223,222,1,0,0,0,224,
-        227,1,0,0,0,225,223,1,0,0,0,225,226,1,0,0,0,226,229,1,0,0,0,227,
-        225,1,0,0,0,228,230,3,36,18,0,229,228,1,0,0,0,229,230,1,0,0,0,230,
-        33,1,0,0,0,231,232,5,15,0,0,232,233,5,14,0,0,233,234,3,48,24,0,234,
-        235,5,51,0,0,235,236,5,52,0,0,236,240,5,1,0,0,237,239,3,24,12,0,
-        238,237,1,0,0,0,239,242,1,0,0,0,240,238,1,0,0,0,240,241,1,0,0,0,
-        241,243,1,0,0,0,242,240,1,0,0,0,243,244,5,2,0,0,244,35,1,0,0,0,245,
-        246,5,15,0,0,246,247,5,51,0,0,247,248,5,52,0,0,248,252,5,1,0,0,249,
-        251,3,24,12,0,250,249,1,0,0,0,251,254,1,0,0,0,252,250,1,0,0,0,252,
-        253,1,0,0,0,253,255,1,0,0,0,254,252,1,0,0,0,255,256,5,2,0,0,256,
-        37,1,0,0,0,257,258,5,16,0,0,258,259,3,74,37,0,259,260,5,18,0,0,260,
-        261,3,48,24,0,261,262,5,51,0,0,262,263,5,52,0,0,263,267,5,1,0,0,
-        264,266,3,24,12,0,265,264,1,0,0,0,266,269,1,0,0,0,267,265,1,0,0,
-        0,267,268,1,0,0,0,268,270,1,0,0,0,269,267,1,0,0,0,270,271,5,2,0,
-        0,271,39,1,0,0,0,272,273,5,17,0,0,273,274,3,48,24,0,274,275,5,19,
-        0,0,275,276,3,48,24,0,276,277,5,6,0,0,277,278,3,74,37,0,278,279,
-        5,51,0,0,279,280,5,52,0,0,280,284,5,1,0,0,281,283,3,24,12,0,282,
-        281,1,0,0,0,283,286,1,0,0,0,284,282,1,0,0,0,284,285,1,0,0,0,285,
-        287,1,0,0,0,286,284,1,0,0,0,287,288,5,2,0,0,288,41,1,0,0,0,289,290,
-        5,20,0,0,290,291,5,52,0,0,291,43,1,0,0,0,292,293,5,21,0,0,293,294,
-        5,52,0,0,294,45,1,0,0,0,295,296,5,22,0,0,296,297,5,52,0,0,297,47,
-        1,0,0,0,298,299,3,50,25,0,299,49,1,0,0,0,300,305,3,52,26,0,301,302,
-        5,29,0,0,302,304,3,52,26,0,303,301,1,0,0,0,304,307,1,0,0,0,305,303,
-        1,0,0,0,305,306,1,0,0,0,306,51,1,0,0,0,307,305,1,0,0,0,308,313,3,
-        54,27,0,309,310,5,28,0,0,310,312,3,54,27,0,311,309,1,0,0,0,312,315,
-        1,0,0,0,313,311,1,0,0,0,313,314,1,0,0,0,314,53,1,0,0,0,315,313,1,
-        0,0,0,316,317,3,58,29,0,317,318,3,56,28,0,318,319,3,58,29,0,319,
-        326,1,0,0,0,320,321,3,58,29,0,321,322,5,7,0,0,322,323,3,84,42,0,
-        323,326,1,0,0,0,324,326,3,58,29,0,325,316,1,0,0,0,325,320,1,0,0,
-        0,325,324,1,0,0,0,326,55,1,0,0,0,327,328,7,1,0,0,328,57,1,0,0,0,
-        329,334,3,60,30,0,330,331,7,2,0,0,331,333,3,60,30,0,332,330,1,0,
-        0,0,333,336,1,0,0,0,334,332,1,0,0,0,334,335,1,0,0,0,335,59,1,0,0,
-        0,336,334,1,0,0,0,337,342,3,62,31,0,338,339,7,3,0,0,339,341,3,62,
-        31,0,340,338,1,0,0,0,341,344,1,0,0,0,342,340,1,0,0,0,342,343,1,0,
-        0,0,343,61,1,0,0,0,344,342,1,0,0,0,345,346,5,24,0,0,346,351,3,62,
-        31,0,347,348,5,44,0,0,348,351,3,62,31,0,349,351,3,64,32,0,350,345,
-        1,0,0,0,350,347,1,0,0,0,350,349,1,0,0,0,351,63,1,0,0,0,352,361,3,
-        78,39,0,353,361,3,66,33,0,354,361,3,70,35,0,355,361,3,82,41,0,356,
-        357,5,49,0,0,357,358,3,48,24,0,358,359,5,50,0,0,359,361,1,0,0,0,
-        360,352,1,0,0,0,360,353,1,0,0,0,360,354,1,0,0,0,360,355,1,0,0,0,
-        360,356,1,0,0,0,361,65,1,0,0,0,362,363,3,70,35,0,363,365,5,49,0,
-        0,364,366,3,68,34,0,365,364,1,0,0,0,365,366,1,0,0,0,366,367,1,0,
-        0,0,367,368,5,50,0,0,368,67,1,0,0,0,369,374,3,48,24,0,370,371,5,
-        48,0,0,371,373,3,48,24,0,372,370,1,0,0,0,373,376,1,0,0,0,374,372,
-        1,0,0,0,374,375,1,0,0,0,375,69,1,0,0,0,376,374,1,0,0,0,377,381,3,
-        74,37,0,378,380,3,72,36,0,379,378,1,0,0,0,380,383,1,0,0,0,381,379,
-        1,0,0,0,381,382,1,0,0,0,382,71,1,0,0,0,383,381,1,0,0,0,384,385,5,
-        47,0,0,385,386,3,74,37,0,386,73,1,0,0,0,387,388,5,42,0,0,388,75,
-        1,0,0,0,389,390,5,41,0,0,390,77,1,0,0,0,391,392,7,4,0,0,392,79,1,
-        0,0,0,393,394,7,5,0,0,394,81,1,0,0,0,395,396,3,76,38,0,396,83,1,
-        0,0,0,397,400,3,80,40,0,398,400,3,82,41,0,399,397,1,0,0,0,399,398,
-        1,0,0,0,400,85,1,0,0,0,32,89,95,102,107,115,126,130,135,146,154,
-        163,167,181,195,218,225,229,240,252,267,284,305,313,325,334,342,
-        350,360,365,374,381,399
+        147,8,8,1,8,1,8,1,8,1,8,5,8,153,8,8,10,8,12,8,156,9,8,1,8,1,8,3,
+        8,160,8,8,1,9,1,9,4,9,164,8,9,11,9,12,9,165,1,10,1,10,3,10,170,8,
+        10,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,1,11,5,11,182,8,
+        11,10,11,12,11,185,9,11,1,11,1,11,1,12,1,12,1,12,1,12,1,12,1,12,
+        1,12,1,12,1,12,3,12,198,8,12,1,13,1,13,1,13,1,13,1,13,1,13,1,14,
+        1,14,1,14,1,14,1,15,1,15,1,15,1,16,1,16,1,16,1,16,1,16,1,16,5,16,
+        219,8,16,10,16,12,16,222,9,16,1,16,1,16,5,16,226,8,16,10,16,12,16,
+        229,9,16,1,16,3,16,232,8,16,1,17,1,17,1,17,1,17,1,17,1,17,1,17,5,
+        17,241,8,17,10,17,12,17,244,9,17,1,17,1,17,1,18,1,18,1,18,1,18,1,
+        18,5,18,253,8,18,10,18,12,18,256,9,18,1,18,1,18,1,19,1,19,1,19,1,
+        19,1,19,1,19,1,19,1,19,5,19,268,8,19,10,19,12,19,271,9,19,1,19,1,
+        19,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,1,20,5,20,285,8,
+        20,10,20,12,20,288,9,20,1,20,1,20,1,21,1,21,1,21,1,22,1,22,1,22,
+        1,23,1,23,1,23,1,24,1,24,1,25,1,25,1,25,5,25,306,8,25,10,25,12,25,
+        309,9,25,1,26,1,26,1,26,5,26,314,8,26,10,26,12,26,317,9,26,1,27,
+        1,27,1,27,1,27,1,27,1,27,1,27,1,27,1,27,3,27,328,8,27,1,28,1,28,
+        1,29,1,29,1,29,5,29,335,8,29,10,29,12,29,338,9,29,1,30,1,30,1,30,
+        5,30,343,8,30,10,30,12,30,346,9,30,1,31,1,31,1,31,1,31,1,31,3,31,
+        353,8,31,1,32,1,32,1,32,1,32,1,32,1,32,1,32,1,32,3,32,363,8,32,1,
+        33,1,33,1,33,3,33,368,8,33,1,33,1,33,1,34,1,34,1,34,5,34,375,8,34,
+        10,34,12,34,378,9,34,1,35,1,35,5,35,382,8,35,10,35,12,35,385,9,35,
+        1,36,1,36,1,36,1,37,1,37,1,38,1,38,1,39,1,39,1,40,1,40,1,41,1,41,
+        1,42,1,42,3,42,402,8,42,1,42,0,0,43,0,2,4,6,8,10,12,14,16,18,20,
+        22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,
+        66,68,70,72,74,76,78,80,82,84,0,6,1,0,3,4,1,0,25,27,1,0,43,44,1,
+        0,45,46,1,0,37,40,1,0,30,36,405,0,89,1,0,0,0,2,102,1,0,0,0,4,104,
+        1,0,0,0,6,120,1,0,0,0,8,122,1,0,0,0,10,130,1,0,0,0,12,132,1,0,0,
+        0,14,139,1,0,0,0,16,142,1,0,0,0,18,161,1,0,0,0,20,167,1,0,0,0,22,
+        171,1,0,0,0,24,197,1,0,0,0,26,199,1,0,0,0,28,205,1,0,0,0,30,209,
+        1,0,0,0,32,212,1,0,0,0,34,233,1,0,0,0,36,247,1,0,0,0,38,259,1,0,
+        0,0,40,274,1,0,0,0,42,291,1,0,0,0,44,294,1,0,0,0,46,297,1,0,0,0,
+        48,300,1,0,0,0,50,302,1,0,0,0,52,310,1,0,0,0,54,327,1,0,0,0,56,329,
+        1,0,0,0,58,331,1,0,0,0,60,339,1,0,0,0,62,352,1,0,0,0,64,362,1,0,
+        0,0,66,364,1,0,0,0,68,371,1,0,0,0,70,379,1,0,0,0,72,386,1,0,0,0,
+        74,389,1,0,0,0,76,391,1,0,0,0,78,393,1,0,0,0,80,395,1,0,0,0,82,397,
+        1,0,0,0,84,401,1,0,0,0,86,88,5,52,0,0,87,86,1,0,0,0,88,91,1,0,0,
+        0,89,87,1,0,0,0,89,90,1,0,0,0,90,95,1,0,0,0,91,89,1,0,0,0,92,94,
+        3,2,1,0,93,92,1,0,0,0,94,97,1,0,0,0,95,93,1,0,0,0,95,96,1,0,0,0,
+        96,98,1,0,0,0,97,95,1,0,0,0,98,99,5,0,0,1,99,1,1,0,0,0,100,103,3,
+        4,2,0,101,103,3,22,11,0,102,100,1,0,0,0,102,101,1,0,0,0,103,3,1,
+        0,0,0,104,105,3,6,3,0,105,107,3,76,38,0,106,108,3,8,4,0,107,106,
+        1,0,0,0,107,108,1,0,0,0,108,109,1,0,0,0,109,110,5,51,0,0,110,111,
+        5,52,0,0,111,115,5,1,0,0,112,114,3,10,5,0,113,112,1,0,0,0,114,117,
+        1,0,0,0,115,113,1,0,0,0,115,116,1,0,0,0,116,118,1,0,0,0,117,115,
+        1,0,0,0,118,119,5,2,0,0,119,5,1,0,0,0,120,121,7,0,0,0,121,7,1,0,
+        0,0,122,123,5,7,0,0,123,126,5,8,0,0,124,127,5,33,0,0,125,127,3,76,
+        38,0,126,124,1,0,0,0,126,125,1,0,0,0,127,9,1,0,0,0,128,131,3,12,
+        6,0,129,131,3,16,8,0,130,128,1,0,0,0,130,129,1,0,0,0,131,11,1,0,
+        0,0,132,133,5,5,0,0,133,135,3,74,37,0,134,136,3,14,7,0,135,134,1,
+        0,0,0,135,136,1,0,0,0,136,137,1,0,0,0,137,138,5,52,0,0,138,13,1,
+        0,0,0,139,140,5,6,0,0,140,141,3,48,24,0,141,15,1,0,0,0,142,143,5,
+        5,0,0,143,144,5,9,0,0,144,146,3,74,37,0,145,147,3,18,9,0,146,145,
+        1,0,0,0,146,147,1,0,0,0,147,159,1,0,0,0,148,149,5,51,0,0,149,150,
+        5,52,0,0,150,154,5,1,0,0,151,153,3,24,12,0,152,151,1,0,0,0,153,156,
+        1,0,0,0,154,152,1,0,0,0,154,155,1,0,0,0,155,157,1,0,0,0,156,154,
+        1,0,0,0,157,160,5,2,0,0,158,160,5,52,0,0,159,148,1,0,0,0,159,158,
+        1,0,0,0,160,17,1,0,0,0,161,163,5,10,0,0,162,164,3,20,10,0,163,162,
+        1,0,0,0,164,165,1,0,0,0,165,163,1,0,0,0,165,166,1,0,0,0,166,19,1,
+        0,0,0,167,169,3,74,37,0,168,170,3,84,42,0,169,168,1,0,0,0,169,170,
+        1,0,0,0,170,21,1,0,0,0,171,172,5,23,0,0,172,173,3,76,38,0,173,174,
+        3,74,37,0,174,175,5,6,0,0,175,176,3,76,38,0,176,177,3,74,37,0,177,
+        178,5,51,0,0,178,179,5,52,0,0,179,183,5,1,0,0,180,182,3,24,12,0,
+        181,180,1,0,0,0,182,185,1,0,0,0,183,181,1,0,0,0,183,184,1,0,0,0,
+        184,186,1,0,0,0,185,183,1,0,0,0,186,187,5,2,0,0,187,23,1,0,0,0,188,
+        198,3,26,13,0,189,198,3,28,14,0,190,198,3,32,16,0,191,198,3,38,19,
+        0,192,198,3,40,20,0,193,198,3,42,21,0,194,198,3,44,22,0,195,198,
+        3,46,23,0,196,198,3,30,15,0,197,188,1,0,0,0,197,189,1,0,0,0,197,
+        190,1,0,0,0,197,191,1,0,0,0,197,192,1,0,0,0,197,193,1,0,0,0,197,
+        194,1,0,0,0,197,195,1,0,0,0,197,196,1,0,0,0,198,25,1,0,0,0,199,200,
+        5,11,0,0,200,201,3,70,35,0,201,202,5,12,0,0,202,203,3,48,24,0,203,
+        204,5,52,0,0,204,27,1,0,0,0,205,206,5,13,0,0,206,207,3,48,24,0,207,
+        208,5,52,0,0,208,29,1,0,0,0,209,210,3,66,33,0,210,211,5,52,0,0,211,
+        31,1,0,0,0,212,213,5,14,0,0,213,214,3,48,24,0,214,215,5,51,0,0,215,
+        216,5,52,0,0,216,220,5,1,0,0,217,219,3,24,12,0,218,217,1,0,0,0,219,
+        222,1,0,0,0,220,218,1,0,0,0,220,221,1,0,0,0,221,223,1,0,0,0,222,
+        220,1,0,0,0,223,227,5,2,0,0,224,226,3,34,17,0,225,224,1,0,0,0,226,
+        229,1,0,0,0,227,225,1,0,0,0,227,228,1,0,0,0,228,231,1,0,0,0,229,
+        227,1,0,0,0,230,232,3,36,18,0,231,230,1,0,0,0,231,232,1,0,0,0,232,
+        33,1,0,0,0,233,234,5,15,0,0,234,235,5,14,0,0,235,236,3,48,24,0,236,
+        237,5,51,0,0,237,238,5,52,0,0,238,242,5,1,0,0,239,241,3,24,12,0,
+        240,239,1,0,0,0,241,244,1,0,0,0,242,240,1,0,0,0,242,243,1,0,0,0,
+        243,245,1,0,0,0,244,242,1,0,0,0,245,246,5,2,0,0,246,35,1,0,0,0,247,
+        248,5,15,0,0,248,249,5,51,0,0,249,250,5,52,0,0,250,254,5,1,0,0,251,
+        253,3,24,12,0,252,251,1,0,0,0,253,256,1,0,0,0,254,252,1,0,0,0,254,
+        255,1,0,0,0,255,257,1,0,0,0,256,254,1,0,0,0,257,258,5,2,0,0,258,
+        37,1,0,0,0,259,260,5,16,0,0,260,261,3,74,37,0,261,262,5,18,0,0,262,
+        263,3,48,24,0,263,264,5,51,0,0,264,265,5,52,0,0,265,269,5,1,0,0,
+        266,268,3,24,12,0,267,266,1,0,0,0,268,271,1,0,0,0,269,267,1,0,0,
+        0,269,270,1,0,0,0,270,272,1,0,0,0,271,269,1,0,0,0,272,273,5,2,0,
+        0,273,39,1,0,0,0,274,275,5,17,0,0,275,276,3,48,24,0,276,277,5,19,
+        0,0,277,278,3,48,24,0,278,279,5,6,0,0,279,280,3,74,37,0,280,281,
+        5,51,0,0,281,282,5,52,0,0,282,286,5,1,0,0,283,285,3,24,12,0,284,
+        283,1,0,0,0,285,288,1,0,0,0,286,284,1,0,0,0,286,287,1,0,0,0,287,
+        289,1,0,0,0,288,286,1,0,0,0,289,290,5,2,0,0,290,41,1,0,0,0,291,292,
+        5,20,0,0,292,293,5,52,0,0,293,43,1,0,0,0,294,295,5,21,0,0,295,296,
+        5,52,0,0,296,45,1,0,0,0,297,298,5,22,0,0,298,299,5,52,0,0,299,47,
+        1,0,0,0,300,301,3,50,25,0,301,49,1,0,0,0,302,307,3,52,26,0,303,304,
+        5,29,0,0,304,306,3,52,26,0,305,303,1,0,0,0,306,309,1,0,0,0,307,305,
+        1,0,0,0,307,308,1,0,0,0,308,51,1,0,0,0,309,307,1,0,0,0,310,315,3,
+        54,27,0,311,312,5,28,0,0,312,314,3,54,27,0,313,311,1,0,0,0,314,317,
+        1,0,0,0,315,313,1,0,0,0,315,316,1,0,0,0,316,53,1,0,0,0,317,315,1,
+        0,0,0,318,319,3,58,29,0,319,320,3,56,28,0,320,321,3,58,29,0,321,
+        328,1,0,0,0,322,323,3,58,29,0,323,324,5,7,0,0,324,325,3,84,42,0,
+        325,328,1,0,0,0,326,328,3,58,29,0,327,318,1,0,0,0,327,322,1,0,0,
+        0,327,326,1,0,0,0,328,55,1,0,0,0,329,330,7,1,0,0,330,57,1,0,0,0,
+        331,336,3,60,30,0,332,333,7,2,0,0,333,335,3,60,30,0,334,332,1,0,
+        0,0,335,338,1,0,0,0,336,334,1,0,0,0,336,337,1,0,0,0,337,59,1,0,0,
+        0,338,336,1,0,0,0,339,344,3,62,31,0,340,341,7,3,0,0,341,343,3,62,
+        31,0,342,340,1,0,0,0,343,346,1,0,0,0,344,342,1,0,0,0,344,345,1,0,
+        0,0,345,61,1,0,0,0,346,344,1,0,0,0,347,348,5,24,0,0,348,353,3,62,
+        31,0,349,350,5,44,0,0,350,353,3,62,31,0,351,353,3,64,32,0,352,347,
+        1,0,0,0,352,349,1,0,0,0,352,351,1,0,0,0,353,63,1,0,0,0,354,363,3,
+        78,39,0,355,363,3,66,33,0,356,363,3,70,35,0,357,363,3,82,41,0,358,
+        359,5,49,0,0,359,360,3,48,24,0,360,361,5,50,0,0,361,363,1,0,0,0,
+        362,354,1,0,0,0,362,355,1,0,0,0,362,356,1,0,0,0,362,357,1,0,0,0,
+        362,358,1,0,0,0,363,65,1,0,0,0,364,365,3,70,35,0,365,367,5,49,0,
+        0,366,368,3,68,34,0,367,366,1,0,0,0,367,368,1,0,0,0,368,369,1,0,
+        0,0,369,370,5,50,0,0,370,67,1,0,0,0,371,376,3,48,24,0,372,373,5,
+        48,0,0,373,375,3,48,24,0,374,372,1,0,0,0,375,378,1,0,0,0,376,374,
+        1,0,0,0,376,377,1,0,0,0,377,69,1,0,0,0,378,376,1,0,0,0,379,383,3,
+        74,37,0,380,382,3,72,36,0,381,380,1,0,0,0,382,385,1,0,0,0,383,381,
+        1,0,0,0,383,384,1,0,0,0,384,71,1,0,0,0,385,383,1,0,0,0,386,387,5,
+        47,0,0,387,388,3,74,37,0,388,73,1,0,0,0,389,390,5,42,0,0,390,75,
+        1,0,0,0,391,392,5,41,0,0,392,77,1,0,0,0,393,394,7,4,0,0,394,79,1,
+        0,0,0,395,396,7,5,0,0,396,81,1,0,0,0,397,398,3,76,38,0,398,83,1,
+        0,0,0,399,402,3,80,40,0,400,402,3,82,41,0,401,399,1,0,0,0,401,400,
+        1,0,0,0,402,85,1,0,0,0,33,89,95,102,107,115,126,130,135,146,154,
+        159,165,169,183,197,220,227,231,242,254,269,286,307,315,327,336,
+        344,352,362,367,376,383,401
     ];
 
     private static __ATN: antlr.ATN;
@@ -2339,17 +2356,17 @@ export class ElementFunctionDefinitionContext extends antlr.ParserRuleContext {
     public identifier(): IdentifierContext {
         return this.getRuleContext(0, IdentifierContext)!;
     }
-    public COLON(): antlr.TerminalNode {
-        return this.getToken(DSLParser.COLON, 0)!;
+    public COLON(): antlr.TerminalNode | null {
+        return this.getToken(DSLParser.COLON, 0);
     }
-    public NEWLINE(): antlr.TerminalNode {
-        return this.getToken(DSLParser.NEWLINE, 0)!;
+    public NEWLINE(): antlr.TerminalNode | null {
+        return this.getToken(DSLParser.NEWLINE, 0);
     }
-    public INDENT(): antlr.TerminalNode {
-        return this.getToken(DSLParser.INDENT, 0)!;
+    public INDENT(): antlr.TerminalNode | null {
+        return this.getToken(DSLParser.INDENT, 0);
     }
-    public DEDENT(): antlr.TerminalNode {
-        return this.getToken(DSLParser.DEDENT, 0)!;
+    public DEDENT(): antlr.TerminalNode | null {
+        return this.getToken(DSLParser.DEDENT, 0);
     }
     public functionParameters(): FunctionParametersContext | null {
         return this.getRuleContext(0, FunctionParametersContext);

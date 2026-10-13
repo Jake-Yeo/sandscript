@@ -13,6 +13,7 @@ export class Lexer implements TokenSource {
 
     private atBeginningOfLine = true;
     private reachedEOF = false;
+    private lastRawToken: Token | null = null;
 
     constructor(input: string) {
         const chars = CharStream.fromString(input);
@@ -26,6 +27,7 @@ export class Lexer implements TokenSource {
 
         let token = this.lexer.nextToken();
 
+
         if (token.type === Token.EOF) {
             this.handleEOF(token);
 
@@ -34,6 +36,8 @@ export class Lexer implements TokenSource {
             }
 
             return token;
+        } else {
+            this.lastRawToken = token;
         }
 
         if (this.atBeginningOfLine) {
@@ -51,6 +55,8 @@ export class Lexer implements TokenSource {
                     }
 
                     return token;
+                } else {
+                    this.lastRawToken = token;
                 }
             }
 
@@ -128,6 +134,23 @@ export class Lexer implements TokenSource {
         }
 
         this.reachedEOF = true;
+
+        if (
+            this.lastRawToken !== null &&
+            this.lastRawToken.type !== DSLLexer.NEWLINE
+        ) {
+            const newline = CommonToken.fromType(
+                DSLLexer.NEWLINE,
+                '\n',
+            );
+
+            newline.line = this.lastRawToken.line;
+            newline.column =
+                this.lastRawToken.column +
+                (this.lastRawToken.text?.length ?? 0);
+
+            this.pendingTokens.push(newline);
+        }
 
         while (this.indentationStack.length > 1) {
             this.indentationStack.pop();
