@@ -1,9 +1,9 @@
 import LanguageServiceProvider from '@/context/LanguageServiceProvider';
 import MainContextProvider from '../context/MainContextProvider';
-import InputSection from './InputSection';
+import InputSection from './input/InputSection';
 import ThemeButton from './ThemeButton';
 import GameContextProvider from '@/context/GameContextProvider';
-import GameSection from './GameSection';
+import GameSection from './game/GameSection';
 
 function App() {
   return (

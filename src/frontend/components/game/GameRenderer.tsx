@@ -1,9 +1,9 @@
-import { CANVAS_DIMS } from '../lib/canvas';
+import { CANVAS_DIMS } from '../../lib/canvas';
 import type {
   EraseRequest,
   SpawnRequest,
-} from '../lib/gameWorker/worker';
-import type { Location } from '../lib/types';
+} from '../../lib/gameWorker/worker';
+import type { Location } from '../../lib/types';
 import { useGameContext } from '@/context/GameContext';
 
 export default function GameRenderer() {
