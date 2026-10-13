@@ -116,12 +116,20 @@ function resolveMethods(
 }
 
 function validateInteractions(
-    _interactions: readonly InteractionDef[],
-    _elements: ReadonlyMap<string, CompiledElement>,
+    interactions: readonly InteractionDef[],
+    elements: ReadonlyMap<string, CompiledElement>,
 ): void {
-    throw new Error(
-        'TODO (checklist 5): check interaction type names exist and binding names are distinct',
-    );
+    for (const interaction of interactions) {
+        if (!elements.has(interaction.element1.value)) {
+            throw new Error(`Unknown element "${interaction.element1.value}" in interaction.`);
+        }
+        if (!elements.has(interaction.element2.value)) {
+            throw new Error(`Unknown element "${interaction.element2.value}" in interaction.`);
+        }
+        if (interaction.element1Binding.value === interaction.element2Binding.value) {
+            throw new Error(`Duplicate interaction binding "${interaction.element1Binding.value}".`);
+        }
+    }
 }
 
 function rootElement(): CompiledElement {
