@@ -6,18 +6,29 @@ export type CompilerServiceRequest = {
   source: string;
 };
 
-export type CompilerServiceResponse = {
-  program: Program;
+export type CompilerServiceResponse = SuccessResponse | ErrorResponse;
+type SuccessResponse = {
+  type: 'success';
+  program: Program
+};
+type ErrorResponse = {
+  type: 'error';
+  message: string;
 };
 
 self.onmessage = (event: MessageEvent<CompilerServiceRequest>) => {
-  const data = event.data;
+  try {
+    const tree = new Parser(event.data.source).parse();
+    const program = new ASTBuilder().build(tree);
 
-  const parser = new Parser(data.source);
-  const tree = parser.parse();
+    const response: SuccessResponse = { type: 'success', program };
+    self.postMessage(response);
 
-  const astBuilder = new ASTBuilder();
-  const program: Program = astBuilder.build(tree);
-
-  self.postMessage({ program });
+  } catch (e) {
+    const response: ErrorResponse = {
+      type: 'error',
+      message: e instanceof Error ? e.message : String(e)
+    }
+    self.postMessage(response);
+  }
 };

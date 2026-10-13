@@ -40,12 +40,25 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
     });
     workerRef.current = worker;
 
-    worker.onmessage = (event: MessageEvent<CompilerServiceResponse>) => {
+    const onCompileDone = () => {
       setIsCompiling(false);
       isCompilingRef.current = false;
+    };
 
-      const program = event.data.program;
-      console.log(program);
+    worker.onmessage = (event: MessageEvent<CompilerServiceResponse>) => {
+      onCompileDone();
+
+      if (event.data.type === 'error') {
+        console.error(event.data.message);
+        return;
+      }
+
+      console.log(event.data.program);
+    };
+
+    worker.onerror = (event) => {
+      onCompileDone();
+      console.error(event.message);
     };
 
     return () => {
