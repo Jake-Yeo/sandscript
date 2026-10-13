@@ -6,16 +6,19 @@ import {
 import { DSLLexer } from '../generated/DSLLexer';
 import type { TokenSource } from 'antlr4ng';
 
+
 export class Lexer implements TokenSource {
     private readonly lexer: DSLLexer;
     private readonly pendingTokens: Token[] = [];
     private readonly indentationStack: number[] = [0];
+    private readonly errors?: string[];
 
     private atBeginningOfLine = true;
     private reachedEOF = false;
     private lastRawToken: Token | null = null;
 
     constructor(input: string, errors?: string[]) {
+        this.errors = errors;
         const chars = CharStream.fromString(input);
         this.lexer = new DSLLexer(chars);
 
@@ -36,7 +39,7 @@ export class Lexer implements TokenSource {
                     errors.push(error);
                 }
 
-                throw new Error(`Lexing failed: ${error}`);
+                this.reportError(`Lexing failed: ${error}`);
             },
             reportAmbiguity: () => { },
             reportAttemptingFullContext: () => { },
@@ -85,7 +88,7 @@ export class Lexer implements TokenSource {
             }
 
             if (token.type === DSLLexer.SPACE) {
-                throw new Error(
+                this.reportError(
                     `Spaces cannot be used for indentation on line ${token.line}.`,
                 );
             }
@@ -122,7 +125,7 @@ export class Lexer implements TokenSource {
                     ];
 
                 if (indentation !== expectedIndentation) {
-                    throw new Error(
+                    this.reportError(
                         `Invalid indentation on line ${token.line}. ` +
                         `Expected indentation level ` +
                         `${expectedIndentation}, ` +
@@ -233,5 +236,10 @@ export class Lexer implements TokenSource {
 
     set tokenFactory(factory) {
         this.lexer.tokenFactory = factory;
+    }
+
+    private reportError(message: string): never {
+        this.errors?.push(message);
+        throw new Error(message);
     }
 }
