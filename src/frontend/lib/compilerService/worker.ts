@@ -1,6 +1,7 @@
 import type { Program } from "../../../ast/ast";
 import { Parser } from "../../../parser/parser";
 import { ASTBuilder } from "../../../ast/astBuilder";
+import { validateAST } from '../../..//ast/astValidator';
 
 export type CompilerServiceRequest = {
   source: string;
@@ -20,6 +21,7 @@ self.onmessage = (event: MessageEvent<CompilerServiceRequest>) => {
   try {
     const tree = new Parser(event.data.source).parse();
     const program = new ASTBuilder().build(tree);
+    validateAST(program);
 
     const response: SuccessResponse = { type: 'success', program };
     self.postMessage(response);

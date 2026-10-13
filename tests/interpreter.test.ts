@@ -64,6 +64,7 @@ const method = (name: string, statements: Statement[], args: Parameter[] = []): 
   name: identifier(name),
   args,
   statements,
+  hasBody: true,
 });
 
 interface BuiltinCall {

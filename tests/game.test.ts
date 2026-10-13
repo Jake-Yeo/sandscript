@@ -720,11 +720,11 @@ test('real parser/evaluator run ordinary loops and helpers through the engine', 
 \thas color with Color(#111111)
 \thas total with 0
 \thas function amount needs value Number:
-\t\tif value less-than 2:
+\t\tif value less_than 2:
 \t\t\tgive value
 \t\tgive value * 2
 \thas function tick:
-\t\tgo-through 1 to 3 with i:
+\t\tgo_through 1 to 3 with i:
 \t\t\tlet total be total + amount(i)
 \t\tif total equals 11:
 \t\t\tlet color be Color(#00ff00)
