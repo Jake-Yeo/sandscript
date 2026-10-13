@@ -35,10 +35,19 @@ export function buildGame(program: Program): CompiledGame {
     };
 }
 
-function registerElements(_program: Program): Map<string, ElementDef> {
-    throw new Error(
-        'TODO (checklist 1): index element definitions by name; reject duplicates and user redefinition of the reserved root',
-    );
+function registerElements(program: Program): Map<string, ElementDef> {
+    const definitions = new Map<string, ElementDef>();
+    for (const def of program.elementDefs) {
+        const name = def.name.value;
+        if (name === ROOT_ELEMENT_NAME) {
+            throw new Error(`Cannot redefine reserved root element "${ROOT_ELEMENT_NAME}".`);
+        }
+        if (definitions.has(name)) {
+            throw new Error(`Duplicate element definition "${name}".`);
+        }
+        definitions.set(name, def);
+    }
+    return definitions;
 }
 
 function resolveElements(

@@ -103,19 +103,19 @@ function fieldNames(element: string, program: Program): string[] {
 }
 
 describe('registration', () => {
-    test.skip('rejects duplicate element names', () => {
+    test('rejects duplicate element names', () => {
         const program = makeProgram([makeElement('Water'), makeElement('Water')]);
 
         expect(() => buildGame(program)).toThrow();
     });
 
-    test.skip('rejects an unknown parent', () => {
+    test('rejects an unknown parent', () => {
         const program = makeProgram([makeElement('Ice', { parent: 'Mineral' })]);
 
         expect(() => buildGame(program)).toThrow();
     });
 
-    test.skip('rejects inheritance cycles', () => {
+    test('rejects inheritance cycles', () => {
         const program = makeProgram([
             makeElement('A', { parent: 'B' }),
             makeElement('B', { parent: 'A' }),
@@ -124,7 +124,7 @@ describe('registration', () => {
         expect(() => buildGame(program)).toThrow();
     });
 
-    test.skip('rejects a definition inheriting from itself', () => {
+    test('rejects a definition inheriting from itself', () => {
         const program = makeProgram([makeElement('A', { parent: 'A' })]);
 
         expect(() => buildGame(program)).toThrow();
@@ -132,7 +132,7 @@ describe('registration', () => {
 });
 
 describe('reserved root', () => {
-    test.skip('rejects user redefinition of the root Element', () => {
+    test('rejects user redefinition of the root Element', () => {
         const program = makeProgram([makeElement(ROOT_ELEMENT_NAME)]);
 
         expect(() => buildGame(program)).toThrow();
