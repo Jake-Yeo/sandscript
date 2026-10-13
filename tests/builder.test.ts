@@ -144,8 +144,8 @@ describe('reserved root', () => {
 
         expect(root?.abstract).toBe(true);
         expect(root?.fieldInitializers.map((field) => field.varName.value)).toEqual([
-            'position-x',
-            'position-y',
+            'position_x',
+            'position_y',
             'color',
         ]);
         expect(root?.methods.size).toBe(0);
@@ -155,8 +155,8 @@ describe('reserved root', () => {
         const program = makeProgram([makeElement('Water')]);
 
         expect(fieldNames('Water', program)).toEqual([
-            'position-x',
-            'position-y',
+            'position_x',
+            'position_y',
             'color',
         ]);
     });
@@ -165,8 +165,8 @@ describe('reserved root', () => {
         const program = makeProgram([makeElement('Water', { parent: ROOT_ELEMENT_NAME })]);
 
         expect(fieldNames('Water', program)).toEqual([
-            'position-x',
-            'position-y',
+            'position_x',
+            'position_y',
             'color',
         ]);
     });
@@ -189,8 +189,8 @@ describe('fields', () => {
         ]);
 
         expect(fieldNames('Stone', program)).toEqual([
-            'position-x',
-            'position-y',
+            'position_x',
+            'position_y',
             'color',
             'friction',
             'weight',
@@ -300,7 +300,7 @@ describe('handoff', () => {
                         varDefs: [
                             makeVarDef('color', number(0xaaddff)),
                             makeVarDef('health', number(3)),
-                            makeVarDef('melting-speed', number(1)),
+                            makeVarDef('melting_speed', number(1)),
                         ],
                     }),
                     makeElement('Fire', {
@@ -321,8 +321,8 @@ describe('handoff', () => {
         expect(stone?.methods.get('tick')).toBe(tick);
         expect(stone?.methods.get('fall')).toBe(fall);
         expect(stone?.fieldInitializers.map((field) => field.varName.value)).toEqual([
-            'position-x',
-            'position-y',
+            'position_x',
+            'position_y',
             'color',
             'color',
         ]);
@@ -330,12 +330,12 @@ describe('handoff', () => {
         expect(
             game.elements.get('Ice')?.fieldInitializers.map((field) => field.varName.value),
         ).toEqual([
-            'position-x',
-            'position-y',
+            'position_x',
+            'position_y',
             'color',
             'color',
             'health',
-            'melting-speed',
+            'melting_speed',
         ]);
 
         expect(game.interactions).toEqual([interaction]);

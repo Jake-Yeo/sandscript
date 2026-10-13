@@ -137,8 +137,8 @@ function rootElement(): CompiledElement {
         name: ROOT_ELEMENT_NAME,
         abstract: true,
         fieldInitializers: [
-            makeField('position-x', { type: 'NumberLiteral', value: 0 }),
-            makeField('position-y', { type: 'NumberLiteral', value: 0 }),
+            makeField('position_x', { type: 'NumberLiteral', value: 0 }),
+            makeField('position_y', { type: 'NumberLiteral', value: 0 }),
             makeField('color', null),
         ],
         methods: new Map<string, ElementFuncDef>(),
