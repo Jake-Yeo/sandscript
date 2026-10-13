@@ -98,21 +98,21 @@ function resolveElement(
 }
 
 function resolveFields(
-    _def: ElementDef,
-    _parent: CompiledElement,
+    def: ElementDef,
+    parent: CompiledElement,
 ): readonly ElementVarDef[] {
-    throw new Error(
-        'TODO (checklist 3): parent initializers first, then the child var defs; keep initializer expressions as AST',
-    );
+    return [...parent.fieldInitializers, ...def.varDefs];
 }
 
 function resolveMethods(
-    _def: ElementDef,
-    _parent: CompiledElement,
+    def: ElementDef,
+    parent: CompiledElement,
 ): Map<string, ElementFuncDef> {
-    throw new Error(
-        'TODO (checklist 4): copy the parent method map, then replace entries the child defines; bodies stay AST',
-    );
+    const methods = new Map<string, ElementFuncDef>(parent.methods);
+    for (const funcDef of def.funcDefs) {
+        methods.set(funcDef.name.value, funcDef);
+    }
+    return methods;
 }
 
 function validateInteractions(
