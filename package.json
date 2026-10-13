@@ -1,9 +1,10 @@
 {
   "name": "cs410-game",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
+    "test": "bun test",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
