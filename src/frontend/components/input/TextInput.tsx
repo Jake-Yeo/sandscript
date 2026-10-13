@@ -3,11 +3,11 @@ import { cn } from 'cn';
 import { useRef } from 'react';
 import { flushSync } from 'react-dom';
 import { useLanguageServiceContext } from '@/context/LanguageServiceContext';
-import { Textarea } from './ui/textarea';
+import { Textarea } from '../ui/textarea';
 import { getTokenColor } from '@/lib/token-utils';
 import { useMainContext } from '@/context/MainContext';
 import { ArrowRightToLine } from 'lucide-react';
-import { DSLLexer } from '../../generated/DSLLexer';
+import { DSLLexer } from '../../../generated/DSLLexer';
 
 type ReactKBEvent = React.KeyboardEvent<HTMLTextAreaElement>;
 

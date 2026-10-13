@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { GameContext } from './GameContext';
-import type { CanvasRequest, NewGameRequest, NewGameResponse } from '@/lib/gameWorker/worker';
+import type { CanvasRequest, GameWorkerResponse, NewGameRequest } from '@/lib/gameWorker/worker';
 
 // provider is in its own file to allow react fast refresh
 export default function GameContextProvider({ children }: { children: ReactNode }) {
@@ -17,7 +17,7 @@ export default function GameContextProvider({ children }: { children: ReactNode 
     });
     workerRef.current = worker;
 
-    worker.onmessage = (event: MessageEvent<NewGameResponse>) => {
+    worker.onmessage = (event: MessageEvent<GameWorkerResponse>) => {
       if (event.data.type === 'game') {
         setElements([...event.data.elements]);
       }
