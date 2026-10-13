@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/frontend/*"]
+    },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "es2023",
     "lib": [
@@ -8,7 +11,8 @@
     ],
     "module": "esnext",
     "types": [
-      "vite/client"
+      "vite/client",
+      "bun"
     ],
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
@@ -32,6 +36,7 @@
     "src/parser",
     "src/grammar",
     "src/ast",
-    "src/generated"
+    "src/generated",
+    "tests"
   ]
 }

@@ -1,8 +1,10 @@
-Use indentation like python (tabs only)
-There is no concept of users defining types like plain Python or JS.
-Use kebab-case for names, PascalCase for types and elements
-Use hash symbol for comment - no in line comments(stretch goal)
-
+General Syntax
+Use indentation like Python. Tabs only are allowed for indentation.
+There is no concept of users defining types like in plain Python or JavaScript.
+Use strict snake_case for variables, function names, parameters, and other ordinary identifiers.
+Use PascalCase for element names and types.
+Use # for comments. Comments may appear on their own line or inline after code.
+Parentheses () can be used to indicate expression priority.
 
 Types
 
@@ -15,173 +17,183 @@ use 'equals' for ==
 use 'less-than' for <
 use 'and' for &&
 use 'or' for ||
-use parentheses () to indicate priority (stretch goal)
+use parentheses () to indicate priority
 
 Color
-Color(#123456) to define a custom color
+Use Color(#123456) to define a custom color.
 
 Element
-See classes below
+Represents an element in the game. See Classes below.
 
 Null
-just the 'null' value to represent a lack of something
-all values are truthy, except false and null.
+null represents a lack of something.
+All values are truthy except false and null.
 
-Type (holds one of the above)
-use 'is' to check a type
-
+Type
+Type holds one of the language's types.
+Use is to check whether a value is a particular type.
 
 Variable Assignment
-
-use 'let x be y' for variable assignments (functions only)
+Use:
+let <variable> be <value> for variable assignments. Variable assignments can only occur inside functions.
 e.g. let speed be 10
+Variables use strict snake_case.
 
+Classes/Elements
 
-Classes
-
-use element to define a 'class'
-use template-element to define an 'abstract class'
-use 'has x' to define 'class members'
-use 'has x with y' to provide an initial value (element only - will always have value)
-use . notation to access them
-use 'this' to reference the element you are in
-functions always call the parent implementation (e.g. call super() automatically)
-only single inheritance is allowed, nested inheritance is allowed
+Use element to define a class representing a concrete element.
+Use template-element to define an abstract element class.
+Use has x to define class members.
+Use has x with y to provide an initial value. This is only allowed for element definitions; such members will always have a value.
+Use . notation to access members.
+Functions automatically call their parent's implementation.
+Only single inheritance is allowed, but nested inheritance is allowed
 
 
 Functions
+Functions can only be added to elements. There are no top-level functions.
 
-function <function-name> needs <arg-name> <arg-name> <arg-name> ...:
-   ...
-   give <return value>
+Define a function using:
+has function <function-name> needs <arg-name> <arg-name> ...:
+	...
+	give <return-value>
 
-Call functions with
-function-name(arg, arg, arg, ...)
+Call functions using:
+function-name(arg, arg, ...)
 
-functions can only be added to elements (no top level funcs)
+Functions can return a value using give
+Arguments may optionally have a type.
 
-variables and args can be type:
-Boolean, Color, Null, Number
+Variable and Argument Types
+
+Variables and arguments can have the following types:
+Boolean
+Color
+Null
+Number
 Element
 ElementType
+An element's type can be obtained using .type.
 
-let x be f.type
-if x == “Fire”
-  do something()
+Example:
+let x be f.type 
+if x is Fire: 
+	do-something()
+where Fire is an ElementType referring to the Fire element
 
-if x == Fire <- ElementType
-  do something()
-
-
-Conditionals
-use the following for conditionals
+Conditionals:
+Use the following syntax:
 if <condition>:
-  ...
+	...
+
 else if <condition>:
-  ...
+	...
+
 else:
-  ...
+	...
 
 Loops
-
-use 'for-every x in <collection-name>' to iterate through arrays
+Collection Loop
+use 'for-every x in <collection-name>' to iterate through a collection
 e.g. for-every apple in apples
 
-use 'go-through x to y with <var-name>' to iterate through a set of numbers
-e.g. 'go-through 1 to 10 with i' for something like 'for (int i = 1; i <= 10; i++)'
-
+Range Loop
+use 'go-through <start> to <end> with <variable>' to iterate through a range of numbers
+e.g. 'go-through 1 to 10 with i'
+This is similar to 'for (int i = 1; i <= 10; i++)'
 
 Other keywords
-
-use 'do-nothing' to be something like 'pass' from Python (stretch)
-use 'skip-iteration' for 'continue'
-use 'stop-looping' for 'break'
-
+use 'do-nothing' acts similarly to Python's pass.
+use 'skip-iteration' acts similarly to continue.
+use 'stop-looping' acts similarly to break.
 
 Built-in functions
-
 get-all-elements(): returns array of all elements in the game
-convert-to(Element):
+convert-to(Element): converts the given element into another element type
+spread-element(): adds the given element to all four adjacent sides.
+disappear(): removes the given element from the grid
 
 
 Examples
 
-# in our actual language Element would be already implemented by the language
-# and cannot be altered
+# In the actual language, Element would already be implemented 
+# by the language and cannot be altered.
+
 template-element Element:
-    has position-x with 0
-    has position-y with 0
-    has color
+	has position_x with 0
+	has position_y with 0
+	has color
 
-    has function tick
+	has function tick
 
-    has function is-there-something-below:
-        let elements be get-all-elements() # probably language-implemented function
-
-        for-every element in elements:
-            if (element.position-y - 1) equals position-y:
-                give true
-
-        give false
+	has function is_there_something_below:
+		let below be get_element_at(position_x - 1, position_y - 1)
+		let nothing_below be below equals null
+		give not nothing_below
 
 template-element Solid is like Element:
-    has function tick:
-        fall()
+	has function tick:
+		fall()
 
-    has function fall:
-        bool something-is-below = is-there-something-below()
+	has function fall:
+		let something_is_below be is_there_something_below()
 
-        if not something-is-below:
-            let position-y be position-y - 1
+		if not something_is_below:
+			let position_y be position_y - 1
 
 template-element Liquid is like Element:
-    has function tick:
-        flow()
+	has function tick:
+		flow()
 
-    has function flow needs element
-        # do something with element that makes it flow properly with other liquids here
-        do-nothing
+	has function flow needs element
+		# do something with element that makes it flow properly with other liquids here
+		do-nothing
 
 template-element Gas is like Element:
-    has function tick:
-        do-nothing
+	has function tick:
+		do-nothing
 
 template-element Energy is like Element:
-    has intensity with 10
+	has intensity with 10
 
-    has function tick:
-        if intensity greater-than 0:
-            let intensity be intensity - 1
-        else
-            disappear()
+	has function tick:
+		if intensity greater-than 0:
+			let intensity be intensity - 1
+		else
+			disappear()
 
 element Water is like Liquid:
-    has color with Color.blue
+	has color with Color(#123456)
 
 element Lava is like Liquid:
-    has color with Color.red
+	has color with Color(#123456)
 
 element Stone is like Solid:
-    has color with Color.grey
+	has color with Color(#123456)
 
 element Ice is like Solid:
-    has color with Color.light-blue
-    has health with 50
-    has melting-speed with 2
-
-    has function tick:
-        parent()
+	has color with Color(#123456)
+	has health with 50
+	has melting_speed with 2
 
 element Fire is like Energy:
-    has color with Color.orange
+	has color with Color(#123456)
 
 interaction TNT t with Fire f:
-  t.convert-to(Fire)
-  let new-fire = t
-  for next 50 ticks:
-    new-fire.spread-element()
+	t.convert_to(Fire)
+	let new_fire = t
+	go-through 1 to 50 with i: 
+		new_fire.spread_element()
 
 interaction Ice i with Fire f:
-  let i.health be i.health - i.melting-speed
-  if health equals 0:
-    i.convert-to(Water)
+	let i.health be i.health - i.melting_speed
+	if health equals 0:
+		i.convert_to(Water)
+
+
+Naming Conventions
+Variables = strict snake_case
+Function names = strict snake_case
+Parameters = strict snake_case
+Element names = PascalCase
+Built-in types = PascalCase
