@@ -200,6 +200,7 @@ export interface ElementFuncDef extends BaseNode {
   name: Identifier;
   args: Parameter[];
   statements: Statement[];
+  hasBody: boolean;
 }
 
 export interface InteractionDef extends BaseNode {

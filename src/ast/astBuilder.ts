@@ -135,6 +135,7 @@ export class ASTBuilder {
             name: this.identifier(ctx.identifier().getText()),
             args,
             statements: ctx.statement().map((s) => this.buildStatement(s)),
+            hasBody: ctx.COLON() !== null,
         };
     }
 

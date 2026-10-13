@@ -161,7 +161,7 @@ template_element Energy is like Element:
     has function tick:
         if intensity greater_than 0:
             let intensity be intensity - 1
-        else
+        else:
             disappear()
 
 element Water is like Liquid:

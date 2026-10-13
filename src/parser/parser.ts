@@ -8,7 +8,7 @@ export class Parser {
     private readonly errors: string[] = [];
 
     constructor(input: string) {
-        const lexer = new Lexer(input);
+        const lexer = new Lexer(input, this.errors);
         const tokenStream = new CommonTokenStream(lexer);
 
         this.parser = new DSLParser(tokenStream);

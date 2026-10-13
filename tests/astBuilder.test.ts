@@ -401,6 +401,7 @@ template_element Fire is like Water:
 
         expect(ast.elementDefs[0].funcDefs[0]).toEqual({
             type: 'ElementFuncDef',
+            hasBody: true,
             name: {
                 type: 'Identifier',
                 value: 'add',

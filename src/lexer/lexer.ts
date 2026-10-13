@@ -15,9 +15,33 @@ export class Lexer implements TokenSource {
     private reachedEOF = false;
     private lastRawToken: Token | null = null;
 
-    constructor(input: string) {
+    constructor(input: string, errors?: string[]) {
         const chars = CharStream.fromString(input);
         this.lexer = new DSLLexer(chars);
+
+        this.lexer.removeErrorListeners();
+
+        this.lexer.addErrorListener({
+            syntaxError: (
+                _recognizer,
+                _offendingSymbol,
+                line,
+                column,
+                message,
+                _e,
+            ) => {
+                const error = `line ${line}:${column} ${message}`;
+
+                if (errors) {
+                    errors.push(error);
+                }
+
+                throw new Error(`Lexing failed: ${error}`);
+            },
+            reportAmbiguity: () => { },
+            reportAttemptingFullContext: () => { },
+            reportContextSensitivity: () => { },
+        });
     }
 
     nextToken(): Token {
