@@ -16,7 +16,7 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
-    const worker = new Worker(new URL('../lib/languageService/worker.ts', import.meta.url), {
+    const worker = new Worker(new URL('../lib/compilerService/worker.ts', import.meta.url), {
       type: 'module',
     });
     workerRef.current = worker;
@@ -30,7 +30,6 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
     setTokens(lex(value));
     setTextState(value);
   }
-
 
   const value = {
     lex: () => {},
