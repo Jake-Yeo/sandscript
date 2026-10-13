@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { LanguageServiceContext } from './LanguageServiceContext';
 import { CharStream, Token } from 'antlr4ng';
 import { DSLLexer } from '../../generated/DSLLexer';
+import type { CompilerServiceRequest, CompilerServiceResponse } from '@/lib/compilerService/worker';
 
 function lex(source: string): Token[] {
   const lexer = new DSLLexer(CharStream.fromString(source));
@@ -13,7 +14,25 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
   const [text, setTextState] = useState('');
   const [tokens, setTokens] = useState<Token[]>([]);
 
+  const [isCompiling, setIsCompiling] = useState(false);
+  const isCompilingRef = useRef(false);
+
   const workerRef = useRef<Worker | null>(null);
+
+  const setText = (value: string) => {
+    setTokens(lex(value));
+    setTextState(value);
+  }
+
+  const compile = () => {
+    if (isCompilingRef.current || !workerRef.current) return;
+
+    setIsCompiling(true);
+    isCompilingRef.current = true;
+
+    const req: CompilerServiceRequest = { source: text };
+    workerRef.current.postMessage(req);
+  }
 
   useEffect(() => {
     const worker = new Worker(new URL('../lib/compilerService/worker.ts', import.meta.url), {
@@ -21,19 +40,24 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
     });
     workerRef.current = worker;
 
+    worker.onmessage = (event: MessageEvent<CompilerServiceResponse>) => {
+      setIsCompiling(false);
+      isCompilingRef.current = false;
+
+      const program = event.data.program;
+      console.log(program);
+    };
+
     return () => {
       worker.terminate();
     };
   }, []);
 
-  const setText = (value: string) => {
-    setTokens(lex(value));
-    setTextState(value);
-  }
+
 
   const value = {
-    lex: () => {},
-    parse: () => { },
+    compile,
+    isCompiling,
     tokens,
     text,
     setText,

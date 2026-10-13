@@ -1,11 +1,11 @@
 import TextInput from './TextInput';
-import { Button } from '../ui/button';
+import SubmitButton from './SubmitButton';
 
 export default function InputSection() {
   return (
     <div className="p-5">
       <TextInput />
-      <Button variant="outline">Submit</Button>
+      <SubmitButton />
     </div>
   );
 }
