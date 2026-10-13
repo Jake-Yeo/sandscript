@@ -29,7 +29,10 @@ elementVariableDefinition:
 elementInitialValue: WITH expression;
 
 elementFunctionDefinition:
-	HAS FUNCTION identifier functionParameters? COLON NEWLINE INDENT statement* DEDENT;
+	HAS FUNCTION identifier functionParameters? (
+		COLON NEWLINE INDENT statement* DEDENT
+		| NEWLINE
+	);
 
 functionParameters: NEEDS parameter+;
 

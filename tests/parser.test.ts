@@ -19,7 +19,7 @@ describe('Parser', () => {
     });
 
     test('parses template elements and inheritance', () => {
-        const source = `template-element Solid is like Element:
+        const source = `template_element Solid is like Element:
 
 \thas color
 
@@ -33,11 +33,11 @@ describe('Parser', () => {
     });
 
     test('parses nested inheritance', () => {
-        const source = `template-element Solid is like Element:
+        const source = `template_element Solid is like Element:
 
 \thas color
 
-template-element HeavySolid is like Solid:
+template_element HeavySolid is like Solid:
 
 \thas weight
 
@@ -141,9 +141,9 @@ template-element HeavySolid is like Solid:
 
 \thas function tick:
 
-\t\tif health greater-than 0 and not frozen:
+\t\tif health greater_than 0 and not frozen:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -161,7 +161,7 @@ template-element HeavySolid is like Solid:
 
 \t\tif element_type is Fire:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -197,13 +197,13 @@ template-element HeavySolid is like Solid:
 
 \t\t\tdisappear()
 
-\t\telse if health less-than 10:
+\t\telse if health less_than 10:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 \t\telse:
 
-\t\t\tskip-iteration
+\t\t\tskip_iteration
 
 `;
 
@@ -219,9 +219,9 @@ template-element HeavySolid is like Solid:
 
 \thas function tick:
 
-\t\tfor-every apple in apples:
+\t\tfor_every apple in apples:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -237,9 +237,9 @@ template-element HeavySolid is like Solid:
 
 \thas function tick:
 
-\t\tgo-through 1 to 10 with i:
+\t\tgo_through 1 to 10 with i:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -255,11 +255,11 @@ template-element HeavySolid is like Solid:
 
 \thas function tick:
 
-\t\tdo-nothing
+\t\tdo_nothing
 
-\t\tskip-iteration
+\t\tskip_iteration
 
-\t\tstop-looping
+\t\tstop_looping
 
 `;
 
@@ -295,7 +295,7 @@ template-element HeavySolid is like Solid:
 
 \t\tif element_type is Fire:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -319,7 +319,7 @@ element Water:
 
 \t\t# statement comment
 
-\t\tdo-nothing
+\t\tdo_nothing
 
 `;
 
@@ -360,7 +360,7 @@ has color
 
 \thas function tick
 
-\t\tdo-nothing
+\t\tdo_nothing
 
 `;
 
@@ -376,7 +376,7 @@ has color
 
 \t\tif health equals 0
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -437,7 +437,7 @@ has color
 
 \t\tif health > 0:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -454,7 +454,7 @@ has color
 
 \t\tif health equals 0 && frozen:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -499,9 +499,9 @@ has color
 
 \thas function tick:
 
-\t\tfor-every apple apples:
+\t\tfor_every apple apples:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -516,9 +516,9 @@ has color
 
 \thas function tick:
 
-\t\tgo-through 1 10 with i:
+\t\tgo_through 1 10 with i:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -604,7 +604,7 @@ has color
 
 \thas function Tick:
 
-\t\tdo-nothing
+\t\tdo_nothing
 
 `;
 
@@ -622,7 +622,7 @@ has color
 
 \t\tfor next 50 ticks:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 
@@ -683,7 +683,7 @@ has color
 
 \thas function test needs a Color b Null c Element d ElementType:
 
-\t\tdo-nothing
+\t\tdo_nothing
 
 `;
 
@@ -700,9 +700,9 @@ has color
 
 \thas function tick:
 
-\t\tfor-every apple apples:
+\t\tfor_every apple apples:
 
-\t\t\tdo-nothing
+\t\t\tdo_nothing
 
 `;
 

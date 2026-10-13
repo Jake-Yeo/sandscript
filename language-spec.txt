@@ -5,6 +5,7 @@ Use strict snake_case for variables, function names, parameters, and other ordin
 Use PascalCase for element names and types.
 Use # for comments. Comments may appear on their own line or inline after code.
 Parentheses () can be used to indicate expression priority.
+Do not use - for anything other than subtraction and negation. Use _ instead.
 
 Types
 
@@ -14,7 +15,8 @@ Can hold any type of number supported by JavaScript / TypeScript, except for NaN
 Boolean
 use 'not' to negate Booleans
 use 'equals' for ==
-use 'less-than' for <
+use 'less_than' for <
+use 'greater_than' for >
 use 'and' for &&
 use 'or' for ||
 use parentheses () to indicate priority
@@ -42,7 +44,7 @@ Variables use strict snake_case.
 Classes/Elements
 
 Use element to define a class representing a concrete element.
-Use template-element to define an abstract element class.
+Use template_element to define an abstract element class.
 Use has x to define class members.
 Use has x with y to provide an initial value. This is only allowed for element definitions; such members will always have a value.
 Use . notation to access members.
@@ -54,12 +56,12 @@ Functions
 Functions can only be added to elements. There are no top-level functions.
 
 Define a function using:
-has function <function-name> needs <arg-name> <arg-name> ...:
-	...
-	give <return-value>
+has function <function_name> needs <arg_name> <arg_name> ...:
+  ...
+  give <return_value>
 
 Call functions using:
-function-name(arg, arg, ...)
+function_name(arg, arg, ...)
 
 Functions can return a value using give
 Arguments may optionally have a type.
@@ -78,7 +80,7 @@ An element's type can be obtained using .type.
 Example:
 let x be f.type 
 if x is Fire: 
-	do-something()
+  do_something()
 where Fire is an ElementType referring to the Fire element
 
 Conditionals:
@@ -94,23 +96,23 @@ else:
 
 Loops
 Collection Loop
-use 'for-every x in <collection-name>' to iterate through a collection
-e.g. for-every apple in apples
+use 'for_every x in <collection_name>' to iterate through a collection
+e.g. for_every apple in apples
 
 Range Loop
-use 'go-through <start> to <end> with <variable>' to iterate through a range of numbers
-e.g. 'go-through 1 to 10 with i'
+use 'go_through <start> to <end> with <variable>' to iterate through a range of numbers
+e.g. 'go_through 1 to 10 with i'
 This is similar to 'for (int i = 1; i <= 10; i++)'
 
 Other keywords
-use 'do-nothing' acts similarly to Python's pass.
-use 'skip-iteration' acts similarly to continue.
-use 'stop-looping' acts similarly to break.
+use 'do_nothing' acts similarly to Python's pass.
+use 'skip_iteration' acts similarly to continue.
+use 'stop_looping' acts similarly to break.
 
 Built-in functions
-get-all-elements(): returns array of all elements in the game
-convert-to(Element): converts the given element into another element type
-spread-element(): adds the given element to all four adjacent sides.
+get_all_elements(): returns array of all elements in the game
+convert_to(Element): converts the given element into another element type
+spread_element(): adds the given element to all four adjacent sides.
 disappear(): removes the given element from the grid
 
 
@@ -119,10 +121,10 @@ Examples
 # In the actual language, Element would already be implemented 
 # by the language and cannot be altered.
 
-template-element Element:
-	has position_x with 0
-	has position_y with 0
-	has color
+template_element Element:
+  has position_x with 0
+  has position_y with 0
+  has color
 
 	has function tick
 
@@ -131,9 +133,9 @@ template-element Element:
 		let nothing_below be below equals null
 		give not nothing_below
 
-template-element Solid is like Element:
-	has function tick:
-		fall()
+template_element Solid is like Element:
+  has function tick:
+  fall()
 
 	has function fall:
 		let something_is_below be is_there_something_below()
@@ -141,26 +143,26 @@ template-element Solid is like Element:
 		if not something_is_below:
 			let position_y be position_y - 1
 
-template-element Liquid is like Element:
-	has function tick:
-		flow()
+template_element Liquid is like Element:
+  has function tick:
+    flow()
+    
+  has function flow needs element
+    # do something with element that makes it flow properly with other liquids here
+    do_nothing
 
-	has function flow needs element
-		# do something with element that makes it flow properly with other liquids here
-		do-nothing
+template_element Gas is like Element:
+  has function tick:
+    do_nothing
 
-template-element Gas is like Element:
-	has function tick:
-		do-nothing
+template_element Energy is like Element:
+  has intensity with 10
 
-template-element Energy is like Element:
-	has intensity with 10
-
-	has function tick:
-		if intensity greater-than 0:
-			let intensity be intensity - 1
-		else
-			disappear()
+  has function tick:
+    if intensity greater_than 0:
+      let intensity be intensity - 1
+    else:
+      disappear()
 
 element Water is like Liquid:
 	has color with Color(#123456)
@@ -180,10 +182,10 @@ element Fire is like Energy:
 	has color with Color(#123456)
 
 interaction TNT t with Fire f:
-	t.convert_to(Fire)
-	let new_fire = t
-	go-through 1 to 50 with i: 
-		new_fire.spread_element()
+  t.convert_to(Fire)
+  let new_fire = t
+  go_through 1 to 50 with i: 
+    new_fire.spread_element()
 
 interaction Ice i with Fire f:
 	let i.health be i.health - i.melting_speed

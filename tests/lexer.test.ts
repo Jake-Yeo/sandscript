@@ -47,7 +47,7 @@ describe('Lexer', () => {
 
     test('tokenizes keywords', () => {
 
-        const source = `element template-element has with is like function needs let be give if else for-every go-through in skip-iteration stop-looping do-nothing interaction not equals less-than greater-than and or`;
+        const source = `element template_element has with is like function needs let be give if else for_every go_through in skip_iteration stop_looping do_nothing interaction not equals less_than greater_than and or`;
 
         const lexer = new Lexer(source);
 
@@ -65,7 +65,7 @@ describe('Lexer', () => {
 
         expect(tokens.map(token => token.text)).toEqual([
             'element',
-            'template-element',
+            'template_element',
             'has',
             'with',
             'is',
@@ -77,19 +77,20 @@ describe('Lexer', () => {
             'give',
             'if',
             'else',
-            'for-every',
-            'go-through',
+            'for_every',
+            'go_through',
             'in',
-            'skip-iteration',
-            'stop-looping',
-            'do-nothing',
+            'skip_iteration',
+            'stop_looping',
+            'do_nothing',
             'interaction',
             'not',
             'equals',
-            'less-than',
-            'greater-than',
+            'less_than',
+            'greater_than',
             'and',
             'or',
+            '\n',
         ]);
 
     });
@@ -121,6 +122,7 @@ describe('Lexer', () => {
             'ElementType',
             'Null',
             'Type',
+            '\n',
         ]);
 
     });
@@ -148,6 +150,7 @@ describe('Lexer', () => {
             'true',
             'false',
             'null',
+            '\n',
         ]);
 
     });
@@ -177,6 +180,7 @@ describe('Lexer', () => {
             '10',
             '123',
             '999',
+            '\n',
         ]);
 
     });
@@ -206,6 +210,7 @@ describe('Lexer', () => {
             'Solid',
             'HeavySolid',
             'Element123',
+            '\n',
         ]);
 
     });
@@ -236,6 +241,7 @@ describe('Lexer', () => {
             'element_type',
             'convert_to',
             'get_all_elements',
+            '\n',
         ]);
 
     });
@@ -269,6 +275,7 @@ describe('Lexer', () => {
             '(',
             ')',
             ':',
+            '\n',
         ]);
 
     });
@@ -296,6 +303,7 @@ describe('Lexer', () => {
             'Color(#123456)',
             'Color(#ABCDEF)',
             'Color(#000000)',
+            '\n',
         ]);
 
     });
@@ -349,7 +357,7 @@ describe('Lexer', () => {
 
 \thas function tick:
 
-\t\tdo-nothing
+\t\tdo_nothing
 
 `;
 
@@ -379,7 +387,7 @@ describe('Lexer', () => {
             ':',
             '\n',
             '<INDENT>',
-            'do-nothing',
+            'do_nothing',
             '\n',
             '<DEDENT>',
             '<DEDENT>',
@@ -394,7 +402,7 @@ describe('Lexer', () => {
 
 \thas function tick:
 
-\t\tdo-nothing
+\t\tdo_nothing
 
 \thas color
 
@@ -426,7 +434,7 @@ describe('Lexer', () => {
             ':',
             '\n',
             '<INDENT>',
-            'do-nothing',
+            'do_nothing',
             '\n',
             '<DEDENT>',
             'has',
@@ -568,7 +576,7 @@ element Water:
 
 \thas function tick:
 
-\t\tdo-nothing`;
+\t\tdo_nothing`;
 
         const lexer = new Lexer(source);
 
@@ -596,7 +604,8 @@ element Water:
             ':',
             '\n',
             '<INDENT>',
-            'do-nothing',
+            'do_nothing',
+            '\n',
             '<DEDENT>',
             '<DEDENT>',
         ]);
@@ -621,4 +630,30 @@ element Water:
         }).toThrow('Spaces cannot be used for indentation');
     });
 
+    // test('accepts a final statement inside a nested conditional', () => {
+    //     const source =
+    //         'element Water:\n' +
+    //         '\thas color';
+
+    //     const lexer = new Lexer(source);
+    //     const tokens = [];
+    //     let token = lexer.nextToken();
+
+    //     while (token.type !== Token.EOF) {
+    //         tokens.push(token);
+    //         token = lexer.nextToken();
+    //     }
+
+    //     expect(tokens.map(token => token.text)).toEqual([
+    //         'element',
+    //         'Water',
+    //         ':',
+    //         '\n',
+    //         '<INDENT>',
+    //         'has',
+    //         'color',
+    //         '\n',
+    //         '<DEDENT>',
+    //     ]);
+    // });
 });

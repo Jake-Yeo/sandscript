@@ -135,6 +135,7 @@ export class ASTBuilder {
             name: this.identifier(ctx.identifier().getText()),
             args,
             statements: ctx.statement().map((s) => this.buildStatement(s)),
+            hasBody: ctx.COLON() !== null,
         };
     }
 
@@ -228,8 +229,8 @@ export class ASTBuilder {
         const operation = operator.getText();
         const operationMap: Record<string, TwoValueBooleanExpression['operation']> = {
             equals: 'Equals',
-            'less-than': 'Less Than',
-            'greater-than': 'Greater Than',
+            'less_than': 'Less Than',
+            'greater_than': 'Greater Than',
         };
 
         return {

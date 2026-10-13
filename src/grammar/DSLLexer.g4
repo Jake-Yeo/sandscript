@@ -8,7 +8,7 @@ tokens {
 // KEYWORDS
 
 ELEMENT: 'element';
-TEMPLATE_ELEMENT: 'template-element';
+TEMPLATE_ELEMENT: 'template_element';
 
 HAS: 'has';
 WITH: 'with';
@@ -26,14 +26,14 @@ GIVE: 'give';
 IF: 'if';
 ELSE: 'else';
 
-FOR_EVERY: 'for-every';
-GO_THROUGH: 'go-through';
+FOR_EVERY: 'for_every';
+GO_THROUGH: 'go_through';
 IN: 'in';
 TO: 'to';
 
-SKIP_ITERATION: 'skip-iteration';
-STOP_LOOPING: 'stop-looping';
-DO_NOTHING: 'do-nothing';
+SKIP_ITERATION: 'skip_iteration';
+STOP_LOOPING: 'stop_looping';
+DO_NOTHING: 'do_nothing';
 
 INTERACTION: 'interaction';
 
@@ -41,8 +41,8 @@ INTERACTION: 'interaction';
 
 NOT: 'not';
 EQUALS: 'equals';
-LESS_THAN: 'less-than';
-GREATER_THAN: 'greater-than';
+LESS_THAN: 'less_than';
+GREATER_THAN: 'greater_than';
 AND: 'and';
 OR: 'or';
 

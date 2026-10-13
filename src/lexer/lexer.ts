@@ -6,17 +6,45 @@ import {
 import { DSLLexer } from '../generated/DSLLexer';
 import type { TokenSource } from 'antlr4ng';
 
+
 export class Lexer implements TokenSource {
     private readonly lexer: DSLLexer;
     private readonly pendingTokens: Token[] = [];
     private readonly indentationStack: number[] = [0];
+    private readonly errors?: string[];
 
     private atBeginningOfLine = true;
     private reachedEOF = false;
+    private lastRawToken: Token | null = null;
 
-    constructor(input: string) {
+    constructor(input: string, errors?: string[]) {
+        this.errors = errors;
         const chars = CharStream.fromString(input);
         this.lexer = new DSLLexer(chars);
+
+        this.lexer.removeErrorListeners();
+
+        this.lexer.addErrorListener({
+            syntaxError: (
+                _recognizer,
+                _offendingSymbol,
+                line,
+                column,
+                message,
+                _e,
+            ) => {
+                const error = `line ${line}:${column} ${message}`;
+
+                if (errors) {
+                    errors.push(error);
+                }
+
+                this.reportError(`Lexing failed: ${error}`);
+            },
+            reportAmbiguity: () => { },
+            reportAttemptingFullContext: () => { },
+            reportContextSensitivity: () => { },
+        });
     }
 
     nextToken(): Token {
@@ -26,6 +54,7 @@ export class Lexer implements TokenSource {
 
         let token = this.lexer.nextToken();
 
+
         if (token.type === Token.EOF) {
             this.handleEOF(token);
 
@@ -34,6 +63,8 @@ export class Lexer implements TokenSource {
             }
 
             return token;
+        } else {
+            this.lastRawToken = token;
         }
 
         if (this.atBeginningOfLine) {
@@ -51,11 +82,13 @@ export class Lexer implements TokenSource {
                     }
 
                     return token;
+                } else {
+                    this.lastRawToken = token;
                 }
             }
 
             if (token.type === DSLLexer.SPACE) {
-                throw new Error(
+                this.reportError(
                     `Spaces cannot be used for indentation on line ${token.line}.`,
                 );
             }
@@ -92,7 +125,7 @@ export class Lexer implements TokenSource {
                     ];
 
                 if (indentation !== expectedIndentation) {
-                    throw new Error(
+                    this.reportError(
                         `Invalid indentation on line ${token.line}. ` +
                         `Expected indentation level ` +
                         `${expectedIndentation}, ` +
@@ -128,6 +161,23 @@ export class Lexer implements TokenSource {
         }
 
         this.reachedEOF = true;
+
+        if (
+            this.lastRawToken !== null &&
+            this.lastRawToken.type !== DSLLexer.NEWLINE
+        ) {
+            const newline = CommonToken.fromType(
+                DSLLexer.NEWLINE,
+                '\n',
+            );
+
+            newline.line = this.lastRawToken.line;
+            newline.column =
+                this.lastRawToken.column +
+                (this.lastRawToken.text?.length ?? 0);
+
+            this.pendingTokens.push(newline);
+        }
 
         while (this.indentationStack.length > 1) {
             this.indentationStack.pop();
@@ -186,5 +236,10 @@ export class Lexer implements TokenSource {
 
     set tokenFactory(factory) {
         this.lexer.tokenFactory = factory;
+    }
+
+    private reportError(message: string): never {
+        this.errors?.push(message);
+        throw new Error(message);
     }
 }
