@@ -138,7 +138,7 @@ describe('reserved root', () => {
         expect(() => buildGame(program)).toThrow();
     });
 
-    test.skip('always supplies the root with position and color fields', () => {
+    test('always supplies the root with position and color fields', () => {
         const game = buildGame(makeProgram([]));
         const root = game.elements.get(ROOT_ELEMENT_NAME);
 
@@ -151,7 +151,7 @@ describe('reserved root', () => {
         expect(root?.methods.size).toBe(0);
     });
 
-    test.skip('defaults a definition with no parent to the root Element', () => {
+    test('defaults a definition with no parent to the root Element', () => {
         const program = makeProgram([makeElement('Water')]);
 
         expect(fieldNames('Water', program)).toEqual([
@@ -161,7 +161,7 @@ describe('reserved root', () => {
         ]);
     });
 
-    test.skip('accepts an explicit parent of the root Element', () => {
+    test('accepts an explicit parent of the root Element', () => {
         const program = makeProgram([makeElement('Water', { parent: ROOT_ELEMENT_NAME })]);
 
         expect(fieldNames('Water', program)).toEqual([
@@ -171,7 +171,7 @@ describe('reserved root', () => {
         ]);
     });
 
-    test.skip('preserves the abstract flag', () => {
+    test('preserves the abstract flag', () => {
         const game = buildGame(makeProgram([makeElement('Solid', { abstract: true })]));
 
         expect(game.elements.get('Solid')?.abstract).toBe(true);
@@ -179,7 +179,7 @@ describe('reserved root', () => {
 });
 
 describe('fields', () => {
-    test.skip('resolves fields parent-first with child defaults appended after', () => {
+    test('resolves fields parent-first with child defaults appended after', () => {
         const program = makeProgram([
             makeElement('Solid', { varDefs: [makeVarDef('friction', number(1))] }),
             makeElement('Stone', {
@@ -197,7 +197,7 @@ describe('fields', () => {
         ]);
     });
 
-    test.skip('keeps initializer expressions as AST nodes', () => {
+    test('keeps initializer expressions as AST nodes', () => {
         const initializer = number(42);
         const game = buildGame(
             makeProgram([makeElement('Stone', { varDefs: [makeVarDef('weight', initializer)] })]),
@@ -208,7 +208,7 @@ describe('fields', () => {
 });
 
 describe('methods', () => {
-    test.skip('inherits parent methods the child does not override', () => {
+    test('inherits parent methods the child does not override', () => {
         const tick = makeFuncDef('tick');
         const game = buildGame(
             makeProgram([
@@ -220,7 +220,7 @@ describe('methods', () => {
         expect(game.elements.get('Stone')?.methods.get('tick')).toBe(tick);
     });
 
-    test.skip('lets a child method replace the parent method with the same name', () => {
+    test('lets a child method replace the parent method with the same name', () => {
         const parentTick = makeFuncDef('tick');
         const childTick = makeFuncDef('tick');
         const game = buildGame(
@@ -233,7 +233,7 @@ describe('methods', () => {
         expect(game.elements.get('Stone')?.methods.get('tick')).toBe(childTick);
     });
 
-    test.skip('gives each element its own copy of the method map', () => {
+    test('gives each element its own copy of the method map', () => {
         const game = buildGame(
             makeProgram([
                 makeElement('Solid', { funcDefs: [makeFuncDef('tick')] }),
@@ -248,16 +248,21 @@ describe('methods', () => {
 });
 
 describe('interactions', () => {
-    test.skip('rejects interactions naming an unknown element type', () => {
-        const program = makeProgram(
+    test('rejects interactions naming an unknown element type', () => {
+        const unknownSecond = makeProgram(
             [makeElement('Ice')],
             [makeInteraction('Ice', 'Fire', 'i', 'f')],
         );
+        const unknownFirst = makeProgram(
+            [makeElement('Fire')],
+            [makeInteraction('Ice', 'Fire', 'i', 'f')],
+        );
 
-        expect(() => buildGame(program)).toThrow();
+        expect(() => buildGame(unknownSecond)).toThrow();
+        expect(() => buildGame(unknownFirst)).toThrow();
     });
 
-    test.skip('rejects interactions with identical binding names', () => {
+    test('rejects interactions with identical binding names', () => {
         const program = makeProgram(
             [makeElement('Ice'), makeElement('Fire')],
             [makeInteraction('Ice', 'Fire', 'e', 'e')],
@@ -266,7 +271,7 @@ describe('interactions', () => {
         expect(() => buildGame(program)).toThrow();
     });
 
-    test.skip('preserves interaction bodies and source order', () => {
+    test('preserves interaction bodies and source order', () => {
         const first = makeInteraction('Ice', 'Fire', 'i', 'f');
         const second = makeInteraction('Fire', 'Fire', 'a', 'b');
         const game = buildGame(
@@ -274,6 +279,66 @@ describe('interactions', () => {
         );
 
         expect(game.interactions).toEqual([first, second]);
+    });
+});
+
+describe('handoff', () => {
+    test('compiles the Solid/Stone/Ice/Fire/Water program from the evaluation plan', () => {
+        const tick = makeFuncDef('tick');
+        const fall = makeFuncDef('fall');
+        const interaction = makeInteraction('Ice', 'Fire', 'i', 'f');
+        const game = buildGame(
+            makeProgram(
+                [
+                    makeElement('Solid', { abstract: true, funcDefs: [tick, fall] }),
+                    makeElement('Stone', {
+                        parent: 'Solid',
+                        varDefs: [makeVarDef('color', number(0x888888))],
+                    }),
+                    makeElement('Ice', {
+                        parent: 'Solid',
+                        varDefs: [
+                            makeVarDef('color', number(0xaaddff)),
+                            makeVarDef('health', number(3)),
+                            makeVarDef('melting-speed', number(1)),
+                        ],
+                    }),
+                    makeElement('Fire', {
+                        varDefs: [makeVarDef('color', number(0xff6600))],
+                    }),
+                    makeElement('Water'),
+                ],
+                [interaction],
+            ),
+        );
+
+        expect(game.elements.get('Solid')?.abstract).toBe(true);
+        expect(game.elements.get('Solid')?.methods.get('tick')).toBe(tick);
+        expect(game.elements.get('Solid')?.methods.get('fall')).toBe(fall);
+
+        const stone = game.elements.get('Stone');
+        expect(stone?.abstract).toBe(false);
+        expect(stone?.methods.get('tick')).toBe(tick);
+        expect(stone?.methods.get('fall')).toBe(fall);
+        expect(stone?.fieldInitializers.map((field) => field.varName.value)).toEqual([
+            'position-x',
+            'position-y',
+            'color',
+            'color',
+        ]);
+
+        expect(
+            game.elements.get('Ice')?.fieldInitializers.map((field) => field.varName.value),
+        ).toEqual([
+            'position-x',
+            'position-y',
+            'color',
+            'color',
+            'health',
+            'melting-speed',
+        ]);
+
+        expect(game.interactions).toEqual([interaction]);
     });
 });
 /** End Code Generated by OpenCode (Muse Spark) on 2026-10-11 */
