@@ -1,11 +1,6 @@
 
 import * as antlr from "antlr4ng";
-import { Token } from "antlr4ng";
 
-import { DSLParserListener } from "./DSLParserListener.js";
-// for running tests with parameters, TODO: discuss strategy for typed parameters in CI
-// eslint-disable-next-line no-unused-vars
-type int = number;
 
 
 export class DSLParser extends antlr.Parser {
@@ -2095,16 +2090,6 @@ export class ProgramContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_program;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterProgram) {
-             listener.enterProgram(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitProgram) {
-             listener.exitProgram(this);
-        }
-    }
 }
 
 
@@ -2120,16 +2105,6 @@ export class TopLevelStatementContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_topLevelStatement;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterTopLevelStatement) {
-             listener.enterTopLevelStatement(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitTopLevelStatement) {
-             listener.exitTopLevelStatement(this);
-        }
     }
 }
 
@@ -2171,16 +2146,6 @@ export class ElementDefinitionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementDefinition;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementDefinition) {
-             listener.enterElementDefinition(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementDefinition) {
-             listener.exitElementDefinition(this);
-        }
-    }
 }
 
 
@@ -2196,16 +2161,6 @@ export class ElementKeywordContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementKeyword;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementKeyword) {
-             listener.enterElementKeyword(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementKeyword) {
-             listener.exitElementKeyword(this);
-        }
     }
 }
 
@@ -2229,16 +2184,6 @@ export class ElementParentContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementParent;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementParent) {
-             listener.enterElementParent(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementParent) {
-             listener.exitElementParent(this);
-        }
-    }
 }
 
 
@@ -2254,16 +2199,6 @@ export class ElementMemberContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementMember;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementMember) {
-             listener.enterElementMember(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementMember) {
-             listener.exitElementMember(this);
-        }
     }
 }
 
@@ -2287,16 +2222,6 @@ export class ElementVariableDefinitionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementVariableDefinition;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementVariableDefinition) {
-             listener.enterElementVariableDefinition(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementVariableDefinition) {
-             listener.exitElementVariableDefinition(this);
-        }
-    }
 }
 
 
@@ -2312,16 +2237,6 @@ export class ElementInitialValueContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementInitialValue;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementInitialValue) {
-             listener.enterElementInitialValue(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementInitialValue) {
-             listener.exitElementInitialValue(this);
-        }
     }
 }
 
@@ -2366,16 +2281,6 @@ export class ElementFunctionDefinitionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementFunctionDefinition;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementFunctionDefinition) {
-             listener.enterElementFunctionDefinition(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementFunctionDefinition) {
-             listener.exitElementFunctionDefinition(this);
-        }
-    }
 }
 
 
@@ -2398,16 +2303,6 @@ export class FunctionParametersContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_functionParameters;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterFunctionParameters) {
-             listener.enterFunctionParameters(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitFunctionParameters) {
-             listener.exitFunctionParameters(this);
-        }
-    }
 }
 
 
@@ -2423,16 +2318,6 @@ export class ParameterContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_parameter;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterParameter) {
-             listener.enterParameter(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitParameter) {
-             listener.exitParameter(this);
-        }
     }
 }
 
@@ -2489,16 +2374,6 @@ export class InteractionDefinitionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_interactionDefinition;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterInteractionDefinition) {
-             listener.enterInteractionDefinition(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitInteractionDefinition) {
-             listener.exitInteractionDefinition(this);
-        }
-    }
 }
 
 
@@ -2536,16 +2411,6 @@ export class StatementContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_statement;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterStatement) {
-             listener.enterStatement(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitStatement) {
-             listener.exitStatement(this);
-        }
-    }
 }
 
 
@@ -2571,16 +2436,6 @@ export class VariableAssignmentContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_variableAssignment;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterVariableAssignment) {
-             listener.enterVariableAssignment(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitVariableAssignment) {
-             listener.exitVariableAssignment(this);
-        }
-    }
 }
 
 
@@ -2600,16 +2455,6 @@ export class GiveStatementContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_giveStatement;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterGiveStatement) {
-             listener.enterGiveStatement(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitGiveStatement) {
-             listener.exitGiveStatement(this);
-        }
-    }
 }
 
 
@@ -2625,16 +2470,6 @@ export class ExpressionStatementContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_expressionStatement;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterExpressionStatement) {
-             listener.enterExpressionStatement(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitExpressionStatement) {
-             listener.exitExpressionStatement(this);
-        }
     }
 }
 
@@ -2685,16 +2520,6 @@ export class ConditionalContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_conditional;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterConditional) {
-             listener.enterConditional(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitConditional) {
-             listener.exitConditional(this);
-        }
-    }
 }
 
 
@@ -2735,16 +2560,6 @@ export class ElseIfClauseContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_elseIfClause;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElseIfClause) {
-             listener.enterElseIfClause(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElseIfClause) {
-             listener.exitElseIfClause(this);
-        }
-    }
 }
 
 
@@ -2778,16 +2593,6 @@ export class ElseClauseContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_elseClause;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElseClause) {
-             listener.enterElseClause(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElseClause) {
-             listener.exitElseClause(this);
-        }
     }
 }
 
@@ -2831,16 +2636,6 @@ export class CollectionBasedLoopContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_collectionBasedLoop;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterCollectionBasedLoop) {
-             listener.enterCollectionBasedLoop(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitCollectionBasedLoop) {
-             listener.exitCollectionBasedLoop(this);
-        }
     }
 }
 
@@ -2894,16 +2689,6 @@ export class RangeBasedLoopContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_rangeBasedLoop;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterRangeBasedLoop) {
-             listener.enterRangeBasedLoop(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitRangeBasedLoop) {
-             listener.exitRangeBasedLoop(this);
-        }
-    }
 }
 
 
@@ -2919,16 +2704,6 @@ export class SkipIterationContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_skipIteration;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterSkipIteration) {
-             listener.enterSkipIteration(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitSkipIteration) {
-             listener.exitSkipIteration(this);
-        }
     }
 }
 
@@ -2946,16 +2721,6 @@ export class StopLoopingContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_stopLooping;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterStopLooping) {
-             listener.enterStopLooping(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitStopLooping) {
-             listener.exitStopLooping(this);
-        }
-    }
 }
 
 
@@ -2972,16 +2737,6 @@ export class DoNothingContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_doNothing;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterDoNothing) {
-             listener.enterDoNothing(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitDoNothing) {
-             listener.exitDoNothing(this);
-        }
-    }
 }
 
 
@@ -2994,16 +2749,6 @@ export class ExpressionContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_expression;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterExpression) {
-             listener.enterExpression(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitExpression) {
-             listener.exitExpression(this);
-        }
     }
 }
 
@@ -3033,16 +2778,6 @@ export class BooleanOrExpressionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_booleanOrExpression;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterBooleanOrExpression) {
-             listener.enterBooleanOrExpression(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitBooleanOrExpression) {
-             listener.exitBooleanOrExpression(this);
-        }
-    }
 }
 
 
@@ -3070,16 +2805,6 @@ export class BooleanAndExpressionContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_booleanAndExpression;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterBooleanAndExpression) {
-             listener.enterBooleanAndExpression(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitBooleanAndExpression) {
-             listener.exitBooleanAndExpression(this);
-        }
     }
 }
 
@@ -3109,16 +2834,6 @@ export class BooleanComparisonContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_booleanComparison;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterBooleanComparison) {
-             listener.enterBooleanComparison(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitBooleanComparison) {
-             listener.exitBooleanComparison(this);
-        }
-    }
 }
 
 
@@ -3137,16 +2852,6 @@ export class ComparisonOperatorContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_comparisonOperator;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterComparisonOperator) {
-             listener.enterComparisonOperator(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitComparisonOperator) {
-             listener.exitComparisonOperator(this);
-        }
     }
 }
 
@@ -3185,16 +2890,6 @@ export class ArithmeticExpressionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_arithmeticExpression;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterArithmeticExpression) {
-             listener.enterArithmeticExpression(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitArithmeticExpression) {
-             listener.exitArithmeticExpression(this);
-        }
-    }
 }
 
 
@@ -3232,16 +2927,6 @@ export class MultiplicationExpressionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_multiplicationExpression;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterMultiplicationExpression) {
-             listener.enterMultiplicationExpression(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitMultiplicationExpression) {
-             listener.exitMultiplicationExpression(this);
-        }
-    }
 }
 
 
@@ -3263,16 +2948,6 @@ export class UnaryExpressionContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_unaryExpression;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterUnaryExpression) {
-             listener.enterUnaryExpression(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitUnaryExpression) {
-             listener.exitUnaryExpression(this);
-        }
     }
 }
 
@@ -3305,16 +2980,6 @@ export class PrimaryExpressionContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_primaryExpression;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterPrimaryExpression) {
-             listener.enterPrimaryExpression(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitPrimaryExpression) {
-             listener.exitPrimaryExpression(this);
-        }
-    }
 }
 
 
@@ -3336,16 +3001,6 @@ export class FunctionCallContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_functionCall;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterFunctionCall) {
-             listener.enterFunctionCall(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitFunctionCall) {
-             listener.exitFunctionCall(this);
-        }
     }
 }
 
@@ -3375,16 +3030,6 @@ export class ArgumentListContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_argumentList;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterArgumentList) {
-             listener.enterArgumentList(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitArgumentList) {
-             listener.exitArgumentList(this);
-        }
-    }
 }
 
 
@@ -3407,16 +3052,6 @@ export class GeneralIdentifierContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_generalIdentifier;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterGeneralIdentifier) {
-             listener.enterGeneralIdentifier(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitGeneralIdentifier) {
-             listener.exitGeneralIdentifier(this);
-        }
-    }
 }
 
 
@@ -3433,16 +3068,6 @@ export class MemberAccessContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_memberAccess;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterMemberAccess) {
-             listener.enterMemberAccess(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitMemberAccess) {
-             listener.exitMemberAccess(this);
-        }
-    }
 }
 
 
@@ -3456,16 +3081,6 @@ export class IdentifierContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_identifier;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterIdentifier) {
-             listener.enterIdentifier(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitIdentifier) {
-             listener.exitIdentifier(this);
-        }
-    }
 }
 
 
@@ -3478,16 +3093,6 @@ export class PascalIdentifierContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_pascalIdentifier;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterPascalIdentifier) {
-             listener.enterPascalIdentifier(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitPascalIdentifier) {
-             listener.exitPascalIdentifier(this);
-        }
     }
 }
 
@@ -3510,16 +3115,6 @@ export class LiteralContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_literal;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterLiteral) {
-             listener.enterLiteral(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitLiteral) {
-             listener.exitLiteral(this);
-        }
     }
 }
 
@@ -3552,16 +3147,6 @@ export class TypeLiteralContext extends antlr.ParserRuleContext {
     public override get ruleIndex(): number {
         return DSLParser.RULE_typeLiteral;
     }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterTypeLiteral) {
-             listener.enterTypeLiteral(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitTypeLiteral) {
-             listener.exitTypeLiteral(this);
-        }
-    }
 }
 
 
@@ -3574,16 +3159,6 @@ export class ElementTypeReferenceContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_elementTypeReference;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterElementTypeReference) {
-             listener.enterElementTypeReference(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitElementTypeReference) {
-             listener.exitElementTypeReference(this);
-        }
     }
 }
 
@@ -3600,15 +3175,5 @@ export class TypeReferenceContext extends antlr.ParserRuleContext {
     }
     public override get ruleIndex(): number {
         return DSLParser.RULE_typeReference;
-    }
-    public override enterRule(listener: DSLParserListener): void {
-        if(listener.enterTypeReference) {
-             listener.enterTypeReference(this);
-        }
-    }
-    public override exitRule(listener: DSLParserListener): void {
-        if(listener.exitTypeReference) {
-             listener.exitTypeReference(this);
-        }
     }
 }

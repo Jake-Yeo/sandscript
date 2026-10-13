@@ -78,10 +78,10 @@ export declare function createEvaluator(): Evaluator;
 // ---------- C: world callbacks (B calls these) ----------
 
 export type BuiltinName =
-  | "get-all-elements"
-  | "get-element-at"
-  | "convert-to"
-  | "spread-element"
+  | "get_all_elements"
+  | "get_element_at"
+  | "convert_to"
+  | "spread_element"
   | "disappear";
 
 export interface RuntimeHost {

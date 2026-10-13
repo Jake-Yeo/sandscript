@@ -55,8 +55,8 @@ Functions can only be added to elements. There are no top-level functions.
 
 Define a function using:
 has function <function-name> needs <arg-name> <arg-name> ...:
-    ...
-    give <return-value>
+	...
+	give <return-value>
 
 Call functions using:
 function-name(arg, arg, ...)
@@ -78,19 +78,19 @@ An element's type can be obtained using .type.
 Example:
 let x be f.type 
 if x is Fire: 
-    do-something()
+	do-something()
 where Fire is an ElementType referring to the Fire element
 
 Conditionals:
 Use the following syntax:
 if <condition>:
-    ...
+	...
 
 else if <condition>:
-    ...
+	...
 
 else:
-    ...
+	...
 
 Loops
 Collection Loop
@@ -120,75 +120,75 @@ Examples
 # by the language and cannot be altered.
 
 template-element Element:
-    has position_x with 0
-    has position_y with 0
-    has color
+	has position_x with 0
+	has position_y with 0
+	has color
 
-    has function tick
+	has function tick
 
-    has function is_there_something_below:
-        let below be get_element_at(position_x - 1, position_y - 1)
-        let nothing_below be below equals null
-        give not nothing_below
+	has function is_there_something_below:
+		let below be get_element_at(position_x - 1, position_y - 1)
+		let nothing_below be below equals null
+		give not nothing_below
 
 template-element Solid is like Element:
-    has function tick:
-        fall()
+	has function tick:
+		fall()
 
-    has function fall:
-        let something_is_below be is_there_something_below()
+	has function fall:
+		let something_is_below be is_there_something_below()
 
-        if not something_is_below:
-            let position_y be position_y - 1
+		if not something_is_below:
+			let position_y be position_y - 1
 
 template-element Liquid is like Element:
-    has function tick:
-        flow()
-    
-    has function flow needs element
-        # do something with element that makes it flow properly with other liquids here
-        do-nothing
+	has function tick:
+		flow()
+
+	has function flow needs element
+		# do something with element that makes it flow properly with other liquids here
+		do-nothing
 
 template-element Gas is like Element:
-    has function tick:
-        do-nothing
+	has function tick:
+		do-nothing
 
 template-element Energy is like Element:
-    has intensity with 10
+	has intensity with 10
 
-    has function tick:
-        if intensity greater-than 0:
-            let intensity be intensity - 1
-        else
-            disappear()
+	has function tick:
+		if intensity greater-than 0:
+			let intensity be intensity - 1
+		else
+			disappear()
 
 element Water is like Liquid:
-    has color with Color(#123456)
+	has color with Color(#123456)
 
 element Lava is like Liquid:
-    has color with Color(#123456)
+	has color with Color(#123456)
 
 element Stone is like Solid:
-    has color with Color(#123456)
+	has color with Color(#123456)
 
 element Ice is like Solid:
-    has color with Color(#123456)
-    has health with 50
-    has melting_speed with 2
+	has color with Color(#123456)
+	has health with 50
+	has melting_speed with 2
 
 element Fire is like Energy:
-    has color with Color(#123456)
+	has color with Color(#123456)
 
 interaction TNT t with Fire f:
-  t.convert_to(Fire)
-  let new_fire = t
-  go-through 1 to 50 with i: 
-    new_fire.spread_element()
+	t.convert_to(Fire)
+	let new_fire = t
+	go-through 1 to 50 with i: 
+		new_fire.spread_element()
 
 interaction Ice i with Fire f:
-  let i.health be i.health - i.melting_speed
-  if health equals 0:
-    i.convert_to(Water)
+	let i.health be i.health - i.melting_speed
+	if health equals 0:
+		i.convert_to(Water)
 
 
 Naming Conventions
