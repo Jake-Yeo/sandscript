@@ -228,8 +228,8 @@ export class ASTBuilder {
         const operation = operator.getText();
         const operationMap: Record<string, TwoValueBooleanExpression['operation']> = {
             equals: 'Equals',
-            'less-than': 'Less Than',
-            'greater-than': 'Greater Than',
+            'less_than': 'Less Than',
+            'greater_than': 'Greater Than',
         };
 
         return {
