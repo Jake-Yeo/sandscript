@@ -1,7 +1,8 @@
-import type { Program } from "../../../ast/ast";
 import { Parser } from "../../../parser/parser";
 import { ASTBuilder } from "../../../ast/astBuilder";
 import { validateAST } from '../../..//ast/astValidator';
+import type { CompiledGame } from "../../../game/contracts";
+import { buildGame } from "../../../game/builder/builder";
 
 export type CompilerServiceRequest = {
   source: string;
@@ -10,7 +11,7 @@ export type CompilerServiceRequest = {
 export type CompilerServiceResponse = SuccessResponse | ErrorResponse;
 type SuccessResponse = {
   type: 'success';
-  program: Program
+  game: CompiledGame
 };
 type ErrorResponse = {
   type: 'error';
@@ -23,7 +24,9 @@ self.onmessage = (event: MessageEvent<CompilerServiceRequest>) => {
     const program = new ASTBuilder().build(tree);
     validateAST(program);
 
-    const response: SuccessResponse = { type: 'success', program };
+    const game = buildGame(program);
+
+    const response: SuccessResponse = { type: 'success', game };
     self.postMessage(response);
 
   } catch (e) {

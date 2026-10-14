@@ -1,4 +1,4 @@
-import type { GameEngine } from '../../../game/contracts';
+import type { CompiledGame, GameEngine } from '../../../game/contracts';
 import { CANVAS_DIMS } from '../canvas';
 import { createFakeEngine } from '../FAKEGAME';
 import type { Location } from '../types';
@@ -12,6 +12,7 @@ export type CanvasRequest = {
 };
 export type NewGameRequest = {
   type: 'game';
+  game: CompiledGame;
 };
 export type SpawnRequest = {
   type: 'spawn';

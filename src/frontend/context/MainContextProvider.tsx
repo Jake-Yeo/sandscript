@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import type { Theme } from '@/lib/types';
 import { MainContext } from './MainContext';
+import type { CompiledGame } from '../../game/contracts';
 
 function setThemeHTML(theme: Theme) {
   document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -14,6 +15,7 @@ function setupTheme(): Theme {
 // provider is in its own file to allow react fast refresh
 export default function MainContextProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState(setupTheme());
+  const [game, setGame] = useState<CompiledGame | null>(null);
 
   const setTheme = (value: Theme) => {
     setThemeHTML(value);
@@ -24,6 +26,8 @@ export default function MainContextProvider({ children }: { children: ReactNode 
   const value = {
     theme,
     setTheme,
+    game,
+    setGame,
   };
 
   return <MainContext.Provider value={value}>{children}</MainContext.Provider>;

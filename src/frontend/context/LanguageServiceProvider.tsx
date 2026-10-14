@@ -3,6 +3,7 @@ import { LanguageServiceContext } from './LanguageServiceContext';
 import { CharStream, Token } from 'antlr4ng';
 import { DSLLexer } from '../../generated/DSLLexer';
 import type { CompilerServiceRequest, CompilerServiceResponse } from '@/lib/compilerService/worker';
+import { useMainContext } from './MainContext';
 
 function lex(source: string): Token[] {
   const lexer = new DSLLexer(CharStream.fromString(source));
@@ -11,6 +12,8 @@ function lex(source: string): Token[] {
 }
 
 export default function LanguageServiceProvider({ children }: { children: ReactNode }) {
+  const { setGame } = useMainContext();
+
   const [text, setTextState] = useState('');
   const [tokens, setTokens] = useState<Token[]>([]);
 
@@ -53,7 +56,7 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
         return;
       }
 
-      console.log(event.data.program);
+      setGame(event.data.game);
     };
 
     worker.onerror = (event) => {
@@ -64,7 +67,7 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
     return () => {
       worker.terminate();
     };
-  }, []);
+  }, [setGame]);
 
 
 

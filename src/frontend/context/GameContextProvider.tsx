@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { GameContext } from './GameContext';
 import type { CanvasRequest, GameWorkerResponse, NewGameRequest } from '@/lib/gameWorker/worker';
+import { useMainContext } from './MainContext';
 
 // provider is in its own file to allow react fast refresh
 export default function GameContextProvider({ children }: { children: ReactNode }) {
+  const { game } = useMainContext();
+
   const workerRef = useRef<Worker | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -29,13 +32,16 @@ export default function GameContextProvider({ children }: { children: ReactNode 
     const canvasReq: CanvasRequest = { type: 'canvas', canvas: offscreen };
     worker.postMessage(canvasReq, [offscreen]);
 
-    const gameReq: NewGameRequest = { type: 'game' };
-    worker.postMessage(gameReq, []);
-
     return () => {
       worker.terminate();
     };
   }, [setElements]);
+
+  useEffect(() => {
+    if (!game || !workerRef.current) return;
+    const newGameReq: NewGameRequest = { type: 'game', game };
+    workerRef.current.postMessage(newGameReq);
+  }, [game]);
 
   const value = {
     workerRef,
