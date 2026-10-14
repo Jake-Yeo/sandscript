@@ -49,6 +49,8 @@ export default function TextInput() {
         )}
       >
         {langService.tokens.map((t, i) => <TokenDisplay key={i} token={t} />)}
+        {/* handle edge case with trailing newline */}
+        {'\n'}
       </div>
       <Textarea
         className={cn(
