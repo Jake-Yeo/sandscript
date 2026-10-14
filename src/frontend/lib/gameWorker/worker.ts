@@ -1,6 +1,7 @@
-import type { CompiledGame, GameEngine } from '../../../game/contracts';
+import type { CompiledGame, EngineOptions, GameEngine } from '../../../game/contracts';
+import { createEngine } from '../../../game/game';
+import { createEvaluator } from '../../../game/interpreter/interpreter';
 import { CANVAS_DIMS } from '../canvas';
-import { createFakeEngine } from '../FAKEGAME';
 import type { Location } from '../types';
 import { drawGame } from './draw';
 import Loop from './loop';
@@ -35,7 +36,7 @@ let game: GameEngine | null = null;
 self.onmessage = (event: MessageEvent<GameWorkerRequest>) => {
   const data = event.data;
   if (data.type === 'canvas') handleCanvasRequest(data);
-  if (data.type === 'game') handleNewGameRequest();
+  if (data.type === 'game') handleNewGameRequest(data);
   if (data.type === 'spawn') handleSpawnRequest(data);
   if (data.type === 'erase') handleEraseRequest(data);
 };
@@ -53,8 +54,14 @@ function handleCanvasRequest(req: CanvasRequest) {
   loop.start();
 }
 
-function handleNewGameRequest() {
-  game = createFakeEngine({ width: CANVAS_DIMS.x, height: CANVAS_DIMS.y });
+function handleNewGameRequest(req: NewGameRequest) {
+  const evaluator = createEvaluator();
+  const options: EngineOptions = {
+    width: CANVAS_DIMS.x,
+    height: CANVAS_DIMS.y
+  }
+
+  game = createEngine(req.game, options, evaluator);
 
   const message: NewGameResponse = {
     type: 'game',
