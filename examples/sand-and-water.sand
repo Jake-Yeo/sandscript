@@ -20,7 +20,7 @@ template_element Liquid:
 		if is_empty(position_x, position_y + 1):
 			let position_y be position_y + 1
 		else:
-			let position_x be position_x + random(-1, 1)
+			let position_x be position_x + random(-2, 2)
 
 element Sand is like Powder:
 	has color with Color(#e0b25c)
