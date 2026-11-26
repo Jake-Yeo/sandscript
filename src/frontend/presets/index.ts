@@ -25,6 +25,8 @@ element Sand:
 	has function tick:
 		if is_empty(position_x, position_y + 1):
 			let position_y be position_y + 1
+		if is_empty(position_x, position_y + 1):
+			let position_y be position_y + 1
 `,
   },
   {
@@ -33,7 +35,7 @@ element Sand:
     description: "A drifting cloud that makes rain with place_element and random.",
     level: 'starter',
     source: `# Rain Cloud
-# Paint a Cloud near the top and watch it rain.
+# Paint a Cloud near the top and watch it drift, puff apart and rain.
 # place_element(Type, x, y) puts a pixel anywhere.
 # random(low, high) picks a number for you.
 
@@ -41,10 +43,15 @@ element Cloud:
 	has color with Color(#e8edf2)
 
 	has function tick:
-		if chance(3):
+		if chance(20):
+			let position_x be position_x + 1
+		if chance(5):
 			let position_x be position_x + random(-1, 1)
-		if chance(3):
-			place_element(Rain, position_x + random(-1, 1), position_y + 1)
+			let position_y be position_y + random(-1, 0)
+		if position_x equals grid_width() - 1:
+			let position_x be 0
+		if chance(2):
+			place_element(Rain, position_x, position_y + 1)
 
 element Rain:
 	has color with Color(#5b9bf0)
@@ -84,10 +91,32 @@ element Fire:
 	has function tick:
 		let life be life - 1
 		if life less_than 0:
+			convert_to(Smoke)
+		else:
+			let flame be random(1, 3)
+			if flame equals 1:
+				let color be Color(#ff5a1a)
+			else if flame equals 2:
+				let color be Color(#ff9a2a)
+			else:
+				let color be Color(#ffd24a)
+			if chance(10):
+				place_element(Smoke, position_x, position_y - 1)
+			if chance(30):
+				let position_x be position_x + random(-1, 1)
+				let position_y be position_y + random(-1, 1)
+
+element Smoke:
+	has color with Color(#6b7077)
+	has life with 45
+
+	has function tick:
+		let life be life - 1
+		if life less_than 0:
 			disappear()
-		else if chance(30):
+		else if chance(70):
+			let position_y be position_y - 1
 			let position_x be position_x + random(-1, 1)
-			let position_y be position_y + random(-1, 1)
 
 element Water:
 	has color with Color(#2f6fd6)
@@ -165,7 +194,7 @@ element Stone:
   {
     id: "team-sandbox",
     name: "Big Sandbox",
-    description: "The original Group 4 sandbox: birds, bombs, thunder, wheels and more.",
+    description: "The original Group 4 sandbox, now with flickering fire, smoke, clouds and faster sand.",
     level: 'advanced',
     source: `
 template_element Kinetic:
@@ -343,6 +372,7 @@ template_element ChaoticMover is like Kinetic:
 template_element RisingGas is like ChaoticMover:
 	has lifetime with 45
 	has side_tick with 0
+	has rise_chance with 70
 
 	has function rise:
 		let lifetime be lifetime - 1
@@ -357,7 +387,18 @@ template_element RisingGas is like ChaoticMover:
 
 		choose_direction()
 
-		let above be get_element_at(position_x, position_y - 1)
+		if lifetime less_than 18:
+			if chance(7):
+				disappear()
+				give null
+
+		# Updated with Claude (2026-11-26): gas does not rise every tick, so it puffs out into clouds.
+		let above be null
+
+		if chance(rise_chance):
+			let above be get_element_at(position_x, position_y - 1)
+		else:
+			let above be this
 
 		if above is Thunder:
 			above.clear_for_particle()
@@ -380,17 +421,19 @@ template_element RisingGas is like ChaoticMover:
 			convert_to(Water)
 			give null
 
-		let side_tick be side_tick + 1
+		# Updated with Claude (2026-11-26): gas drifts sideways at random, with a steady breeze to the right.
+		if chance(55):
+			let drift be random(0 - 1, 1)
 
-		if side_tick equals 2:
-			let side_tick be 0
-			let side be get_element_at(position_x + direction, position_y)
+			if chance(35):
+				let drift be 1
 
-			if side equals null:
-				let position_x be position_x + direction
-				mark_impact(direction, 0)
-			else:
-				let direction be 0 - direction
+			if not (drift equals 0):
+				let side be get_element_at(position_x + drift, position_y)
+
+				if side equals null:
+					let position_x be position_x + drift
+					mark_impact(drift, 0)
 
 	has function tick:
 		if apply_velocity():
@@ -634,6 +677,40 @@ element Stone is like Idle:
 element Sand is like ChaoticMover:
 	has color with Color(#dbbd78)
 	has uses_gravity with true
+	has grain_set with false
+
+	# Updated with Claude (2026-11-26): each grain gets its own shade.
+	has function pick_shade:
+		let grain_set be true
+		let shade be random(0, 3)
+
+		if shade equals 0:
+			let color be Color(#d6b36c)
+		else if shade equals 1:
+			let color be Color(#e4c68a)
+		else if shade equals 2:
+			let color be Color(#c9a35b)
+
+	# Updated with Claude (2026-11-26): a grain packed in on all sides below cannot move, so it rests.
+	has function is_buried:
+		let below be get_element_at(position_x, position_y + 1)
+
+		if below equals null:
+			give false
+
+		if below is Water:
+			give false
+
+		if below is Thunder:
+			give false
+
+		if get_element_at(position_x - 1, position_y + 1) equals null:
+			give false
+
+		if get_element_at(position_x + 1, position_y + 1) equals null:
+			give false
+
+		give true
 
 	has function has_two_adjacent_sand:
 		let sand_count be 0
@@ -678,7 +755,7 @@ element Sand is like ChaoticMover:
 		if lower_right is Sand:
 			let sand_count be sand_count + 1
 
-		give sand_count greater_than 1
+		give sand_count greater_than 4
 
 	has function tick:
 		if not airborne:
@@ -697,7 +774,13 @@ element Sand is like ChaoticMover:
 				let velocity_x be 0
 				let motion_x be 0
 
+		if not grain_set:
+			pick_shade()
+
 		if apply_velocity():
+			give null
+
+		if is_buried():
 			give null
 
 		if has_two_adjacent_sand():
@@ -713,18 +796,36 @@ element Sand is like ChaoticMover:
 		else if below equals null:
 			let position_y be position_y + 1
 			mark_impact(0, 1)
+			let airborne be true
+			let velocity_y be velocity_y + 0.8
 		else if below is Water:
 			below.convert_to(Sand)
 			convert_to(Water)
 		else:
-			let side be get_element_at(position_x + direction, position_y)
-			let diagonal be get_element_at(position_x + direction, position_y + 1)
+			# Updated with Claude (2026-11-26): grains avalanche down the slope (up to 3 cells a
+			# tick, trying the other side too), so pours spread into a real cone-shaped pile.
+			if not slide(direction):
+				slide(0 - direction)
+
+	has function slide needs slide_direction Number:
+		let moved be false
+
+		go_through 1 to 3 with slide_step:
+			let side be get_element_at(position_x + slide_direction, position_y)
+			let diagonal be get_element_at(position_x + slide_direction, position_y + 1)
 
 			if side equals null:
 				if diagonal equals null:
-					let position_x be position_x + direction
+					let position_x be position_x + slide_direction
 					let position_y be position_y + 1
-					mark_impact(direction, 1)
+					mark_impact(slide_direction, 1)
+					let moved be true
+				else:
+					stop_looping
+			else:
+				stop_looping
+
+		give moved
 
 element Water is like ChaoticMover:
 	has color with Color(#3478db)
@@ -1023,7 +1124,43 @@ element Water is like ChaoticMover:
 
 		give false
 
+	# Updated with Claude (2026-11-26): still water with no open cell below or beside it skips its tick.
+	has function is_still:
+		let below be get_element_at(position_x, position_y + 1)
+
+		if below equals null:
+			give false
+
+		if below is Thunder:
+			give false
+
+		let left be get_element_at(position_x - 1, position_y)
+
+		if left equals null:
+			give false
+
+		if left is Thunder:
+			give false
+
+		let right be get_element_at(position_x + 1, position_y)
+
+		if right equals null:
+			give false
+
+		if right is Thunder:
+			give false
+
+		give true
+
 	has function tick:
+		if compressed less_than 2:
+			if not electrified:
+				if not airborne:
+					if velocity_x equals 0:
+						if velocity_y equals 0:
+							if is_still():
+								give null
+
 		if compressed greater_than 1:
 			let pressure_handled be false
 
@@ -1182,10 +1319,39 @@ element Fire is like ChaoticMover:
 			give true
 
 		give false
+	# Updated with Claude (2026-11-26): flames flicker through hot colours and give off smoke.
+	has function flicker:
+		let flame be random(0, 4)
+
+		if intensity less_than 7:
+			let color be Color(#b83a0e)
+		else if flame equals 0:
+			let color be Color(#ff4d12)
+		else if flame equals 1:
+			let color be Color(#ff7a18)
+		else if flame equals 2:
+			let color be Color(#ffa424)
+		else if flame equals 3:
+			let color be Color(#ffcf3f)
+		else:
+			let color be Color(#fff07a)
+
+		if chance(16):
+			place_element(Smoke, position_x + random(0 - 1, 1), position_y - 1)
+
+		let fuel be get_element_at(position_x, position_y + 1)
+
+		if fuel is Wood:
+			let fuel.heat be fuel.heat + 1
+
+			if fuel.heat greater_than 3:
+				fuel.convert_to(BurningWood)
+
 	has function tick:
 		if apply_velocity():
 			give null
 
+		flicker()
 		let intensity be intensity - 1
 
 		if intensity less_than 1:
@@ -1227,18 +1393,88 @@ element Fire is like ChaoticMover:
 				mark_impact(direction, 0)
 
 element Smoke is like RisingGas:
-	has color with Color(#6f7378)
-	has lifetime with 45
+	has color with Color(#4c5056)
+	has lifetime with 75
+	has rise_chance with 62
+
+	# Updated with Claude (2026-11-26): smoke starts dark and thins to a pale grey as it rises.
+	has function tick:
+		if apply_velocity():
+			give null
+
+		if lifetime less_than 22:
+			let color be Color(#a3a8ae)
+		else if lifetime less_than 48:
+			let color be Color(#787d84)
+
+		rise()
+
+element Steam is like RisingGas:
+	has color with Color(#dfe5ea)
+	has lifetime with 150
+	has rise_chance with 85
+
+	# Updated with Claude (2026-11-26): steam that reaches the sky gathers into clouds.
+	has function tick:
+		if apply_velocity():
+			give null
+
+		if position_y less_than 26:
+			if chance(12):
+				convert_to(Cloud)
+				give null
+
+		rise()
+
+# Updated with Claude (2026-11-26): clouds drift on the wind, puff apart, slowly rise and rain.
+element Cloud is like Kinetic:
+	has color with Color(#eef2f6)
+	has rain with 4
+	has life with 700
+	has shade_set with false
+
+	has function drift needs change_x Number change_y Number:
+		let target_x be position_x + change_x
+		let target_y be position_y + change_y
+
+		if target_y less_than 3:
+			give null
+
+		if target_x greater_than 127:
+			let target_x be 0
+		else if target_x less_than 0:
+			let target_x be 127
+
+		if get_element_at(target_x, target_y) equals null:
+			let position_x be target_x
+			let position_y be target_y
 
 	has function tick:
 		if apply_velocity():
 			give null
 
-		rise()
+		if not shade_set:
+			let shade_set be true
 
-element Steam is like RisingGas:
-	has color with Color(#d0d0d0)
-	has lifetime with 35
+			if chance(50):
+				let color be Color(#dfe5ec)
+
+		let life be life - 1
+
+		if life less_than 1:
+			disappear()
+			give null
+
+		if chance(22):
+			drift(1, 0)
+
+		if chance(6):
+			drift(random(0 - 1, 1), random(0 - 1, 0))
+
+		if rain greater_than 0:
+			if chance(1):
+				if not (place_element(Water, position_x, position_y + 1) equals null):
+					let rain be rain - 1
 
 element Thunder is like Kinetic:
 	has color with Color(#00aaff)
@@ -1901,6 +2137,10 @@ element Square is like Kinetic:
 	has square_collision with false
 	has weight with 5
 	has sand_supporting with false
+	has rest_ticks with 0
+	has sleep_tick with 0
+	has rest_x with 0
+	has rest_y with 0
 
 	has function configure_piece needs piece Square piece_x Number piece_y Number:
 		let piece.is_center be false
@@ -2984,6 +3224,18 @@ element Square is like Kinetic:
 
 			give null
 
+		# Updated with Claude (2026-11-26): a cube that has come to rest only re-checks its footing every 8 ticks.
+		if rest_ticks greater_than 3:
+			if absolute(velocity_x) less_than 0.05:
+				if absolute(velocity_y) less_than 1:
+					if angular_velocity equals 0:
+						let sleep_tick be sleep_tick + 1
+
+						if sleep_tick less_than 8:
+							give null
+
+						let sleep_tick be 0
+
 		clear_shape()
 		eject_interior_sand()
 
@@ -3012,6 +3264,23 @@ element Square is like Kinetic:
 
 		if repair_water_on_outline():
 			build_shape()
+
+		let resting be false
+
+		if position_x equals rest_x:
+			if position_y equals rest_y:
+				if angular_velocity equals 0:
+					if absolute(velocity_y) less_than 1:
+						if absolute(velocity_x) less_than 0.05:
+							let resting be true
+
+		if resting:
+			let rest_ticks be rest_ticks + 1
+		else:
+			let rest_ticks be 0
+
+		let rest_x be position_x
+		let rest_y be position_y
 
 element Seed is like Kinetic:
 	has color with Color(#4caf50)
@@ -3313,7 +3582,7 @@ element Wood is like Kinetic:
 element BurningWood is like Kinetic:
 	has color with Color(#e85d24)
 	has uses_gravity with true
-	has lifetime with 36
+	has lifetime with 110
 	has emit_tick with 0
 
 	has function emit_fire:
@@ -3354,6 +3623,19 @@ element BurningWood is like Kinetic:
 		if lifetime less_than 1:
 			convert_to(Smoke)
 			give null
+
+		# Updated with Claude (2026-11-26): burning wood glows like embers and smokes.
+		let glow be random(0, 2)
+
+		if glow equals 0:
+			let color be Color(#e2531f)
+		else if glow equals 1:
+			let color be Color(#f07a2a)
+		else:
+			let color be Color(#b8401a)
+
+		if chance(6):
+			place_element(Smoke, position_x, position_y - 1)
 
 		let emit_tick be emit_tick + 1
 

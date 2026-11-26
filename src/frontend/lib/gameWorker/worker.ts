@@ -2,7 +2,7 @@
 // Runs the simulation off the main thread and draws it straight to an OffscreenCanvas.
 import type { CompiledGame, EngineOptions, GameEngine } from '../../../game/contracts';
 import { createEngine } from '../../../game/game';
-import { createEvaluator } from '../../../game/interpreter/interpreter';
+import { createCompiledEvaluator } from '../../../game/interpreter/compiler';
 import { CANVAS_DIMS } from '../canvas';
 import type { Location } from '../types';
 import { drawGame } from './draw';
@@ -40,7 +40,7 @@ const post = (message: GameWorkerResponse) => self.postMessage(message);
 
 function makeEngine(source: CompiledGame) {
   const options: EngineOptions = { width: CANVAS_DIMS.x, height: CANVAS_DIMS.y };
-  game = createEngine(source, options, createEvaluator());
+  game = createEngine(source, options, createCompiledEvaluator());
   failed = false;
   redraw();
 }

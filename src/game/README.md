@@ -50,10 +50,12 @@ and helper functions/loops, with simple fixtures standing in for the builder.
   formed during interactions wait until the next step. Interaction bindings work
   in either spatial order; same-type pairs execute once per rule.
 - `snapshot` returns detached render data without advancing time. Runtime field
-  values are copied on read/write so callers cannot mutate private state by alias.
-- Each `place`/`step` starts a fresh budget of 100,000 instructions. The engine
-  accounts for creation, defaults, ticks, rule checks and built-ins; B must also
-  call `ctx.host.consumeInstruction()` for each evaluated/executed AST node.
+  values are validated and frozen when stored (collections are also copied on
+  read) so callers cannot mutate private state by alias.
+- There is no per-step instruction budget. `consumeInstruction()` is only a stuck
+  guard: it throws once a single `place`/`step` has run for 10 seconds. The
+  compiled evaluator (`interpreter/compiler.ts`, used by the app) calls it every
+  65,536 loop turns or method calls.
 - Exceptions propagate as ordinary errors. Failed placement removes its incomplete
   instance; failed conversion restores the original instance. Failed steps do not
   increment time, but earlier successful mutations remain. The frontend should

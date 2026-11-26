@@ -59,8 +59,8 @@ export function friendlyError(message: string, kind: 'compile' | 'runtime'): Fri
     hint = `There is no element called ${m[1]}. Check the spelling, or add "element ${m[1]}:".`;
   } else if ((m = raw.match(/Unknown field "(.+?)"/))) {
     hint = `This element has no "${m[1]}". Add "has ${m[1]} with 0" to the element first.`;
-  } else if (/Instruction limit/.test(raw)) {
-    hint = 'One tick took too many steps. Look for a loop that never ends, or a go_through with a huge range.';
+  } else if (/Stuck in a loop/.test(raw)) {
+    hint = 'One tick never finished. Look for a loop that never ends, or a go_through with a huge range.';
   } else if (/AST validation failed/.test(raw)) {
     hint = raw.split('\n').slice(1, 2).join(' ');
   }
