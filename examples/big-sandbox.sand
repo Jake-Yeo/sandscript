@@ -1315,7 +1315,7 @@ element Thunder is like Kinetic:
 			build_bolt(10, direction, phase, branches)
 
 element Bomb is like Kinetic:
-	has color with Color(#252a34)
+	has color with Color(#e9edf3)
 	has uses_gravity with true
 	has airborne with true
 	has fuse with 35
