@@ -1,0 +1,3403 @@
+
+template_element Kinetic:
+	has velocity_x with 0
+	has velocity_y with 0
+	has motion_x with 0
+	has motion_y with 0
+	has uses_gravity with false
+	has airborne with false
+	has impact_x with 0
+	has impact_y with 0
+	has impact_ready with false
+
+	has function mark_impact needs change_x Number change_y Number:
+		let impact_x be change_x
+		let impact_y be change_y
+		let impact_ready be true
+
+	has function apply_velocity:
+		let start_x be position_x
+		let start_y be position_y
+		let moving be false
+
+		if velocity_x greater_than 0:
+			let moving be true
+			let motion_x be motion_x + velocity_x
+		else if velocity_x less_than 0:
+			let moving be true
+			let motion_x be motion_x + velocity_x
+
+		if velocity_y greater_than 0:
+			let moving be true
+			let motion_y be motion_y + velocity_y
+		else if velocity_y less_than 0:
+			let moving be true
+			let motion_y be motion_y + velocity_y
+
+		if uses_gravity:
+			if airborne:
+				let moving be true
+				let velocity_y be velocity_y + 0.55
+				let velocity_x be velocity_x * 0.96
+		else:
+			let velocity_x be velocity_x * 0.86
+			let velocity_y be velocity_y * 0.86
+
+		if velocity_x greater_than 0 - 0.15:
+			if velocity_x less_than 0.15:
+				let velocity_x be 0
+
+		if not uses_gravity:
+			if velocity_y greater_than 0 - 0.15:
+				if velocity_y less_than 0.15:
+					let velocity_y be 0
+
+		go_through 1 to 16 with horizontal_step:
+			if motion_x greater_than 0.99:
+				if position_x greater_than 126:
+					let velocity_x be 0
+					let motion_x be 0
+					stop_looping
+
+				let target be get_element_at(position_x + 1, position_y)
+
+				if target is Thunder:
+					target.clear_for_particle()
+					let position_x be position_x + 1
+					let motion_x be motion_x - 1
+				else if target equals null:
+					let position_x be position_x + 1
+					let motion_x be motion_x - 1
+				else:
+					let velocity_x be 0
+					let motion_x be 0
+					stop_looping
+			else if motion_x less_than 0 - 0.99:
+				if position_x less_than 1:
+					let velocity_x be 0
+					let motion_x be 0
+					stop_looping
+
+				let target be get_element_at(position_x - 1, position_y)
+
+				if target is Thunder:
+					target.clear_for_particle()
+					let position_x be position_x - 1
+					let motion_x be motion_x + 1
+				else if target equals null:
+					let position_x be position_x - 1
+					let motion_x be motion_x + 1
+				else:
+					let velocity_x be 0
+					let motion_x be 0
+					stop_looping
+			else:
+				stop_looping
+
+		go_through 1 to 16 with vertical_step:
+			if motion_y greater_than 0.99:
+				if position_y greater_than 126:
+					let velocity_y be 0
+					let motion_y be 0
+					let airborne be false
+					stop_looping
+
+				let target be get_element_at(position_x, position_y + 1)
+
+				if target is Thunder:
+					target.clear_for_particle()
+					let position_y be position_y + 1
+					let motion_y be motion_y - 1
+				else if target equals null:
+					let position_y be position_y + 1
+					let motion_y be motion_y - 1
+				else:
+					let velocity_y be 0
+					let motion_y be 0
+					let airborne be false
+					stop_looping
+			else if motion_y less_than 0 - 0.99:
+				if position_y less_than 1:
+					let velocity_y be 0
+					let motion_y be 0
+					stop_looping
+
+				let target be get_element_at(position_x, position_y - 1)
+
+				if target is Thunder:
+					target.clear_for_particle()
+					let position_y be position_y - 1
+					let motion_y be motion_y + 1
+				else if target equals null:
+					let position_y be position_y - 1
+					let motion_y be motion_y + 1
+				else:
+					let velocity_y be 0
+					let motion_y be 0
+					stop_looping
+			else:
+				stop_looping
+
+		if not (position_x equals start_x):
+			mark_impact(position_x - start_x, position_y - start_y)
+		else if not (position_y equals start_y):
+			mark_impact(position_x - start_x, position_y - start_y)
+
+		give moving
+
+template_element Idle is like Kinetic:
+
+	has function tick:
+		apply_velocity()
+
+template_element ChaoticMover is like Kinetic:
+	has direction with 1
+	has chaos with 17
+
+	has function choose_direction:
+		let chaos be chaos * 5 + position_x * 3 + position_y + 11
+
+		go_through 1 to 12 with i:
+			if chaos greater_than 96:
+				let chaos be chaos - 97
+
+		if chaos less_than 48:
+			let direction be 0 - 1
+		else:
+			let direction be 1
+
+		if position_x less_than 1:
+			let direction be 1
+		else if position_x greater_than 126:
+			let direction be 0 - 1
+
+template_element RisingGas is like ChaoticMover:
+	has lifetime with 45
+	has side_tick with 0
+
+	has function rise:
+		let lifetime be lifetime - 1
+
+		if lifetime less_than 1:
+			disappear()
+			give null
+
+		if position_y less_than 1:
+			disappear()
+			give null
+
+		choose_direction()
+
+		let above be get_element_at(position_x, position_y - 1)
+
+		if above is Thunder:
+			above.clear_for_particle()
+			let position_y be position_y - 1
+			mark_impact(0, 0 - 1)
+		else if above equals null:
+			let position_y be position_y - 1
+			mark_impact(0, 0 - 1)
+		else if above is Water:
+			let gas_type be type
+			let remaining_lifetime be lifetime
+			let current_direction be direction
+			let current_chaos be chaos
+			let current_side_tick be side_tick
+			above.convert_to(gas_type)
+			let above.lifetime be remaining_lifetime
+			let above.direction be current_direction
+			let above.chaos be current_chaos
+			let above.side_tick be current_side_tick
+			convert_to(Water)
+			give null
+
+		let side_tick be side_tick + 1
+
+		if side_tick equals 2:
+			let side_tick be 0
+			let side be get_element_at(position_x + direction, position_y)
+
+			if side equals null:
+				let position_x be position_x + direction
+				mark_impact(direction, 0)
+			else:
+				let direction be 0 - direction
+
+	has function tick:
+		if apply_velocity():
+			give null
+
+		rise()
+
+template_element FlockingBird is like ChaoticMover:
+	has direction_y with 1
+	has steering_tick with 0
+	has axis_tick with 0
+	has independent_ticks with 0
+	has boundary_escape_x_ticks with 0
+	has boundary_escape_y_ticks with 0
+
+	has function steer_with_flock:
+		let total_x be 0
+		let total_y be 0
+		let total_direction_x be 0
+		let total_direction_y be 0
+		let bird_count be 0
+
+		for_every other in get_all_elements():
+			if other is Bird:
+				if other.position_x greater_than position_x - 24:
+					if other.position_x less_than position_x + 24:
+						if other.position_y greater_than position_y - 18:
+							if other.position_y less_than position_y + 18:
+								let total_x be total_x + other.position_x
+								let total_y be total_y + other.position_y
+								let total_direction_x be total_direction_x + other.velocity_x
+								let total_direction_y be total_direction_y + other.velocity_y
+								let bird_count be bird_count + 1
+			else if other is FireBird:
+				if other.position_x greater_than position_x - 24:
+					if other.position_x less_than position_x + 24:
+						if other.position_y greater_than position_y - 18:
+							if other.position_y less_than position_y + 18:
+								let total_x be total_x + other.position_x
+								let total_y be total_y + other.position_y
+								let total_direction_x be total_direction_x + other.velocity_x
+								let total_direction_y be total_direction_y + other.velocity_y
+								let bird_count be bird_count + 1
+
+		if independent_ticks less_than 1:
+			if bird_count greater_than 0:
+				let center_x be total_x / bird_count
+				let center_y be total_y / bird_count
+
+				if position_x + 5 less_than center_x:
+					let direction be 1
+				else if position_x - 5 greater_than center_x:
+					let direction be 0 - 1
+				else if total_direction_x greater_than 0:
+					let direction be 1
+				else if total_direction_x less_than 0:
+					let direction be 0 - 1
+
+				if position_y + 4 less_than center_y:
+					let direction_y be 1
+				else if position_y - 4 greater_than center_y:
+					let direction_y be 0 - 1
+				else if total_direction_y greater_than 0:
+					let direction_y be 1
+				else if total_direction_y less_than 0:
+					let direction_y be 0 - 1
+
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		let above be get_element_at(position_x, position_y - 1)
+		let below be get_element_at(position_x, position_y + 1)
+
+		if left is Bird:
+			let direction be 1
+		else if left is FireBird:
+			let direction be 1
+
+		if right is Bird:
+			let direction be 0 - 1
+		else if right is FireBird:
+			let direction be 0 - 1
+
+		if above is Bird:
+			let direction_y be 1
+		else if above is FireBird:
+			let direction_y be 1
+
+		if below is Bird:
+			let direction_y be 0 - 1
+		else if below is FireBird:
+			let direction_y be 0 - 1
+
+	has function try_horizontal_move:
+		let target be get_element_at(position_x + direction, position_y)
+
+		if target is Thunder:
+			target.clear_for_particle()
+			let position_x be position_x + direction
+			give true
+
+		if target equals null:
+			let position_x be position_x + direction
+			give true
+
+		let direction be 0 - direction
+		let other_target be get_element_at(position_x + direction, position_y)
+
+		if other_target is Thunder:
+			other_target.clear_for_particle()
+			let position_x be position_x + direction
+			give true
+
+		if other_target equals null:
+			let position_x be position_x + direction
+			give true
+
+		give false
+
+	has function try_vertical_move:
+		let target be get_element_at(position_x, position_y + direction_y)
+
+		if target is Thunder:
+			target.clear_for_particle()
+			let position_y be position_y + direction_y
+			give true
+
+		if target equals null:
+			let position_y be position_y + direction_y
+			give true
+
+		let direction_y be 0 - direction_y
+		let other_target be get_element_at(position_x, position_y + direction_y)
+
+		if other_target is Thunder:
+			other_target.clear_for_particle()
+			let position_y be position_y + direction_y
+			give true
+
+		if other_target equals null:
+			let position_y be position_y + direction_y
+			give true
+
+		give false
+
+	has function move_with_flock:
+		if independent_ticks greater_than 0:
+			let independent_ticks be independent_ticks - 1
+
+		let steering_tick be steering_tick + 1
+
+		if steering_tick equals 7:
+			let steering_tick be 0
+			choose_direction()
+
+			if chaos less_than 32:
+				let direction_y be 0 - 1
+			else if chaos greater_than 64:
+				let direction_y be 1
+
+			if independent_ticks less_than 1:
+				if chaos less_than 24:
+					let independent_ticks be 6
+
+		steer_with_flock()
+
+		if position_x less_than 2:
+			let boundary_escape_x_ticks be 12
+		else if position_x greater_than 125:
+			let boundary_escape_x_ticks be 12
+
+		if position_y less_than 2:
+			let boundary_escape_y_ticks be 12
+		else if position_y greater_than 125:
+			let boundary_escape_y_ticks be 12
+
+		if boundary_escape_x_ticks greater_than 0:
+			let boundary_escape_x_ticks be boundary_escape_x_ticks - 1
+
+			if position_x less_than 64:
+				let direction be 1
+			else:
+				let direction be 0 - 1
+
+		if boundary_escape_y_ticks greater_than 0:
+			let boundary_escape_y_ticks be boundary_escape_y_ticks - 1
+
+			if position_y less_than 64:
+				let direction_y be 1
+			else:
+				let direction_y be 0 - 1
+
+		if position_x less_than 1:
+			let direction be 1
+
+			if velocity_x less_than 0:
+				let velocity_x be 0 - velocity_x
+		else if position_x greater_than 126:
+			let direction be 0 - 1
+
+			if velocity_x greater_than 0:
+				let velocity_x be 0 - velocity_x
+
+		if position_y less_than 1:
+			let direction_y be 1
+
+			if velocity_y less_than 0:
+				let velocity_y be 0 - velocity_y
+		else if position_y greater_than 126:
+			let direction_y be 0 - 1
+
+			if velocity_y greater_than 0:
+				let velocity_y be 0 - velocity_y
+
+		if direction greater_than 0:
+			let velocity_x be velocity_x + 0.55
+
+			if velocity_x greater_than 1.5:
+				let velocity_x be 1.5
+		else:
+			let velocity_x be velocity_x - 0.55
+
+			if velocity_x less_than 0 - 1.5:
+				let velocity_x be 0 - 1.5
+
+		if direction_y greater_than 0:
+			let velocity_y be velocity_y + 0.55
+
+			if velocity_y greater_than 1.5:
+				let velocity_y be 1.5
+		else:
+			let velocity_y be velocity_y - 0.55
+
+			if velocity_y less_than 0 - 1.5:
+				let velocity_y be 0 - 1.5
+
+		apply_velocity()
+
+element Stone is like Idle:
+	has color with Color(#787880)
+
+element Sand is like ChaoticMover:
+	has color with Color(#dbbd78)
+	has uses_gravity with true
+
+	has function has_two_adjacent_sand:
+		let sand_count be 0
+		let support be get_element_at(position_x, position_y + 1)
+
+		if support equals null:
+			give false
+
+		if support is Water:
+			give false
+
+		let upper_left be get_element_at(position_x - 1, position_y - 1)
+		let above be get_element_at(position_x, position_y - 1)
+		let upper_right be get_element_at(position_x + 1, position_y - 1)
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		let lower_left be get_element_at(position_x - 1, position_y + 1)
+		let below be get_element_at(position_x, position_y + 1)
+		let lower_right be get_element_at(position_x + 1, position_y + 1)
+
+		if upper_left is Sand:
+			let sand_count be sand_count + 1
+
+		if above is Sand:
+			let sand_count be sand_count + 1
+
+		if upper_right is Sand:
+			let sand_count be sand_count + 1
+
+		if left is Sand:
+			let sand_count be sand_count + 1
+
+		if right is Sand:
+			let sand_count be sand_count + 1
+
+		if lower_left is Sand:
+			let sand_count be sand_count + 1
+
+		if below is Sand:
+			let sand_count be sand_count + 1
+
+		if lower_right is Sand:
+			let sand_count be sand_count + 1
+
+		give sand_count greater_than 1
+
+	has function tick:
+		if not airborne:
+			let support_before_velocity be get_element_at(position_x, position_y + 1)
+
+			if support_before_velocity equals null:
+				if velocity_x greater_than 0.14:
+					let airborne be true
+				else if velocity_x less_than 0 - 0.14:
+					let airborne be true
+				else if velocity_y greater_than 0.14:
+					let airborne be true
+				else if velocity_y less_than 0 - 0.14:
+					let airborne be true
+			else if support_before_velocity is Water:
+				let velocity_x be 0
+				let motion_x be 0
+
+		if apply_velocity():
+			give null
+
+		if has_two_adjacent_sand():
+			give null
+
+		choose_direction()
+		let below be get_element_at(position_x, position_y + 1)
+
+		if below is Thunder:
+			below.clear_for_particle()
+			let position_y be position_y + 1
+			mark_impact(0, 1)
+		else if below equals null:
+			let position_y be position_y + 1
+			mark_impact(0, 1)
+		else if below is Water:
+			below.convert_to(Sand)
+			convert_to(Water)
+		else:
+			let side be get_element_at(position_x + direction, position_y)
+			let diagonal be get_element_at(position_x + direction, position_y + 1)
+
+			if side equals null:
+				if diagonal equals null:
+					let position_x be position_x + direction
+					let position_y be position_y + 1
+					mark_impact(direction, 1)
+
+element Water is like ChaoticMover:
+	has color with Color(#3478db)
+	has uses_gravity with true
+	has air_tick with 0
+	has electrified with false
+	has steam_delay with 0
+	has compressed with 1
+
+	has function configure_expanded_water needs target Water amount Number:
+		let target.compressed be amount
+		let target.direction be 0 - direction
+		let target.velocity_x be velocity_x * 0.25
+		let target.velocity_y be velocity_y * 0.25
+		let target.airborne be true
+
+	has function release_compacted_water:
+		if compressed less_than 2:
+			give false
+
+		let above be get_element_at(position_x, position_y - 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+		let below be get_element_at(position_x, position_y + 1)
+		let available_cells be 0
+
+		if above equals null:
+			let available_cells be available_cells + 1
+
+		if old_left equals null:
+			let available_cells be available_cells + 1
+
+		if old_right equals null:
+			let available_cells be available_cells + 1
+
+		if below equals null:
+			let available_cells be available_cells + 1
+
+		if available_cells equals 0:
+			give false
+
+		let spawn_count be available_cells
+
+		if compressed less_than 5:
+			if spawn_count greater_than 3:
+				let spawn_count be 3
+
+		if compressed less_than 4:
+			if spawn_count greater_than 2:
+				let spawn_count be 2
+
+		if compressed less_than 3:
+			if spawn_count greater_than 1:
+				let spawn_count be 1
+
+		let divided_amount be compressed / (spawn_count + 1)
+
+		spread_element()
+
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+		let remaining_cells be spawn_count
+
+		if old_left equals null:
+			if new_left is Water:
+				if remaining_cells greater_than 0:
+					configure_expanded_water(new_left, divided_amount)
+					let remaining_cells be remaining_cells - 1
+				else:
+					new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Water:
+				if remaining_cells greater_than 0:
+					configure_expanded_water(new_right, divided_amount)
+					let remaining_cells be remaining_cells - 1
+				else:
+					new_right.disappear()
+
+		if below equals null:
+			if new_down is Water:
+				if remaining_cells greater_than 0:
+					configure_expanded_water(new_down, divided_amount)
+					let remaining_cells be remaining_cells - 1
+				else:
+					new_down.disappear()
+
+		if above equals null:
+			if new_up is Water:
+				if remaining_cells greater_than 0:
+					configure_expanded_water(new_up, divided_amount)
+					let remaining_cells be remaining_cells - 1
+				else:
+					new_up.disappear()
+
+		let compressed be divided_amount
+		give true
+
+	has function balance_compression_with needs target Water:
+		let combined_compression be compressed + target.compressed
+		let balanced_compression be combined_compression / 2
+		let compressed be balanced_compression
+		let target.compressed be balanced_compression
+
+	has function collect_compression_from needs target Water:
+		if not (target.compressed greater_than 1):
+			give false
+
+		let needed_compression be 2 - compressed
+		let available_compression be target.compressed - 1
+
+		if available_compression greater_than needed_compression:
+			let compressed be 2
+			let target.compressed be target.compressed - needed_compression
+		else:
+			let compressed be compressed + available_compression
+			let target.compressed be 1
+
+		give true
+
+	has function collect_compression_for_open_space:
+		let above be get_element_at(position_x, position_y - 1)
+		let below be get_element_at(position_x, position_y + 1)
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		let has_open_space be false
+
+		if above equals null:
+			let has_open_space be true
+
+		if below equals null:
+			let has_open_space be true
+
+		if left equals null:
+			let has_open_space be true
+
+		if right equals null:
+			let has_open_space be true
+
+		if not has_open_space:
+			give false
+
+		let collected be false
+
+		if above is Water:
+			if collect_compression_from(above):
+				let collected be true
+
+		if compressed less_than 2:
+			if left is Water:
+				if collect_compression_from(left):
+					let collected be true
+
+		if compressed less_than 2:
+			if right is Water:
+				if collect_compression_from(right):
+					let collected be true
+
+		if compressed less_than 2:
+			if below is Water:
+				if collect_compression_from(below):
+					let collected be true
+
+		give collected
+
+	has function pass_compression:
+		if not (compressed greater_than 1):
+			give false
+
+		choose_direction()
+		let above be get_element_at(position_x, position_y - 1)
+		let first_side be get_element_at(position_x + direction, position_y)
+		let other_side be get_element_at(position_x - direction, position_y)
+		let below be get_element_at(position_x, position_y + 1)
+		let least_compressed be null
+
+		if above is Water:
+			let least_compressed be above
+
+		if first_side is Water:
+			if least_compressed is Water:
+				if first_side.compressed less_than least_compressed.compressed:
+					let least_compressed be first_side
+			else:
+				let least_compressed be first_side
+
+		if other_side is Water:
+			if least_compressed is Water:
+				if other_side.compressed less_than least_compressed.compressed:
+					let least_compressed be other_side
+			else:
+				let least_compressed be other_side
+
+		if below is Water:
+			if least_compressed is Water:
+				if below.compressed less_than least_compressed.compressed:
+					let least_compressed be below
+			else:
+				let least_compressed be below
+
+		if least_compressed is Water:
+			if least_compressed.compressed less_than compressed:
+				balance_compression_with(least_compressed)
+				give true
+
+		give false
+
+	has function should_wait_for_swap:
+		let upper_left be get_element_at(position_x - 1, position_y - 1)
+		let above be get_element_at(position_x, position_y - 1)
+		let upper_right be get_element_at(position_x + 1, position_y - 1)
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		let lower_left be get_element_at(position_x - 1, position_y + 1)
+		let below be get_element_at(position_x, position_y + 1)
+		let lower_right be get_element_at(position_x + 1, position_y + 1)
+
+		if upper_left is Seed:
+			give true
+
+		if above is Seed:
+			give true
+
+		if upper_right is Seed:
+			give true
+
+		if left is Seed:
+			give true
+
+		if right is Seed:
+			give true
+
+		if lower_left is Seed:
+			give true
+
+		if below is Seed:
+			give true
+
+		if lower_right is Seed:
+			give true
+
+		if upper_left is Thunder:
+			give true
+
+		if above is Thunder:
+			give true
+
+		if upper_right is Thunder:
+			give true
+
+		if left is Thunder:
+			give true
+
+		if right is Thunder:
+			give true
+
+		if lower_left is Thunder:
+			give true
+
+		if below is Thunder:
+			give true
+
+		if lower_right is Thunder:
+			give true
+
+		if above is Wood:
+			if above.tip equals true:
+				if above.connected equals true:
+					give true
+
+		if below is Wood:
+			if below.tip equals true:
+				if below.connected equals true:
+					give true
+
+		if left is Wood:
+			if left.tip equals true:
+				if left.connected equals true:
+					give true
+
+		if right is Wood:
+			if right.tip equals true:
+				if right.connected equals true:
+					give true
+
+		if above is Sand:
+			give true
+
+		if below is Smoke:
+			give true
+
+		if below is Steam:
+			give true
+
+		give false
+
+	has function tick:
+		if compressed greater_than 1:
+			let pressure_handled be false
+
+			if release_compacted_water():
+				let pressure_handled be true
+
+			if not pressure_handled:
+				if collect_compression_for_open_space():
+					let pressure_handled be true
+					release_compacted_water()
+
+			if not pressure_handled:
+				pass_compression()
+
+		if electrified:
+			let steam_delay be steam_delay + 1
+
+			if steam_delay greater_than 3:
+				let remaining_velocity_x be velocity_x
+				let remaining_velocity_y be velocity_y
+				convert_to(Steam)
+				let velocity_x be remaining_velocity_x
+				let velocity_y be remaining_velocity_y
+				give null
+
+		if not airborne:
+			let support_before_velocity be get_element_at(position_x, position_y + 1)
+
+			if support_before_velocity equals null:
+				if velocity_x greater_than 0.14:
+					let airborne be true
+				else if velocity_x less_than 0 - 0.14:
+					let airborne be true
+				else if velocity_y greater_than 0.14:
+					let airborne be true
+				else if velocity_y less_than 0 - 0.14:
+					let airborne be true
+
+		if apply_velocity():
+			give null
+
+		if should_wait_for_swap():
+			give null
+
+		choose_direction()
+		let below be get_element_at(position_x, position_y + 1)
+
+		if below is Thunder:
+			below.clear_for_particle()
+			let position_y be position_y + 1
+			let air_tick be air_tick + 1
+			mark_impact(0, 1)
+		else if below equals null:
+			let position_y be position_y + 1
+			let air_tick be air_tick + 1
+			mark_impact(0, 1)
+
+			if air_tick equals 2:
+				let air_tick be 0
+				let air_side be get_element_at(position_x + direction, position_y)
+
+				if air_side equals null:
+					let position_x be position_x + direction
+					mark_impact(direction, 1)
+		else:
+			let air_tick be 0
+			let side be get_element_at(position_x + direction, position_y)
+			let diagonal be get_element_at(position_x + direction, position_y + 1)
+
+			if side equals null:
+				let position_x be position_x + direction
+				mark_impact(direction, 0)
+
+				if diagonal equals null:
+					let position_y be position_y + 1
+					mark_impact(direction, 1)
+			else:
+				let direction be 0 - direction
+				let other_side be get_element_at(position_x + direction, position_y)
+				let other_diagonal be get_element_at(position_x + direction, position_y + 1)
+
+				if other_side equals null:
+					let position_x be position_x + direction
+					mark_impact(direction, 0)
+
+					if other_diagonal equals null:
+						let position_y be position_y + 1
+						mark_impact(direction, 1)
+
+element Fire is like ChaoticMover:
+	has color with Color(#ff5a14)
+	has intensity with 30
+	has spawn_tick with 0
+	has spawned with false
+
+	has function make_flames:
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+
+		spread_element()
+
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+		let kept be null
+
+		if old_up equals null:
+			if new_up is Fire:
+				let kept be new_up
+
+		if kept equals null:
+			if direction equals 1:
+				if old_right equals null:
+					if new_right is Fire:
+						let kept be new_right
+			else:
+				if old_left equals null:
+					if new_left is Fire:
+						let kept be new_left
+
+		if kept equals null:
+			if old_left equals null:
+				if new_left is Fire:
+					let kept be new_left
+
+		if kept equals null:
+			if old_right equals null:
+				if new_right is Fire:
+					let kept be new_right
+
+		if old_down equals null:
+			if new_down is Fire:
+				new_down.disappear()
+
+		if old_up equals null:
+			if new_up is Fire:
+				if not (new_up equals kept):
+					new_up.disappear()
+
+		if old_left equals null:
+			if new_left is Fire:
+				if not (new_left equals kept):
+					new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Fire:
+				if not (new_right equals kept):
+					new_right.disappear()
+
+		if kept is Fire:
+			let kept.intensity be intensity - 10
+			let kept.chaos be chaos + 31
+			give true
+
+		give false
+	has function tick:
+		if apply_velocity():
+			give null
+
+		let intensity be intensity - 1
+
+		if intensity less_than 1:
+			convert_to(Smoke)
+			give null
+
+		choose_direction()
+		if not spawned:
+			let spawn_tick be spawn_tick + 1
+
+			if spawn_tick equals 4:
+				let spawn_tick be 0
+
+				if intensity greater_than 10:
+					if make_flames():
+						let spawned be true
+
+		let above be get_element_at(position_x, position_y - 1)
+
+		if above is Thunder:
+			above.clear_for_particle()
+			let position_y be position_y - 1
+			mark_impact(0, 0 - 1)
+		else if above equals null:
+			let position_y be position_y - 1
+			mark_impact(0, 0 - 1)
+
+			if chaos less_than 33:
+				let upper_side be get_element_at(position_x + direction, position_y)
+
+				if upper_side equals null:
+					let position_x be position_x + direction
+					mark_impact(direction, 0 - 1)
+		else:
+			let side be get_element_at(position_x + direction, position_y)
+
+			if side equals null:
+				let position_x be position_x + direction
+				mark_impact(direction, 0)
+
+element Smoke is like RisingGas:
+	has color with Color(#6f7378)
+	has lifetime with 45
+
+	has function tick:
+		if apply_velocity():
+			give null
+
+		rise()
+
+element Steam is like RisingGas:
+	has color with Color(#d0d0d0)
+	has lifetime with 35
+
+element Thunder is like Kinetic:
+	has color with Color(#00aaff)
+	has lifetime with 10
+	has travel_lifetime with 35
+	has built with false
+	has active_tip with false
+	has finished with false
+	has direction with 1
+	has phase with 0
+	has branches with 3
+	has origin_x with 0
+	has origin_y with 0
+
+	has function blast needs target Element horizontal_force Number vertical_force Number:
+		if target.position_x less_than position_x:
+			let target.velocity_x be 0 - horizontal_force
+		else if target.position_x greater_than position_x:
+			let target.velocity_x be horizontal_force
+		else if direction greater_than 0:
+			let target.velocity_x be 0 - horizontal_force
+		else:
+			let target.velocity_x be horizontal_force
+
+		let target.velocity_y be 0 - vertical_force
+
+		if target.uses_gravity equals true:
+			let target.airborne be true
+
+	has function explode_area needs radius Number:
+		for_every target in get_all_elements():
+			if not (target is Thunder):
+				if not (target is Stone):
+					if target.position_x greater_than position_x - radius - 1:
+						if target.position_x less_than position_x + radius + 1:
+							if target.position_y greater_than position_y - radius - 1:
+								if target.position_y less_than position_y + radius + 1:
+									blast(target, 3.5, 5.5)
+
+									if target is Water:
+										let target.electrified be true
+										let target.steam_delay be 0
+
+	has function choose_bend needs current_direction Number remaining Number:
+		let chaos be position_x * 5 + position_y * 3 + remaining * 7
+
+		go_through 1 to 20 with i:
+			if chaos greater_than 96:
+				let chaos be chaos - 97
+
+		if chaos less_than 48:
+			give current_direction
+
+		give 0 - current_direction
+
+	has function make_segment needs target_x Number target_y Number:
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+		let old_target be get_element_at(target_x, target_y)
+
+		spread_element()
+
+		let child be get_element_at(target_x, target_y)
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is Thunder:
+				if not (new_up equals child):
+					new_up.disappear()
+
+		if old_down equals null:
+			if new_down is Thunder:
+				if not (new_down equals child):
+					new_down.disappear()
+
+		if old_left equals null:
+			if new_left is Thunder:
+				if not (new_left equals child):
+					new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Thunder:
+				if not (new_right equals child):
+					new_right.disappear()
+
+		if old_target equals null:
+			if child is Thunder:
+				let child.built be true
+				let child.origin_x be origin_x
+				let child.origin_y be origin_y
+				give child
+
+		give null
+
+	has function build_branch needs remaining Number branch_direction Number phase Number:
+		if remaining less_than 1:
+			give null
+
+		let target_x be position_x + branch_direction
+		let target_y be position_y
+
+		if phase equals 2:
+			let target_x be position_x
+			let target_y be position_y + 1
+
+		let child be make_segment(target_x, target_y)
+
+		if child is Thunder:
+			let next_phase be phase + 1
+
+			if next_phase greater_than 2:
+				let next_phase be 0
+
+			child.build_branch(remaining - 1, branch_direction, next_phase)
+
+	has function fade_bolt:
+		for_every segment in get_all_elements():
+			if segment is Thunder:
+				if segment.origin_x equals origin_x:
+					if segment.origin_y equals origin_y:
+						let segment.finished be true
+						let segment.active_tip be false
+						let segment.lifetime be 10
+						let segment.color be Color(#ffe600)
+
+	has function finish_bolt:
+		explode_area(8)
+		fade_bolt()
+
+	has function clear_for_particle:
+		if not finished:
+			fade_bolt()
+
+		disappear()
+
+	has function build_bolt needs steps Number current_direction Number current_phase Number branch_count Number:
+		if steps less_than 1:
+			give null
+
+		if position_y greater_than 126:
+			finish_bolt()
+			give null
+
+		let next_direction be current_direction
+
+		if current_phase equals 2:
+			let next_direction be choose_bend(current_direction, position_y)
+		else if current_phase equals 5:
+			let next_direction be choose_bend(current_direction, position_y)
+
+		let target_x be position_x
+		let target_y be position_y + 1
+
+		if current_phase equals 2:
+			let target_x be position_x + next_direction
+			let target_y be position_y
+		else if current_phase equals 5:
+			let target_x be position_x + next_direction
+			let target_y be position_y
+
+		if current_phase equals 5:
+			if branch_count greater_than 0:
+				let branch_direction be 0 - next_direction
+				let branch be make_segment(position_x + branch_direction, position_y)
+
+				if branch is Thunder:
+					branch.build_branch(10, branch_direction, 0)
+
+		let child be make_segment(target_x, target_y)
+
+		if not (child is Thunder):
+			if current_phase equals 2:
+				let child be make_segment(position_x, position_y + 1)
+				let next_direction be 0 - next_direction
+			else if current_phase equals 5:
+				let child be make_segment(position_x, position_y + 1)
+				let next_direction be 0 - next_direction
+			else:
+				let child be make_segment(position_x + next_direction, position_y)
+
+				if not (child is Thunder):
+					let next_direction be 0 - next_direction
+					let child be make_segment(position_x + next_direction, position_y)
+
+		if child is Thunder:
+			let next_phase be current_phase + 1
+			let next_branches be branch_count
+
+			if current_phase equals 5:
+				let next_phase be 0
+
+				if next_branches greater_than 0:
+					let next_branches be next_branches - 1
+
+			if steps greater_than 1:
+				child.build_bolt(steps - 1, next_direction, next_phase, next_branches)
+			else:
+				let child.active_tip be true
+				let child.direction be next_direction
+				let child.phase be next_phase
+				let child.branches be next_branches
+
+			give null
+
+		finish_bolt()
+
+	has function tick:
+		if apply_velocity():
+			give null
+
+		if finished:
+			let lifetime be lifetime - 1
+
+			if lifetime equals 6:
+				let color be Color(#ffd24a)
+			else if lifetime equals 3:
+				let color be Color(#fff4a3)
+
+			if lifetime less_than 1:
+				disappear()
+
+			give null
+
+		let travel_lifetime be travel_lifetime - 1
+
+		if travel_lifetime less_than 1:
+			fade_bolt()
+			give null
+
+		if not built:
+			let built be true
+			let active_tip be true
+			let origin_x be position_x
+			let origin_y be position_y
+
+		if active_tip:
+			let active_tip be false
+			build_bolt(10, direction, phase, branches)
+
+element Bomb is like Kinetic:
+	has color with Color(#252a34)
+	has uses_gravity with true
+	has airborne with true
+	has fuse with 35
+	has exploded with false
+
+	has function absolute needs value Number:
+		if value less_than 0:
+			give 0 - value
+
+		give value
+
+	has function blast_target needs target Element force Number direction_x Number:
+		if direction_x less_than 0:
+			let target.velocity_x be 0 - force
+		else if direction_x greater_than 0:
+			let target.velocity_x be force
+		else if position_x greater_than 63:
+			let target.velocity_x be 0 - force
+		else:
+			let target.velocity_x be force
+
+		let target.velocity_y be (0 - force) - 1.5
+
+		if target.uses_gravity equals true:
+			let target.airborne be true
+
+	has function blast_square needs target Square force Number direction_x Number direction_y Number:
+		if not target.is_center:
+			give null
+
+		blast_target(target, force, direction_x)
+		let torque_direction be direction_x
+
+		if torque_direction equals 0:
+			if direction_y greater_than 0:
+				let torque_direction be 1
+			else:
+				let torque_direction be 0 - 1
+
+		let target.angular_velocity be target.angular_velocity + torque_direction * force * 0.22
+
+		if target.angular_velocity greater_than 3.5:
+			let target.angular_velocity be 3.5
+		else if target.angular_velocity less_than 0 - 3.5:
+			let target.angular_velocity be 0 - 3.5
+
+	has function blast_wheel needs target Wheel force Number direction_x Number:
+		if not target.is_center:
+			give null
+
+		blast_target(target, force, direction_x)
+		let target.angular_velocity be target.angular_velocity + direction_x * force * 0.18
+
+	has function explode:
+		if exploded:
+			give null
+
+		let exploded be true
+
+		for_every target in get_all_elements():
+			if not (target is Bomb):
+				if not (target is Thunder):
+					if not (target is Stone):
+						let distance_x be target.position_x - position_x
+						let distance_y be target.position_y - position_y
+						let distance be absolute(distance_x) + absolute(distance_y)
+
+						if distance less_than 13:
+							let force be 8 - distance * 0.45
+
+							if force less_than 2:
+								let force be 2
+
+							if target is Square:
+								blast_square(target, force, distance_x, distance_y)
+							else if target is Wheel:
+								blast_wheel(target, force, distance_x)
+							else:
+								blast_target(target, force, distance_x)
+
+		disappear()
+
+	has function tick:
+		if exploded:
+			give null
+
+		let was_airborne be airborne
+		apply_velocity()
+		let fuse be fuse - 1
+
+		if fuse equals 8:
+			let color be Color(#e67e22)
+		else if fuse equals 4:
+			let color be Color(#ff3b30)
+
+		if was_airborne:
+			if not airborne:
+				explode()
+				give null
+
+		if fuse less_than 1:
+			explode()
+
+element Wheel is like Kinetic:
+	has color with Color(#aeb6bf)
+	has uses_gravity with true
+	has is_center with true
+	has initialized with false
+	has built with false
+	has center_x with 0
+	has center_y with 0
+	has arm with 0
+	has distance with 0
+	has half_distance with 0
+	has half_step with true
+	has radius with 10
+	has build_tick with 0
+	has phase with 0
+	has angular_velocity with 0
+	has angular_motion with 0
+
+	has function configure_piece needs piece Wheel piece_arm Number:
+		let piece.is_center be false
+		let piece.initialized be true
+		let piece.center_x be position_x
+		let piece.center_y be position_y
+		let piece.arm be piece_arm
+		let piece.distance be 1
+		let piece.half_distance be 0
+		let piece.half_step be true
+
+	has function initialize_cross:
+		let center_x be position_x
+		let center_y be position_y
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+
+		spread_element()
+
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is Wheel:
+				configure_piece(new_up, 2)
+
+		if old_down equals null:
+			if new_down is Wheel:
+				configure_piece(new_down, 0)
+
+		if old_left equals null:
+			if new_left is Wheel:
+				configure_piece(new_left, 1)
+
+		if old_right equals null:
+			if new_right is Wheel:
+				configure_piece(new_right, 3)
+
+		let initialized be true
+
+	has function apply_force needs source Element:
+		if not source.impact_ready:
+			give null
+
+		let force_x be source.impact_x
+		let force_y be source.impact_y
+		let source.impact_ready be false
+
+		let radius_x be source.position_x - center_x
+		let radius_y be source.position_y - center_y
+		let torque be radius_y * force_x - radius_x * force_y
+		let angular_velocity be angular_velocity + torque * 0.08
+
+		if angular_velocity greater_than 3.5:
+			let angular_velocity be 3.5
+		else if angular_velocity less_than 0 - 3.5:
+			let angular_velocity be 0 - 3.5
+
+	has function apply_down_force needs source Element:
+		apply_force(source)
+
+	has function apply_up_force needs source Element:
+		apply_force(source)
+
+	has function apply_side_force needs source Element:
+		apply_force(source)
+
+	has function push_down needs source Element:
+		if is_center:
+			apply_down_force(source)
+		else:
+			let center be get_element_at(center_x, center_y)
+
+			if center is Wheel:
+				center.apply_down_force(source)
+
+	has function push_up needs source Element:
+		if is_center:
+			apply_up_force(source)
+		else:
+			let center be get_element_at(center_x, center_y)
+
+			if center is Wheel:
+				center.apply_up_force(source)
+
+	has function push_sideways needs source Element:
+		if is_center:
+			apply_side_force(source)
+		else:
+			let center be get_element_at(center_x, center_y)
+
+			if center is Wheel:
+				center.apply_side_force(source)
+
+	has function rotate_center:
+		let angular_motion be angular_motion + angular_velocity
+		let angular_velocity be angular_velocity * 0.88
+
+		if angular_velocity greater_than 0 - 0.02:
+			if angular_velocity less_than 0.02:
+				let angular_velocity be 0
+
+		if angular_motion greater_than 0.99:
+			let angular_motion be angular_motion - 1
+			let phase be phase + 1
+		else if angular_motion less_than 0 - 0.99:
+			let angular_motion be angular_motion + 1
+			let phase be phase - 1
+
+		if phase greater_than 15:
+			let phase be 0
+		else if phase less_than 0:
+			let phase be 15
+
+	has function grow_piece:
+		if distance greater_than 9:
+			give null
+
+		let target_x be position_x
+		let target_y be position_y
+
+		if arm equals 0:
+			let target_y be position_y + 1
+		else if arm equals 1:
+			let target_x be position_x - 1
+		else if arm equals 2:
+			let target_y be position_y - 1
+		else:
+			let target_x be position_x + 1
+
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+		let old_target be get_element_at(target_x, target_y)
+
+		spread_element()
+
+		let child be get_element_at(target_x, target_y)
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is Wheel:
+				if not (new_up equals child):
+					new_up.disappear()
+
+		if old_down equals null:
+			if new_down is Wheel:
+				if not (new_down equals child):
+					new_down.disappear()
+
+		if old_left equals null:
+			if new_left is Wheel:
+				if not (new_left equals child):
+					new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Wheel:
+				if not (new_right equals child):
+					new_right.disappear()
+
+		if old_target equals null:
+			if child is Wheel:
+				let child.is_center be false
+				let child.initialized be true
+				let child.center_x be center_x
+				let child.center_y be center_y
+				let child.arm be arm
+				let child.distance be distance + 1
+				let child.half_distance be half_distance
+				let child.half_step be not half_step
+
+				if half_step:
+					let child.half_distance be half_distance + 1
+
+	has function move_piece needs next_phase Number:
+		let target_x be center_x
+		let target_y be center_y
+		let piece_phase be next_phase
+
+		if arm equals 1:
+			let piece_phase be piece_phase + 12
+		else if arm equals 2:
+			let piece_phase be piece_phase + 8
+		else if arm equals 3:
+			let piece_phase be piece_phase + 4
+
+		if piece_phase greater_than 15:
+			let piece_phase be piece_phase - 16
+
+		if piece_phase equals 0:
+			let target_y be center_y + distance
+		else if piece_phase equals 1:
+			let target_x be center_x + half_distance
+			let target_y be center_y + distance
+		else if piece_phase equals 2:
+			let target_x be center_x + distance
+			let target_y be center_y + distance
+		else if piece_phase equals 3:
+			let target_x be center_x + distance
+			let target_y be center_y + half_distance
+		else if piece_phase equals 4:
+			let target_x be center_x + distance
+		else if piece_phase equals 5:
+			let target_x be center_x + distance
+			let target_y be center_y - half_distance
+		else if piece_phase equals 6:
+			let target_x be center_x + distance
+			let target_y be center_y - distance
+		else if piece_phase equals 7:
+			let target_x be center_x + half_distance
+			let target_y be center_y - distance
+		else if piece_phase equals 8:
+			let target_y be center_y - distance
+		else if piece_phase equals 9:
+			let target_x be center_x - half_distance
+			let target_y be center_y - distance
+		else if piece_phase equals 10:
+			let target_x be center_x - distance
+			let target_y be center_y - distance
+		else if piece_phase equals 11:
+			let target_x be center_x - distance
+			let target_y be center_y - half_distance
+		else if piece_phase equals 12:
+			let target_x be center_x - distance
+		else if piece_phase equals 13:
+			let target_x be center_x - distance
+			let target_y be center_y + half_distance
+		else if piece_phase equals 14:
+			let target_x be center_x - distance
+			let target_y be center_y + distance
+		else:
+			let target_x be center_x - half_distance
+			let target_y be center_y + distance
+
+		let position_x be target_x
+		let position_y be target_y
+
+	has function tick:
+		if apply_velocity():
+			give null
+
+		if is_center:
+			if not initialized:
+				initialize_cross()
+				give null
+
+			if not built:
+				let build_tick be build_tick + 1
+
+				if build_tick greater_than 9:
+					let built be true
+
+				give null
+
+			rotate_center()
+		else:
+			let center be get_element_at(center_x, center_y)
+
+			if not (center is Wheel):
+				disappear()
+				give null
+
+			if center.built equals true:
+				move_piece(center.phase)
+			else:
+				grow_piece()
+
+element Square is like Kinetic:
+	has color with Color(#8e44ad)
+	has is_center with true
+	has initialized with false
+	has built with false
+	has owner with null
+	has local_x with 0
+	has local_y with 0
+	has roll_direction with 1
+	has orphan_tick with 0
+	has uses_gravity with true
+	has rotation with 0
+	has rotation_motion with 0
+	has angular_velocity with 0
+	has collision_velocity_x with 0
+	has collision_velocity_y with 0
+	has collision_cooldown with 0
+	has thunder_cooldown with 0
+	has square_collision with false
+	has weight with 5
+	has sand_supporting with false
+
+	has function configure_piece needs piece Square piece_x Number piece_y Number:
+		let piece.is_center be false
+		let piece.initialized be true
+		let piece.built be true
+		let piece.owner be owner
+		let piece.local_x be piece_x
+		let piece.local_y be piece_y
+		let piece.uses_gravity be false
+		let piece.rotation be rotation
+
+	has function absolute needs value Number:
+		if value less_than 0:
+			give 0 - value
+
+		give value
+
+	has function is_shallow_rotated_edge needs cell_x Number cell_y Number:
+		if cell_x greater_than 0 - 3:
+			if cell_x less_than 8:
+				if cell_y greater_than 0 - 8:
+					if cell_y less_than 0 - 1:
+						if absolute(cell_x * 5 - cell_y * 9 - 53) less_than 5:
+							give true
+
+		if cell_x greater_than 1:
+			if cell_x less_than 8:
+				if cell_y greater_than 0 - 3:
+					if cell_y less_than 8:
+						if absolute(cell_x * 9 + cell_y * 5 - 53) less_than 5:
+							give true
+
+		if cell_x greater_than 0 - 8:
+			if cell_x less_than 3:
+				if cell_y greater_than 1:
+					if cell_y less_than 8:
+						if absolute(cell_x * 5 - cell_y * 9 + 53) less_than 5:
+							give true
+
+		if cell_x greater_than 0 - 8:
+			if cell_x less_than 0 - 1:
+				if cell_y greater_than 0 - 8:
+					if cell_y less_than 3:
+						if absolute(cell_x * 9 + cell_y * 5 + 53) less_than 5:
+							give true
+
+		give false
+
+	has function is_shape_cell needs cell_x Number cell_y Number shape_rotation Number:
+		let absolute_x be absolute(cell_x)
+		let absolute_y be absolute(cell_y)
+
+		if shape_rotation equals 0:
+			if cell_x greater_than 0 - 6:
+				if cell_x less_than 6:
+					if cell_y greater_than 0 - 6:
+						if cell_y less_than 6:
+							if cell_x equals 0 - 5:
+								give true
+
+							if cell_x equals 5:
+								give true
+
+							if cell_y equals 0 - 5:
+								give true
+
+							if cell_y equals 5:
+								give true
+
+			give false
+
+		if shape_rotation equals 1:
+			give is_shallow_rotated_edge(cell_x, cell_y)
+
+		if shape_rotation equals 2:
+			let diagonal_distance be absolute_x + absolute_y
+
+			give diagonal_distance equals 7
+
+		give is_shallow_rotated_edge(0 - cell_x, cell_y)
+
+	has function is_inside_shape needs cell_x Number cell_y Number shape_rotation Number:
+		let absolute_x be absolute(cell_x)
+		let absolute_y be absolute(cell_y)
+
+		if shape_rotation equals 0:
+			if absolute_x less_than 6:
+				give absolute_y less_than 6
+
+			give false
+
+		if shape_rotation equals 1:
+			if absolute(cell_x * 5 - cell_y * 9) less_than 58:
+				give absolute(cell_x * 9 + cell_y * 5) less_than 58
+
+			give false
+
+		if shape_rotation equals 2:
+			give absolute_x + absolute_y less_than 8
+
+		if absolute((0 - cell_x) * 5 - cell_y * 9) less_than 58:
+			give absolute((0 - cell_x) * 9 + cell_y * 5) less_than 58
+
+		give false
+
+	has function build_vertical needs remaining Number step Number current_y Number:
+		if remaining less_than 1:
+			give null
+
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+		let target_y be position_y + step
+
+		spread_element()
+
+		let child be get_element_at(position_x, target_y)
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is Square:
+				if not (new_up equals child):
+					new_up.disappear()
+
+		if old_down equals null:
+			if new_down is Square:
+				if not (new_down equals child):
+					new_down.disappear()
+
+		if old_left equals null:
+			if new_left is Square:
+				new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Square:
+				new_right.disappear()
+
+		if step less_than 0:
+			if old_up equals null:
+				if child is Square:
+					configure_piece(child, local_x, current_y + step)
+					child.build_vertical(remaining - 1, step, current_y + step)
+		else:
+			if old_down equals null:
+				if child is Square:
+					configure_piece(child, local_x, current_y + step)
+					child.build_vertical(remaining - 1, step, current_y + step)
+
+	has function build_horizontal needs remaining Number step Number current_x Number:
+		build_vertical(7, 0 - 1, 0)
+		build_vertical(7, 1, 0)
+
+		if remaining less_than 1:
+			give null
+
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+		let target_x be position_x + step
+
+		spread_element()
+
+		let child be get_element_at(target_x, position_y)
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is Square:
+				new_up.disappear()
+
+		if old_down equals null:
+			if new_down is Square:
+				new_down.disappear()
+
+		if old_left equals null:
+			if new_left is Square:
+				if not (new_left equals child):
+					new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Square:
+				if not (new_right equals child):
+					new_right.disappear()
+
+		if step less_than 0:
+			if old_left equals null:
+				if child is Square:
+					configure_piece(child, current_x + step, 0)
+					child.build_horizontal(remaining - 1, step, current_x + step)
+		else:
+			if old_right equals null:
+				if child is Square:
+					configure_piece(child, current_x + step, 0)
+					child.build_horizontal(remaining - 1, step, current_x + step)
+
+	has function grow_shape_grid:
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+
+		spread_element()
+
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is Square:
+				let next_y be local_y - 1
+
+				if next_y less_than 0 - 7:
+					new_up.disappear()
+				else:
+					configure_piece(new_up, local_x, next_y)
+					new_up.grow_shape_grid()
+
+		if old_down equals null:
+			if new_down is Square:
+				let next_y be local_y + 1
+
+				if next_y greater_than 7:
+					new_down.disappear()
+				else:
+					configure_piece(new_down, local_x, next_y)
+					new_down.grow_shape_grid()
+
+		if old_left equals null:
+			if new_left is Square:
+				let next_x be local_x - 1
+
+				if next_x less_than 0 - 7:
+					new_left.disappear()
+				else:
+					configure_piece(new_left, next_x, local_y)
+					new_left.grow_shape_grid()
+
+		if old_right equals null:
+			if new_right is Square:
+				let next_x be local_x + 1
+
+				if next_x greater_than 7:
+					new_right.disappear()
+				else:
+					configure_piece(new_right, next_x, local_y)
+					new_right.grow_shape_grid()
+
+	has function build_shape:
+		let local_x be 0
+		let local_y be 0
+		let color be Color(#000000)
+		grow_shape_grid()
+
+		for_every piece in get_all_elements():
+			if piece is Square:
+				if piece.owner equals owner:
+					if not piece.is_center:
+						if not is_shape_cell(piece.local_x, piece.local_y, rotation):
+							piece.disappear()
+
+		let built be true
+
+	has function clear_shape:
+		for_every piece in get_all_elements():
+			if piece is Square:
+				if not piece.is_center:
+					if piece.owner equals owner:
+						piece.disappear()
+
+	has function move_gas_to needs target Element target_x Number target_y Number:
+		if target_x less_than 0:
+			give false
+
+		if target_x greater_than 127:
+			give false
+
+		if target_y less_than 0:
+			give false
+
+		if target_y greater_than 127:
+			give false
+
+		let destination be get_element_at(target_x, target_y)
+
+		if not (destination equals null):
+			give false
+
+		let target.position_x be target_x
+		let target.position_y be target_y
+		let target.velocity_x be velocity_x * 0.2
+		let target.velocity_y be 0 - 0.4
+		give true
+
+	has function displace_gas needs target Element:
+		let center be find_center()
+
+		if not (center is Square):
+			give false
+
+		let mirrored_x be center.position_x * 2 - target.position_x
+		let mirrored_y be center.position_y * 2 - target.position_y
+
+		if center.move_gas_to(target, mirrored_x, mirrored_y):
+			give true
+
+		if center.move_gas_to(target, target.position_x, center.position_y - 8):
+			give true
+
+		if center.move_gas_to(target, center.position_x - 8, target.position_y):
+			give true
+
+		give center.move_gas_to(target, center.position_x + 8, target.position_y)
+
+	has function can_occupy_shape needs change_x Number change_y Number shape_rotation Number:
+		let center_occupant be get_element_at(position_x + change_x, position_y + change_y)
+
+		if not (center_occupant equals null):
+			if center_occupant is Thunder:
+				center_occupant.clear_for_particle()
+			else if center_occupant is Smoke:
+				if not displace_gas(center_occupant):
+					give false
+			else if center_occupant is Steam:
+				if not displace_gas(center_occupant):
+					give false
+			else if center_occupant is Sand:
+				handle_collision(center_occupant)
+				let remaining_center_occupant be get_element_at(position_x + change_x, position_y + change_y)
+
+				if not (remaining_center_occupant equals null):
+					give false
+			else if center_occupant is Water:
+				displace_water(center_occupant)
+				let remaining_center_occupant be get_element_at(position_x + change_x, position_y + change_y)
+
+				if not (remaining_center_occupant equals null):
+					give false
+			else:
+				handle_collision(center_occupant)
+
+				if center_occupant is Square:
+					if center_occupant.is_center:
+						if not (center_occupant.owner equals owner):
+							give false
+					else:
+						give false
+				else:
+					give false
+
+		go_through 0 to 14 with column:
+			go_through 0 to 14 with row:
+				let cell_x be column - 7
+				let cell_y be row - 7
+
+				if not is_shape_cell(cell_x, cell_y, shape_rotation):
+					do_nothing
+				else:
+					let target_x be position_x + change_x + cell_x
+					let target_y be position_y + change_y + cell_y
+
+					if target_x less_than 0:
+						give false
+
+					if target_x greater_than 127:
+						give false
+
+					if target_y less_than 0:
+						give false
+
+					if target_y greater_than 127:
+						give false
+
+					let occupant be get_element_at(target_x, target_y)
+
+					if not (occupant equals null):
+						if occupant is Thunder:
+							occupant.clear_for_particle()
+						else if occupant is Smoke:
+							if not displace_gas(occupant):
+								give false
+						else if occupant is Steam:
+							if not displace_gas(occupant):
+								give false
+						else if occupant is Sand:
+							handle_collision(occupant)
+							let remaining_occupant be get_element_at(target_x, target_y)
+
+							if not (remaining_occupant equals null):
+								give false
+						else if occupant is Water:
+							displace_water(occupant)
+							let remaining_occupant be get_element_at(target_x, target_y)
+
+							if not (remaining_occupant equals null):
+								give false
+						else:
+							handle_collision(occupant)
+
+							if occupant is Square:
+								if occupant.owner equals owner:
+									do_nothing
+								else:
+									give false
+							else:
+								give false
+
+		give true
+
+	has function can_occupy needs change_x Number change_y Number:
+		give can_occupy_shape(change_x, change_y, rotation)
+
+	has function move_horizontal:
+		go_through 1 to 8 with horizontal_step:
+			if motion_x greater_than 0.99:
+				if can_occupy(1, 0):
+					let position_x be position_x + 1
+					let motion_x be motion_x - 1
+					let roll_direction be 1
+					let rotation_motion be rotation_motion + 1
+				else:
+					if square_collision:
+						let velocity_x be 0
+					else:
+						let velocity_x be (0 - velocity_x) * 0.72
+
+					let motion_x be 0
+					stop_looping
+			else if motion_x less_than 0 - 0.99:
+				if can_occupy(0 - 1, 0):
+					let position_x be position_x - 1
+					let motion_x be motion_x + 1
+					let roll_direction be 0 - 1
+					let rotation_motion be rotation_motion - 1
+				else:
+					if square_collision:
+						let velocity_x be 0
+					else:
+						let velocity_x be (0 - velocity_x) * 0.72
+
+					let motion_x be 0
+					stop_looping
+			else:
+				stop_looping
+
+	has function is_rigid_support needs support Element:
+		if support is Stone:
+			give true
+
+		if support is Sand:
+			give true
+
+		if support is Wood:
+			give true
+
+		if support is BurningWood:
+			give true
+
+		if support is Square:
+			give true
+
+		if support is Wheel:
+			give true
+
+		give false
+
+	has function roll_on_slope:
+		let velocity_x be velocity_x * 0.72
+		let angular_velocity be angular_velocity * 0.78
+		let support_count be 0
+		let support_balance be 0
+
+		if velocity_x greater_than 0 - 0.12:
+			if velocity_x less_than 0.12:
+				let velocity_x be 0
+
+		if angular_velocity greater_than 0 - 0.04:
+			if angular_velocity less_than 0.04:
+				let angular_velocity be 0
+
+		go_through 0 to 14 with column:
+			go_through 0 to 14 with row:
+				let cell_x be column - 7
+				let cell_y be row - 7
+
+				if is_shape_cell(cell_x, cell_y, rotation):
+					if not is_shape_cell(cell_x, cell_y + 1, rotation):
+						let support be get_element_at(position_x + cell_x, position_y + cell_y + 1)
+
+						if not (support equals null):
+							if is_rigid_support(support):
+								let support_count be support_count + 1
+								let support_balance be support_balance + cell_x
+
+		if support_count less_than 1:
+			give null
+
+		let tipping_threshold be support_count * 0.5
+
+		if support_balance greater_than tipping_threshold:
+			let angular_velocity be angular_velocity - 0.55
+			let rotation_motion be rotation_motion - 1.5
+
+			if can_occupy(0 - 1, 0):
+				let position_x be position_x - 1
+				let velocity_x be velocity_x - 0.35
+				let roll_direction be 0 - 1
+		else if support_balance less_than 0 - tipping_threshold:
+			let angular_velocity be angular_velocity + 0.55
+			let rotation_motion be rotation_motion + 1.5
+
+			if can_occupy(1, 0):
+				let position_x be position_x + 1
+				let velocity_x be velocity_x + 0.35
+				let roll_direction be 1
+
+	has function has_sand_below:
+		let sand_support_count be 0
+		go_through 0 to 14 with column:
+			go_through 0 to 14 with row:
+				let cell_x be column - 7
+				let cell_y be row - 7
+
+				if is_shape_cell(cell_x, cell_y, rotation):
+					if not is_shape_cell(cell_x, cell_y + 1, rotation):
+						let support be get_element_at(position_x + cell_x, position_y + cell_y + 1)
+
+						if support is Sand:
+							let sand_support_count be sand_support_count + 1
+
+		let impact_load be absolute(velocity_x) * 0.4 + absolute(velocity_y) * 0.7
+		let required_support be weight + impact_load
+
+		give sand_support_count greater_than required_support - 1
+
+	has function is_supporting_sand needs target Sand:
+		go_through 0 to 14 with column:
+			go_through 0 to 14 with row:
+				let cell_x be column - 7
+				let cell_y be row - 7
+
+				if is_shape_cell(cell_x, cell_y, rotation):
+					if not is_shape_cell(cell_x, cell_y + 1, rotation):
+						if target.position_x equals position_x + cell_x:
+							if target.position_y equals position_y + cell_y + 1:
+								give true
+
+		give false
+
+	has function update_rotation:
+		let rotation_motion be rotation_motion + angular_velocity
+		let angular_velocity be angular_velocity * 0.97
+
+		if angular_velocity greater_than 0 - 0.02:
+			if angular_velocity less_than 0.02:
+				let angular_velocity be 0
+
+		if rotation_motion greater_than 3.99:
+			let next_rotation be rotation + 1
+
+			if next_rotation greater_than 3:
+				let next_rotation be 0
+
+			if can_occupy_shape(0, 0, next_rotation):
+				let rotation_motion be rotation_motion - 4
+				let rotation be next_rotation
+			else:
+				let rotation_motion be 0
+				let angular_velocity be (0 - angular_velocity) * 0.45
+		else if rotation_motion less_than 0 - 3.99:
+			let next_rotation be rotation - 1
+
+			if next_rotation less_than 0:
+				let next_rotation be 3
+
+			if can_occupy_shape(0, 0, next_rotation):
+				let rotation_motion be rotation_motion + 4
+				let rotation be next_rotation
+			else:
+				let rotation_motion be 0
+				let angular_velocity be (0 - angular_velocity) * 0.45
+
+	has function move_vertical:
+		go_through 1 to 8 with vertical_step:
+			if motion_y greater_than 0.99:
+				let sand_supporting be has_sand_below()
+
+				if can_occupy(0, 1):
+					let position_y be position_y + 1
+					let motion_y be motion_y - 1
+				else:
+					if square_collision:
+						let velocity_y be 0
+					else:
+						if has_sand_below():
+							let velocity_y be 0
+						else:
+							if velocity_y greater_than 2:
+								let velocity_y be (0 - velocity_y) * 0.48
+							else:
+								let velocity_y be 0
+
+					let motion_y be 0
+					roll_on_slope()
+					stop_looping
+			else if motion_y less_than 0 - 0.99:
+				if can_occupy(0, 0 - 1):
+					let position_y be position_y - 1
+					let motion_y be motion_y + 1
+				else:
+					let velocity_y be (0 - velocity_y) * 0.62
+					let motion_y be 0
+					stop_looping
+			else:
+				stop_looping
+
+	has function find_center:
+		if owner is Square:
+			if owner.is_center:
+				give owner
+
+		give null
+
+	has function struck_by_thunder needs bolt Thunder:
+		let center be find_center()
+
+		if center is Square:
+			if center.thunder_cooldown greater_than 0:
+				give null
+
+			bolt.blast(center, 7, 9)
+			let center.thunder_cooldown be 4
+			let radius_x be position_x - center.position_x
+			let radius_y be position_y - center.position_y
+			let torque be radius_x * center.velocity_y - radius_y * center.velocity_x
+			let center.angular_velocity be center.angular_velocity + torque * 0.025
+
+			if center.angular_velocity greater_than 3:
+				let center.angular_velocity be 3
+			else if center.angular_velocity less_than 0 - 3:
+				let center.angular_velocity be 0 - 3
+
+	has function shove needs target Element:
+		let center be find_center()
+
+		if not (center is Square):
+			give null
+
+		let horizontal_speed be absolute(center.collision_velocity_x)
+		let vertical_speed be absolute(center.collision_velocity_y)
+
+		if horizontal_speed less_than 0.2:
+			if vertical_speed less_than 0.2:
+				give null
+
+		if vertical_speed greater_than horizontal_speed:
+			let splash_speed be vertical_speed * 0.72 + 0.45
+
+			if target.position_x less_than center.position_x:
+				let target.velocity_x be center.collision_velocity_x - splash_speed
+			else if target.position_x greater_than center.position_x:
+				let target.velocity_x be center.collision_velocity_x + splash_speed
+			else if center.roll_direction greater_than 0:
+				let target.velocity_x be splash_speed
+			else:
+				let target.velocity_x be 0 - splash_speed
+
+			if center.collision_velocity_y greater_than 0:
+				let target.velocity_y be (0 - splash_speed) * 0.6
+			else:
+				let target.velocity_y be center.collision_velocity_y * 0.8
+		else:
+			let target.velocity_x be center.collision_velocity_x * 0.82
+			let target.velocity_y be center.collision_velocity_y * 0.35
+
+		if target.uses_gravity:
+			let target.airborne be true
+
+	has function move_water_to needs target Water target_x Number target_y Number direction_x Number:
+		if target_x less_than 0:
+			give false
+
+		if target_x greater_than 127:
+			give false
+
+		if target_y less_than 0:
+			give false
+
+		if target_y greater_than 127:
+			give false
+
+		let relative_x be target_x - position_x
+		let relative_y be target_y - position_y
+
+		if is_inside_shape(relative_x, relative_y, rotation):
+			give false
+
+		let destination be get_element_at(target_x, target_y)
+
+		if not (destination equals null):
+			give false
+
+		let target.position_x be target_x
+		let target.position_y be target_y
+
+		if not (target.position_x equals target_x):
+			give false
+
+		if not (target.position_y equals target_y):
+			give false
+
+		let target.velocity_x be velocity_x * 0.35 + direction_x * 0.45
+		let target.velocity_y be velocity_y * 0.15
+		let target.airborne be true
+		give true
+
+	has function compact_water_into needs target Water container Water:
+		if target equals container:
+			give false
+
+		let relative_x be container.position_x - position_x
+		let relative_y be container.position_y - position_y
+
+		if is_inside_shape(relative_x, relative_y, rotation):
+			give false
+
+		let container.compressed be container.compressed + target.compressed
+		target.disappear()
+		give true
+
+	has function compact_water needs target Water push_direction Number:
+		let first_side be get_element_at(position_x + push_direction * 8, target.position_y)
+
+		if first_side is Water:
+			if compact_water_into(target, first_side):
+				give true
+
+		let other_side be get_element_at(position_x - push_direction * 8, target.position_y)
+
+		if other_side is Water:
+			if compact_water_into(target, other_side):
+				give true
+
+		let upper_water be get_element_at(target.position_x, position_y - 8)
+
+		if upper_water is Water:
+			if compact_water_into(target, upper_water):
+				give true
+
+		let wider_side be get_element_at(position_x + push_direction * 9, target.position_y)
+
+		if wider_side is Water:
+			if compact_water_into(target, wider_side):
+				give true
+
+		let wider_other_side be get_element_at(position_x - push_direction * 9, target.position_y)
+
+		if wider_other_side is Water:
+			if compact_water_into(target, wider_other_side):
+				give true
+
+		give false
+
+	has function displace_water needs target Water:
+		let center be find_center()
+
+		if not (center is Square):
+			give false
+
+		let push_direction be center.roll_direction
+
+		if target.position_x less_than center.position_x:
+			let push_direction be 0 - 1
+		else if target.position_x greater_than center.position_x:
+			let push_direction be 1
+
+		let horizontal_speed be absolute(center.velocity_x)
+		let vertical_speed be absolute(center.velocity_y)
+
+		if horizontal_speed less_than 0.15:
+			if vertical_speed less_than 0.15:
+				if center.compact_water(target, push_direction):
+					give true
+
+		if center.move_water_to(target, center.position_x + push_direction * 8, target.position_y, push_direction):
+			give true
+
+		if center.move_water_to(target, center.position_x - push_direction * 8, target.position_y, 0 - push_direction):
+			give true
+
+		if center.move_water_to(target, center.position_x + push_direction * 9, target.position_y, push_direction):
+			give true
+
+		if center.move_water_to(target, center.position_x - push_direction * 9, target.position_y, 0 - push_direction):
+			give true
+
+		if center.move_water_to(target, center.position_x + push_direction * 10, target.position_y, push_direction):
+			give true
+
+		if center.move_water_to(target, center.position_x - push_direction * 10, target.position_y, 0 - push_direction):
+			give true
+
+		let mirrored_x be center.position_x * 2 - target.position_x
+		let mirrored_y be center.position_y * 2 - target.position_y
+
+		if center.move_water_to(target, mirrored_x, mirrored_y, 0 - push_direction):
+			give true
+
+		give center.compact_water(target, push_direction)
+
+	has function displace_sand needs target Sand:
+		let center be find_center()
+
+		if not (center is Square):
+			give null
+
+		let horizontal_speed be absolute(center.collision_velocity_x)
+		let vertical_speed be absolute(center.collision_velocity_y)
+
+		if horizontal_speed less_than 1.1:
+			if vertical_speed less_than 1.1:
+				give null
+
+		if center.sand_supporting:
+			if center.is_supporting_sand(target):
+				give null
+
+		let push_direction be center.roll_direction
+
+		if target.position_x less_than center.position_x:
+			let push_direction be 0 - 1
+		else if target.position_x greater_than center.position_x:
+			let push_direction be 1
+
+		let side be get_element_at(target.position_x + push_direction, target.position_y)
+		let horizontal_transfer be center.velocity_x * 0.7
+		let vertical_transfer be center.velocity_y * 0.6
+		let outward_force be absolute(center.velocity_y) * 0.35 + 1
+		let upward_force be absolute(center.velocity_y) * 0.45 + 0.8
+
+		if side equals null:
+			let target.position_x be target.position_x + push_direction
+			let target.velocity_x be horizontal_transfer + push_direction * outward_force
+
+			if vertical_transfer less_than 0:
+				let target.velocity_y be vertical_transfer
+			else:
+				let target.velocity_y be 0 - upward_force
+
+			let target.airborne be true
+			give null
+
+		let opposite be get_element_at(target.position_x - push_direction, target.position_y)
+
+		if opposite equals null:
+			let target.position_x be target.position_x - push_direction
+			let target.velocity_x be horizontal_transfer - push_direction * outward_force
+
+			if vertical_transfer less_than 0:
+				let target.velocity_y be vertical_transfer
+			else:
+				let target.velocity_y be 0 - upward_force
+
+			let target.airborne be true
+			give null
+
+		let upper_side be get_element_at(target.position_x + push_direction, target.position_y - 1)
+
+		if upper_side equals null:
+			let target.position_x be target.position_x + push_direction
+			let target.position_y be target.position_y - 1
+			let target.velocity_x be horizontal_transfer + push_direction * outward_force
+			let target.velocity_y be 0 - upward_force
+			let target.airborne be true
+			give null
+
+		let upper_opposite be get_element_at(target.position_x - push_direction, target.position_y - 1)
+
+		if upper_opposite equals null:
+			let target.position_x be target.position_x - push_direction
+			let target.position_y be target.position_y - 1
+			let target.velocity_x be horizontal_transfer - push_direction * outward_force
+			let target.velocity_y be 0 - upward_force
+			let target.airborne be true
+			give null
+
+		give null
+
+	has function eject_sand_to needs target Sand target_x Number target_y Number direction_x Number direction_y Number:
+		let destination be get_element_at(target_x, target_y)
+
+		if not (destination equals null):
+			give false
+
+		for_every candidate in get_all_elements():
+			if candidate is Square:
+				if candidate.is_center:
+					if not (candidate.owner equals owner):
+						if candidate.is_inside_shape(target_x - candidate.position_x, target_y - candidate.position_y, candidate.rotation):
+							give false
+
+		let target.position_x be target_x
+		let target.position_y be target_y
+
+		if not (target.position_x equals target_x):
+			give false
+
+		if not (target.position_y equals target_y):
+			give false
+
+		let target.velocity_x be velocity_x * 0.7 + direction_x * 0.45
+		let target.velocity_y be velocity_y * 0.6 + direction_y * 0.45
+		let target.airborne be true
+		give true
+
+	has function eject_interior_sand:
+		go_through 0 to 14 with column:
+			go_through 0 to 14 with row:
+				let relative_x be column - 7
+				let relative_y be row - 7
+
+				if is_inside_shape(relative_x, relative_y, rotation):
+					let target be get_element_at(position_x + relative_x, position_y + relative_y)
+
+					if target is Sand:
+						let preferred_direction be roll_direction
+
+						if relative_x less_than 0:
+							let preferred_direction be 0 - 1
+						else if relative_x greater_than 0:
+							let preferred_direction be 1
+
+						if eject_sand_to(target, position_x + preferred_direction * 8, target.position_y, preferred_direction, 0):
+							do_nothing
+						else if eject_sand_to(target, position_x - preferred_direction * 8, target.position_y, 0 - preferred_direction, 0):
+							do_nothing
+						else if eject_sand_to(target, target.position_x, position_y - 8, 0, 0 - 1):
+							do_nothing
+						else if eject_sand_to(target, target.position_x, position_y + 8, 0, 1):
+							do_nothing
+						else if eject_sand_to(target, position_x + preferred_direction * 9, target.position_y, preferred_direction, 0):
+							do_nothing
+						else:
+							do_nothing
+					else if target is Water:
+						displace_water(target)
+
+	has function repair_water_on_outline:
+		let repaired be false
+
+		go_through 0 to 14 with column:
+			go_through 0 to 14 with row:
+				let relative_x be column - 7
+				let relative_y be row - 7
+
+				if is_shape_cell(relative_x, relative_y, rotation):
+					let target be get_element_at(position_x + relative_x, position_y + relative_y)
+
+					if target is Water:
+						if displace_water(target):
+							let repaired be true
+
+		give repaired
+
+	has function handle_collision needs target Element:
+		if target is Square:
+			collide_with_square(target)
+		else if target is Sand:
+			displace_sand(target)
+		else if target is Water:
+			shove(target)
+		else if target is Seed:
+			shove(target)
+		else if target is Fire:
+			shove(target)
+		else if target is Bird:
+			shove(target)
+		else if target is FireBird:
+			shove(target)
+
+	has function collide_with_square needs other Square:
+		if owner equals other.owner:
+			give null
+
+		let first_center be find_center()
+		let second_center be other.find_center()
+
+		if not (first_center is Square):
+			give null
+
+		if not (second_center is Square):
+			give null
+
+		let first_center.square_collision be true
+		let second_center.square_collision be true
+
+		if first_center.collision_cooldown greater_than 0:
+			give null
+
+		if second_center.collision_cooldown greater_than 0:
+			give null
+
+		let distance_x be absolute(first_center.position_x - second_center.position_x)
+		let distance_y be absolute(first_center.position_y - second_center.position_y)
+
+		let contact_x be other.position_x - first_center.position_x
+		let contact_y be other.position_y - first_center.position_y
+		let first_spin be first_center.angular_velocity
+		let second_spin be second_center.angular_velocity
+		let first_center.angular_velocity be first_spin * 0.65 + second_spin * 0.25
+		let second_center.angular_velocity be second_spin * 0.65 + first_spin * 0.25
+
+		if distance_x greater_than distance_y:
+			let first_incoming be first_center.collision_velocity_x
+			let second_incoming be second_center.collision_velocity_x
+			let relative_speed be first_incoming - second_incoming
+			let first_center.velocity_x be first_incoming * 0.325 + second_incoming * 0.675
+			let second_center.velocity_x be first_incoming * 0.675 + second_incoming * 0.325
+			let horizontal_torque be contact_y * relative_speed * 0.06
+			let first_center.angular_velocity be first_center.angular_velocity + horizontal_torque
+			let second_center.angular_velocity be second_center.angular_velocity - horizontal_torque
+		else:
+			let upper_incoming be first_center.collision_velocity_y
+			let lower_incoming be second_center.collision_velocity_y
+			let first_is_upper be true
+
+			if first_center.position_y greater_than second_center.position_y:
+				let upper_incoming be second_center.collision_velocity_y
+				let lower_incoming be first_center.collision_velocity_y
+				let first_is_upper be false
+
+			let downward_impact be upper_incoming - lower_incoming
+
+			if downward_impact less_than 0:
+				let downward_impact be 0
+
+			let impact_speed be absolute(downward_impact)
+			let corner_torque be impact_speed * 0.12 + 0.3
+
+			if first_is_upper:
+				let first_center.velocity_y be lower_incoming + downward_impact * 0.28
+				let second_center.velocity_y be lower_incoming + downward_impact * 0.72
+			else:
+				let second_center.velocity_y be lower_incoming + downward_impact * 0.28
+				let first_center.velocity_y be lower_incoming + downward_impact * 0.72
+
+			if contact_x greater_than 0.5:
+				let first_center.angular_velocity be first_center.angular_velocity - corner_torque
+				let first_center.velocity_x be first_center.velocity_x - corner_torque * 0.3
+				let second_center.angular_velocity be second_center.angular_velocity + corner_torque * 0.65
+			else if contact_x less_than 0 - 0.5:
+				let first_center.angular_velocity be first_center.angular_velocity + corner_torque
+				let first_center.velocity_x be first_center.velocity_x + corner_torque * 0.3
+				let second_center.angular_velocity be second_center.angular_velocity - corner_torque * 0.65
+
+		let first_center.collision_cooldown be 2
+		let second_center.collision_cooldown be 2
+
+	has function tick:
+		if not initialized:
+			let initialized be true
+			let owner be get_element_at(position_x, position_y)
+			build_shape()
+			give null
+
+		if not is_center:
+			let orphan_tick be orphan_tick + 1
+
+			if orphan_tick greater_than 10:
+				let orphan_tick be 0
+
+				if find_center() equals null:
+					disappear()
+
+			give null
+
+		clear_shape()
+		eject_interior_sand()
+
+		if collision_cooldown greater_than 0:
+			let collision_cooldown be collision_cooldown - 1
+
+		if thunder_cooldown greater_than 0:
+			let thunder_cooldown be thunder_cooldown - 1
+
+		let square_collision be false
+		let sand_supporting be has_sand_below()
+		let collision_velocity_x be velocity_x
+		let collision_velocity_y be velocity_y
+
+		let motion_x be motion_x + velocity_x
+		let motion_y be motion_y + velocity_y
+		let velocity_y be velocity_y + 0.42
+		let velocity_x be velocity_x * 0.985
+
+		move_horizontal()
+		move_vertical()
+		let previous_rotation be rotation
+		update_rotation()
+		eject_interior_sand()
+		build_shape()
+
+		if repair_water_on_outline():
+			build_shape()
+
+element Seed is like Kinetic:
+	has color with Color(#4caf50)
+	has uses_gravity with true
+	has started with false
+
+	has function adjacent_water:
+		let upper_left be get_element_at(position_x - 1, position_y - 1)
+		let above be get_element_at(position_x, position_y - 1)
+		let upper_right be get_element_at(position_x + 1, position_y - 1)
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		let lower_left be get_element_at(position_x - 1, position_y + 1)
+		let below be get_element_at(position_x, position_y + 1)
+		let lower_right be get_element_at(position_x + 1, position_y + 1)
+
+		if upper_left is Water:
+			give upper_left
+
+		if above is Water:
+			give above
+
+		if upper_right is Water:
+			give upper_right
+
+		if left is Water:
+			give left
+
+		if right is Water:
+			give right
+
+		if lower_left is Water:
+			give lower_left
+
+		if below is Water:
+			give below
+
+		if lower_right is Water:
+			give lower_right
+
+		give null
+
+	has function tick:
+		if apply_velocity():
+			give null
+
+		let water be adjacent_water()
+
+		if water is Water:
+			if has_sand():
+				grow_tree(water)
+				give null
+
+		if not started:
+			let below be get_element_at(position_x, position_y + 1)
+
+			if below is Thunder:
+				below.clear_for_particle()
+				let position_y be position_y + 1
+				mark_impact(0, 1)
+			else if below equals null:
+				let position_y be position_y + 1
+				mark_impact(0, 1)
+			else if below is Water:
+				below.convert_to(Seed)
+				convert_to(Water)
+
+	has function has_sand:
+		let upper_left be get_element_at(position_x - 1, position_y - 1)
+		let above be get_element_at(position_x, position_y - 1)
+		let upper_right be get_element_at(position_x + 1, position_y - 1)
+		let below be get_element_at(position_x, position_y + 1)
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		let lower_left be get_element_at(position_x - 1, position_y + 1)
+		let lower_right be get_element_at(position_x + 1, position_y + 1)
+
+		if upper_left is Sand:
+			give true
+
+		if above is Sand:
+			give true
+
+		if upper_right is Sand:
+			give true
+
+		if below is Sand:
+			give true
+
+		if left is Sand:
+			give true
+
+		if right is Sand:
+			give true
+
+		if lower_left is Sand:
+			give true
+
+		if lower_right is Sand:
+			give true
+
+		give false
+
+	has function make_first_wood needs water Water:
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+
+		spread_element()
+
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_down equals null:
+			if new_down is Seed:
+				new_down.disappear()
+
+		if old_left equals null:
+			if new_left is Seed:
+				new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Seed:
+				new_right.disappear()
+
+		if old_up equals null:
+			if new_up is Seed:
+				new_up.convert_to(Wood)
+				let new_up.root_x be position_x
+				let new_up.root_y be position_y
+				let new_up.parent_x be position_x
+				let new_up.parent_y be position_y
+				water.disappear()
+				let started be true
+				give true
+		else if new_up is Water:
+			new_up.convert_to(Wood)
+			let new_up.root_x be position_x
+			let new_up.root_y be position_y
+			let new_up.parent_x be position_x
+			let new_up.parent_y be position_y
+			let started be true
+			give true
+
+		give false
+
+	has function grow_tree needs water Water:
+		if not started:
+			make_first_wood(water)
+
+			give null
+
+		for_every candidate in get_all_elements():
+			if candidate is Wood:
+				if candidate.root_x equals position_x:
+					if candidate.root_y equals position_y:
+						if candidate.tip equals true:
+							if candidate.connected equals true:
+								if candidate.grow(water):
+									give null
+
+element Wood is like Kinetic:
+	has color with Color(#7a5430)
+	has uses_gravity with true
+	has root_x with 0
+	has root_y with 0
+	has parent_x with 0
+	has parent_y with 0
+	has tip with true
+	has connected with true
+	has direction with 1
+	has horizontal_left with 0
+	has vertical_height with 0
+	has branch_phase with 0
+	has heat with 0
+
+	has function tick:
+		if apply_velocity():
+			give null
+
+		let parent be get_element_at(parent_x, parent_y)
+
+		if parent is Seed:
+			let connected be true
+		else if parent is Wood:
+			if parent.connected equals true:
+				let connected be true
+			else:
+				let connected be false
+		else:
+			let connected be false
+
+		if not connected:
+			let tip be false
+
+	has function make_child needs child_x Number child_y Number next_horizontal Number next_height Number next_direction Number next_branch Number water Water:
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+		let old_child be get_element_at(child_x, child_y)
+
+		spread_element()
+
+		let child be get_element_at(child_x, child_y)
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is Wood:
+				if not (new_up equals child):
+					new_up.disappear()
+
+		if old_down equals null:
+			if new_down is Wood:
+				if not (new_down equals child):
+					new_down.disappear()
+
+		if old_left equals null:
+			if new_left is Wood:
+				if not (new_left equals child):
+					new_left.disappear()
+
+		if old_right equals null:
+			if new_right is Wood:
+				if not (new_right equals child):
+					new_right.disappear()
+
+		if child is Water:
+			child.convert_to(Wood)
+
+		if child is Wood:
+			let child.root_x be root_x
+			let child.root_y be root_y
+			let child.parent_x be position_x
+			let child.parent_y be position_y
+			let child.direction be next_direction
+			let child.horizontal_left be next_horizontal
+			let child.vertical_height be next_height
+			let child.branch_phase be next_branch
+
+			if old_child equals null:
+				water.disappear()
+
+			give true
+
+		give false
+
+	has function grow needs water Water:
+		if not tip:
+			give false
+
+		if not connected:
+			give false
+
+		if branch_phase equals 1:
+			let grew_left be make_child(position_x - 1, position_y, 2, 0, 0 - 1, 0, water)
+
+			if grew_left:
+				let branch_phase be 2
+
+			give grew_left
+
+		if branch_phase equals 2:
+			let grew_right be make_child(position_x + 1, position_y, 2, 0, 1, 0, water)
+
+			if grew_right:
+				let tip be false
+
+			give grew_right
+
+		if horizontal_left greater_than 0:
+			let grew_sideways be make_child(position_x + direction, position_y, horizontal_left - 1, vertical_height, direction, 0, water)
+
+			if grew_sideways:
+				let tip be false
+
+			give grew_sideways
+
+		let next_height be vertical_height + 1
+		let next_branch be 0
+
+		if next_height equals 3:
+			let next_height be 0
+			let next_branch be 1
+
+		let grew_up be make_child(position_x, position_y - 1, 0, next_height, direction, next_branch, water)
+
+		if grew_up:
+			let tip be false
+
+		give grew_up
+
+element BurningWood is like Kinetic:
+	has color with Color(#e85d24)
+	has uses_gravity with true
+	has lifetime with 36
+	has emit_tick with 0
+
+	has function emit_fire:
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+
+		spread_element()
+
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is BurningWood:
+				new_up.convert_to(Fire)
+
+		if old_down equals null:
+			if new_down is BurningWood:
+				new_down.convert_to(Fire)
+
+		if old_left equals null:
+			if new_left is BurningWood:
+				new_left.convert_to(Fire)
+
+		if old_right equals null:
+			if new_right is BurningWood:
+				new_right.convert_to(Fire)
+
+	has function tick:
+		if apply_velocity():
+			give null
+
+		let lifetime be lifetime - 1
+
+		if lifetime less_than 1:
+			convert_to(Smoke)
+			give null
+
+		let emit_tick be emit_tick + 1
+
+		if emit_tick equals 5:
+			let emit_tick be 0
+			emit_fire()
+
+element Bird is like FlockingBird:
+	has color with Color(#f4d35e)
+
+	has function ignite_if_touching_fire:
+		let above be get_element_at(position_x, position_y - 1)
+		let below be get_element_at(position_x, position_y + 1)
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+
+		if above is Fire:
+			above.disappear()
+			convert_to(FireBird)
+			give true
+
+		if below is Fire:
+			below.disappear()
+			convert_to(FireBird)
+			give true
+
+		if left is Fire:
+			left.disappear()
+			convert_to(FireBird)
+			give true
+
+		if right is Fire:
+			right.disappear()
+			convert_to(FireBird)
+			give true
+
+		give false
+
+	has function tick:
+		if ignite_if_touching_fire():
+			give null
+
+		move_with_flock()
+
+element FireBird is like FlockingBird:
+	has color with Color(#ff2f00)
+	has lifetime with 45
+	has emit_tick with 0
+
+	has function emit_one_fire:
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+
+		spread_element()
+
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is FireBird:
+				new_up.disappear()
+
+		if old_left equals null:
+			if new_left is FireBird:
+				new_left.disappear()
+
+		if old_right equals null:
+			if new_right is FireBird:
+				new_right.disappear()
+
+		if old_down equals null:
+			if new_down is FireBird:
+				new_down.convert_to(Fire)
+
+	has function tick:
+		let lifetime be lifetime - 1
+
+		if lifetime less_than 1:
+			disappear()
+			give null
+
+		move_with_flock()
+		let emit_tick be emit_tick + 1
+
+		if emit_tick equals 6:
+			let emit_tick be 0
+			emit_one_fire()
+
+interaction Seed s with Water w:
+	if s.has_sand():
+		s.grow_tree(w)
+
+interaction Wheel r with Water w:
+	r.push_down(w)
+
+interaction Wheel r with Sand s:
+	r.push_down(s)
+
+interaction Wheel r with Seed s:
+	r.push_down(s)
+
+interaction Wheel r with Smoke s:
+	r.push_up(s)
+
+interaction Wheel r with Steam s:
+	r.push_up(s)
+
+interaction Wheel r with Fire f:
+	r.push_up(f)
+
+interaction Wheel r with Bird b:
+	r.push_sideways(b)
+
+interaction Wheel r with FireBird b:
+	r.push_sideways(b)
+
+interaction Thunder t with Water w:
+	if not w.electrified:
+		t.blast(w, 3.5, 5.5)
+		let w.electrified be true
+		let w.steam_delay be 0
+
+interaction Thunder t with Sand s:
+	t.blast(s, 4, 6)
+
+interaction Thunder t with Fire f:
+	t.blast(f, 4, 6)
+
+interaction Thunder t with Smoke s:
+	t.blast(s, 4, 6)
+
+interaction Thunder t with Steam s:
+	t.blast(s, 4, 6)
+
+interaction Thunder t with Wheel w:
+	t.blast(w, 3.5, 5.5)
+
+interaction Thunder t with Wood w:
+	w.convert_to(BurningWood)
+	t.blast(w, 3.5, 5.5)
+
+interaction Thunder t with BurningWood w:
+	t.blast(w, 3.5, 5.5)
+
+interaction Thunder t with Seed s:
+	s.convert_to(BurningWood)
+	t.blast(s, 4, 6)
+
+interaction Thunder t with Bird b:
+	b.convert_to(FireBird)
+	t.blast(b, 4.5, 6.5)
+
+interaction Thunder t with FireBird b:
+	t.blast(b, 4.5, 6.5)
+
+interaction Thunder t with Square s:
+	s.struck_by_thunder(t)
+
+interaction Square q with Sand s:
+	q.displace_sand(s)
+
+interaction Square q with Water w:
+	q.shove(w)
+
+interaction Square q with Seed s:
+	q.shove(s)
+
+interaction Square q with Fire f:
+	q.shove(f)
+
+interaction Square q with Bird b:
+	q.shove(b)
+
+interaction Square q with FireBird b:
+	q.shove(b)
+
+interaction Square first with Square second:
+	first.collide_with_square(second)
+
+interaction Fire f with Water w:
+	w.convert_to(Steam)
+	f.disappear()
+
+interaction Fire f with Wood w:
+	let w.heat be w.heat + 1
+
+	if w.heat greater_than 3:
+		w.convert_to(BurningWood)
+
+interaction Fire f with Seed s:
+	s.convert_to(BurningWood)
+
+interaction BurningWood b with Wood w:
+	if w.position_y less_than b.position_y:
+		let w.heat be w.heat + 1
+	else:
+		let w.heat be w.heat + 0.25
+
+	if w.heat greater_than 4:
+		w.convert_to(BurningWood)
+
+interaction BurningWood b with Water w:
+	b.convert_to(Wood)
+	w.convert_to(Steam)
+
+interaction Fire f with Bird b:
+	b.convert_to(FireBird)
+	f.disappear()
+
+interaction FireBird b with Water w:
+	b.convert_to(Smoke)
+	w.convert_to(Steam)

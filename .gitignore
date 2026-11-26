@@ -31,3 +31,6 @@ dist-ssr
 **/.antlr/
 
 docs/
+
+# Local design-tool state
+.impeccable/

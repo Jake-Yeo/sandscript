@@ -42,6 +42,7 @@ function makeFuncDef(name: string, statements: Statement[] = []): ElementFuncDef
         name: ident(name),
         args: [],
         statements,
+        hasBody: true,
     };
 }
 

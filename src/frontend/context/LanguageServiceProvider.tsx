@@ -1,41 +1,37 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { LanguageServiceContext } from './LanguageServiceContext';
-import { CharStream, Token } from 'antlr4ng';
-import { DSLLexer } from '../../generated/DSLLexer';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { LanguageServiceContext, type CompileStatus } from './LanguageServiceContext';
+import type { Token } from 'antlr4ng';
+import { lex } from '@/lib/lex';
 import type { CompilerServiceRequest, CompilerServiceResponse } from '@/lib/compilerService/worker';
 import { useMainContext } from './MainContext';
+import { friendlyError, type FriendlyError } from '@/lib/friendlyError';
 
-function lex(source: string): Token[] {
-  const lexer = new DSLLexer(CharStream.fromString(source));
-  lexer.removeErrorListeners();
-  return lexer.getAllTokens();
-}
+type Props = { children: ReactNode; initialText: string };
 
-export default function LanguageServiceProvider({ children }: { children: ReactNode }) {
+export default function LanguageServiceProvider({ children, initialText }: Props) {
   const { setGame } = useMainContext();
-
-  const [text, setTextState] = useState('');
-  const [tokens, setTokens] = useState<Token[]>([]);
-
-  const [isCompiling, setIsCompiling] = useState(false);
+  const [text, setTextState] = useState(initialText);
+  const [tokens, setTokens] = useState<Token[]>(() => lex(initialText));
+  const [status, setStatus] = useState<CompileStatus>('idle');
+  const [error, setError] = useState<FriendlyError | null>(null);
+  const [runId, setRunId] = useState(0);
   const isCompilingRef = useRef(false);
-
   const workerRef = useRef<Worker | null>(null);
+  const textRef = useRef(text);
 
-  const setText = (value: string) => {
+  const setText = useCallback((value: string) => {
+    textRef.current = value;
     setTokens(lex(value));
     setTextState(value);
-  }
+  }, []);
 
-  const compile = () => {
+  const compile = useCallback(() => {
     if (isCompilingRef.current || !workerRef.current) return;
-
-    setIsCompiling(true);
     isCompilingRef.current = true;
-
-    const req: CompilerServiceRequest = { source: text };
+    setStatus('compiling');
+    const req: CompilerServiceRequest = { source: textRef.current };
     workerRef.current.postMessage(req);
-  }
+  }, []);
 
   useEffect(() => {
     const worker = new Worker(new URL('../lib/compilerService/worker.ts', import.meta.url), {
@@ -43,40 +39,36 @@ export default function LanguageServiceProvider({ children }: { children: ReactN
     });
     workerRef.current = worker;
 
-    const onCompileDone = () => {
-      setIsCompiling(false);
-      isCompilingRef.current = false;
-    };
-
     worker.onmessage = (event: MessageEvent<CompilerServiceResponse>) => {
-      onCompileDone();
-
+      isCompilingRef.current = false;
       if (event.data.type === 'error') {
-        console.error(event.data.message);
+        setStatus('error');
+        setError(friendlyError(event.data.message, 'compile'));
         return;
       }
-
+      setStatus('ok');
+      setError(null);
       setGame(event.data.game);
+      setRunId((id) => id + 1);
     };
-
     worker.onerror = (event) => {
-      onCompileDone();
-      console.error(event.message);
+      isCompilingRef.current = false;
+      setStatus('error');
+      setError(friendlyError(event.message, 'compile'));
     };
 
-    return () => {
-      worker.terminate();
-    };
+    return () => worker.terminate();
   }, [setGame]);
-
-
 
   const value = {
     compile,
-    isCompiling,
+    isCompiling: status === 'compiling',
+    status,
+    error,
     tokens,
     text,
     setText,
+    runId,
   };
 
   return (

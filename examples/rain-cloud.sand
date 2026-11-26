@@ -1,0 +1,31 @@
+# Rain Cloud
+# Paint a Cloud near the top and watch it rain.
+# place_element(Type, x, y) puts a pixel anywhere.
+# random(low, high) picks a number for you.
+
+element Cloud:
+	has color with Color(#e8edf2)
+
+	has function tick:
+		if chance(3):
+			let position_x be position_x + random(-1, 1)
+		if chance(3):
+			place_element(Rain, position_x + random(-1, 1), position_y + 1)
+
+element Rain:
+	has color with Color(#5b9bf0)
+
+	has function tick:
+		if is_empty(position_x, position_y + 1):
+			let position_y be position_y + 1
+		else:
+			convert_to(Puddle)
+
+element Puddle:
+	has color with Color(#2f6fd6)
+
+	has function tick:
+		if is_empty(position_x, position_y + 1):
+			let position_y be position_y + 1
+		else:
+			let position_x be position_x + random(-1, 1)

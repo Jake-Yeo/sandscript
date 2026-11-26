@@ -1,0 +1,366 @@
+element GameBuilder:
+	has color with Color(#111827)
+	has initialized with false
+	has root with null
+	has local_x with 0
+	has local_y with 0
+	has build_age with 0
+	has quiet_ticks with 0
+
+	has function configure_piece needs piece GameBuilder piece_x Number piece_y Number:
+		let piece.initialized be true
+		let piece.root be root
+		let piece.local_x be piece_x
+		let piece.local_y be piece_y
+
+	has function grow_screen:
+		let old_up be get_element_at(position_x, position_y - 1)
+		let old_down be get_element_at(position_x, position_y + 1)
+		let old_left be get_element_at(position_x - 1, position_y)
+		let old_right be get_element_at(position_x + 1, position_y)
+		spread_element()
+		let new_up be get_element_at(position_x, position_y - 1)
+		let new_down be get_element_at(position_x, position_y + 1)
+		let new_left be get_element_at(position_x - 1, position_y)
+		let new_right be get_element_at(position_x + 1, position_y)
+
+		if old_up equals null:
+			if new_up is GameBuilder:
+				let next_y be local_y - 1
+				if next_y less_than 0:
+					new_up.disappear()
+				else:
+					configure_piece(new_up, local_x, next_y)
+
+		if old_down equals null:
+			if new_down is GameBuilder:
+				let next_y be local_y + 1
+				if next_y greater_than 107:
+					new_down.disappear()
+				else:
+					configure_piece(new_down, local_x, next_y)
+
+		if old_left equals null:
+			if new_left is GameBuilder:
+				let next_x be local_x - 1
+				if next_x less_than 20:
+					new_left.disappear()
+				else:
+					configure_piece(new_left, next_x, local_y)
+
+		if old_right equals null:
+			if new_right is GameBuilder:
+				let next_x be local_x + 1
+				if next_x greater_than 127:
+					new_right.disappear()
+				else:
+					configure_piece(new_right, next_x, local_y)
+
+	has function finish_piece needs piece GameBuilder game_controller Element:
+		let pixel_x be piece.local_x
+		let pixel_y be piece.local_y
+		piece.convert_to(ScenePixel)
+		let piece.game be game_controller
+		let piece.screen_x be pixel_x
+		let piece.screen_y be pixel_y
+
+	has function finish_screen:
+		let game_controller be root
+		for_every piece in get_all_elements():
+			if piece is GameBuilder:
+				if piece.root equals game_controller:
+					if not (piece equals game_controller):
+						finish_piece(piece, game_controller)
+
+		let pixel_x be local_x
+		let pixel_y be local_y
+		convert_to(SceneController)
+		let game be game_controller
+		let screen_x be pixel_x
+		let screen_y be pixel_y
+		let frame be 1
+
+	has function duplicate_seed:
+		for_every candidate in get_all_elements():
+			if candidate is GameBuilder:
+				if candidate.root equals null:
+					if not (candidate equals get_element_at(position_x, position_y)):
+						if candidate.position_x less_than position_x:
+							give true
+						if candidate.position_x equals position_x:
+							if candidate.position_y less_than position_y:
+								give true
+		give false
+
+	has function tick:
+		for_every existing in get_all_elements():
+			if existing is SceneController:
+				disappear()
+				give null
+
+		if initialized:
+			grow_screen()
+			if root equals get_element_at(position_x, position_y):
+				let build_age be build_age + 1
+				if build_age greater_than 145:
+					finish_screen()
+			give null
+
+		if duplicate_seed():
+			disappear()
+			give null
+
+		let quiet_ticks be quiet_ticks + 1
+		if quiet_ticks less_than 2:
+			give null
+		let initialized be true
+		let root be get_element_at(position_x, position_y)
+		let local_x be position_x
+		let local_y be position_y
+		if local_x less_than 20:
+			let local_x be 20
+		if local_y greater_than 107:
+			let local_y be 107
+		grow_screen()
+
+element ScenePixel:
+	has color with Color(#87ceeb)
+	has game with null
+	has screen_x with 0
+	has screen_y with 0
+	has rendered_frame with 0
+
+	has function absolute needs value Number:
+		if value less_than 0:
+			give 0 - value
+		give value
+
+	has function paint_background:
+		if screen_y less_than 52:
+			let color be Color(#78b7e3)
+		else if screen_y less_than 55:
+			let color be Color(#d7e5ec)
+		else if screen_y less_than 66:
+			let color be Color(#7fa06b)
+		else if screen_y less_than 82:
+			let color be Color(#678755)
+		else:
+			let color be Color(#526f45)
+
+	has function camera_lateral needs world_x Number world_z Number:
+		let difference_x be world_x - game.camera_x
+		let difference_z be world_z - game.camera_z
+		if game.yaw equals 0:
+			give difference_x
+		if game.yaw equals 1:
+			give 0 - difference_z
+		if game.yaw equals 2:
+			give 0 - difference_x
+		give difference_z
+
+	has function camera_depth needs world_x Number world_z Number:
+		let difference_x be world_x - game.camera_x
+		let difference_z be world_z - game.camera_z
+		if game.yaw equals 0:
+			give difference_z
+		if game.yaw equals 1:
+			give difference_x
+		if game.yaw equals 2:
+			give 0 - difference_z
+		give 0 - difference_x
+
+	has function paint_box needs world_x Number world_z Number size Number shade Color:
+		let depth be camera_depth(world_x, world_z)
+		if depth less_than 2:
+			give null
+		let lateral be camera_lateral(world_x, world_z)
+		let center_x be 74 + lateral * 38 / depth
+		let half_width be size * 34 / depth
+		let half_height be size * 42 / depth
+		if half_width less_than 1:
+			let half_width be 1
+		if half_height less_than 1:
+			let half_height be 1
+		let left_edge be center_x - half_width
+		let right_edge be center_x + half_width
+		let top_edge be 54 - half_height * 2
+		let bottom_edge be 54 + half_height
+		if screen_x greater_than left_edge:
+			if screen_x less_than right_edge:
+				if screen_y greater_than top_edge:
+					if screen_y less_than bottom_edge:
+						let color be shade
+						if screen_x less_than left_edge + 2:
+							let color be Color(#111827)
+						else if screen_x greater_than right_edge - 2:
+							let color be Color(#111827)
+						else if screen_y less_than top_edge + 2:
+							let color be Color(#f8fafc)
+						else if screen_y greater_than bottom_edge - 2:
+							let color be Color(#111827)
+
+	has function paint_center_marker:
+		if screen_x greater_than 72:
+			if screen_x less_than 76:
+				if screen_y greater_than 50:
+					if screen_y less_than 58:
+						let color be Color(#ffffff)
+		if screen_y greater_than 52:
+			if screen_y less_than 56:
+				if screen_x greater_than 70:
+					if screen_x less_than 78:
+						let color be Color(#ffffff)
+
+	has function render_scene:
+		paint_background()
+		paint_box(0 - 7, 24, 3, Color(#ef4444))
+		paint_box(8, 31, 5, Color(#3b82f6))
+		paint_box(0, 15, 2, Color(#f59e0b))
+		paint_box(12, 18, 2, Color(#8b5cf6))
+		paint_box(0 - 12, 39, 6, Color(#10b981))
+		paint_center_marker()
+
+	has function tick:
+		if game is SceneController:
+			if not (rendered_frame equals game.frame):
+				render_scene()
+				let rendered_frame be game.frame
+
+element SceneController is like ScenePixel:
+	has camera_x with 0
+	has camera_z with 0
+	has yaw with 0
+	has frame with 1
+
+	has function move_forward needs amount Number:
+		if yaw equals 0:
+			let camera_z be camera_z + amount
+		else if yaw equals 1:
+			let camera_x be camera_x + amount
+		else if yaw equals 2:
+			let camera_z be camera_z - amount
+		else:
+			let camera_x be camera_x - amount
+		let frame be frame + 1
+
+	has function move_sideways needs amount Number:
+		if yaw equals 0:
+			let camera_x be camera_x + amount
+		else if yaw equals 1:
+			let camera_z be camera_z - amount
+		else if yaw equals 2:
+			let camera_x be camera_x - amount
+		else:
+			let camera_z be camera_z + amount
+		let frame be frame + 1
+
+	has function rotate needs amount Number:
+		let yaw be yaw + amount
+		if yaw greater_than 3:
+			let yaw be 0
+		else if yaw less_than 0:
+			let yaw be 3
+		let frame be frame + 1
+
+	has function tick:
+		if not (rendered_frame equals frame):
+			render_scene()
+			let rendered_frame be frame
+
+element Movement:
+	has color with Color(#22c55e)
+	has age with 0
+	has handled with false
+
+	has function controller:
+		for_every candidate in get_all_elements():
+			if candidate is SceneController:
+				give candidate
+		give null
+
+	has function detect_drag:
+		let game be controller()
+		if game equals null:
+			give null
+		let above be get_element_at(position_x, position_y - 1)
+		let below be get_element_at(position_x, position_y + 1)
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		if above is Movement:
+			if above.age greater_than age:
+				game.move_forward(0 - 1)
+				give null
+		if below is Movement:
+			if below.age greater_than age:
+				game.move_forward(1)
+				give null
+		if left is Movement:
+			if left.age greater_than age:
+				game.move_sideways(1)
+				give null
+		if right is Movement:
+			if right.age greater_than age:
+				game.move_sideways(0 - 1)
+
+	has function tick:
+		if position_x greater_than 19:
+			disappear()
+			give null
+		if position_y greater_than 107:
+			disappear()
+			give null
+		if not handled:
+			detect_drag()
+			let handled be true
+		let age be age + 1
+		if age greater_than 10:
+			disappear()
+
+element Rotation:
+	has color with Color(#38bdf8)
+	has age with 0
+	has handled with false
+
+	has function controller:
+		for_every candidate in get_all_elements():
+			if candidate is SceneController:
+				give candidate
+		give null
+
+	has function detect_drag:
+		let game be controller()
+		if game equals null:
+			give null
+		let left be get_element_at(position_x - 1, position_y)
+		let right be get_element_at(position_x + 1, position_y)
+		let above be get_element_at(position_x, position_y - 1)
+		let below be get_element_at(position_x, position_y + 1)
+		if left is Rotation:
+			if left.age greater_than age:
+				game.rotate(1)
+				give null
+		if right is Rotation:
+			if right.age greater_than age:
+				game.rotate(0 - 1)
+				give null
+		if above is Rotation:
+			if above.age greater_than age:
+				game.move_forward(1)
+				give null
+		if below is Rotation:
+			if below.age greater_than age:
+				game.move_forward(0 - 1)
+
+	has function tick:
+		if position_y less_than 108:
+			disappear()
+			give null
+		if position_x less_than 20:
+			disappear()
+			give null
+		if not handled:
+			detect_drag()
+			let handled be true
+		let age be age + 1
+		if age greater_than 10:
+			disappear()

@@ -114,6 +114,15 @@ get_all_elements(): returns array of all elements in the game
 convert_to(Element): converts the given element into another element type
 spread_element(): adds the given element to all four adjacent sides.
 disappear(): removes the given element from the grid
+get_element_at(x, y): returns the element at (x, y), or null if the cell is empty or outside the grid
+# Added in the 2026-11 polish pass
+random(low, high): returns a whole number from low to high, inclusive
+chance(percent): returns true roughly percent% of the time
+place_element(ElementType, x, y): spawns a new element at (x, y) if that cell is empty and inside the grid; returns it, or null
+is_empty(x, y): true when (x, y) is inside the grid and unoccupied
+swap_with(other): swaps this element's position with another element
+grid_width(), grid_height(): the grid size (128 x 128 in the app)
+`x is Family` is true for elements that inherit from Family through "is like"
 
 
 Examples
